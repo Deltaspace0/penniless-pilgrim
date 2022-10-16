@@ -63,9 +63,9 @@ gameControl_ game config = widgetNode where
     width  = _gcWidth config
     height = _gcHeight config
     (cols, rows) = getBounds grid
-    linkSizeW = width/(fromIntegral cols)
-    linkSizeH = height/(fromIntegral rows)
-    linkSize  = min linkSizeW linkSizeH
+    factorW = (fromIntegral cols)+2/linkToNodeRatio
+    factorH = (fromIntegral rows)+2/linkToNodeRatio
+    linkSize  = min (width/factorW) (height/factorH)
     nodeSize  = linkSize/linkToNodeRatio
     linkWidth = nodeSize/nodeToWidthRatio
     handleEvent wenv node target evt = case evt of
@@ -80,9 +80,11 @@ gameControl_ game config = widgetNode where
         mapM_ (drawHlink renderer vp) $ getHlinkIndices grid
         mapM_ (drawVlink renderer vp) $ getVlinkIndices grid
         mapM_ (drawNode renderer vp)  $ getNodeIndices grid
+    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
+    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
     drawNode renderer vp (i, j) = do
-        let x = vp ^. L.x + linkSize*(fromIntegral i) - nodeSize
-            y = vp ^. L.y + linkSize*(fromIntegral j) - nodeSize
+        let x = (vx vp) + linkSize*(fromIntegral i)
+            y = (vy vp) + linkSize*(fromIntegral j)
             d = nodeSize*2
             node = getNode (i, j) grid
         beginPath renderer
@@ -92,8 +94,8 @@ gameControl_ game config = widgetNode where
         renderEllipse renderer $ Rect x y d d
         fill renderer
     drawHlink renderer vp (i, j) = do
-        let x = vp ^. L.x + linkSize*(fromIntegral i)
-            y = vp ^. L.y + linkSize*(fromIntegral j)
+        let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
+            y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
             linkM = getHlink (i, j) grid
             link = fromJust linkM
             (color', form') = if null linkM
@@ -133,8 +135,8 @@ gameControl_ game config = widgetNode where
                 renderLineTo renderer $ Point (x' + 1) y
                 stroke renderer
     drawVlink renderer vp (i, j) = do
-        let x = vp ^. L.x + linkSize*(fromIntegral i)
-            y = vp ^. L.y + linkSize*(fromIntegral j)
+        let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
+            y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
             linkM = getVlink (i, j) grid
             link = fromJust linkM
             (color', form') = if null linkM
