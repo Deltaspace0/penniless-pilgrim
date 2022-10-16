@@ -15,7 +15,7 @@ data ConfigSlider = ConfigSlider
     { _csCurrent :: Double
     , _csMin     :: Double
     , _csMax     :: Double
-    , _csCaption   :: Text
+    , _csCaption :: Text
     } deriving (Eq, Show)
 
 makeLenses 'ConfigSlider

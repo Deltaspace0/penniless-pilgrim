@@ -8,9 +8,10 @@ module Parameters
     , AppParameters(..)
     , gridColumnsSlider
     , gridRowsSlider
-    , linkWidthSlider
-    , linkSizeSlider
-    , nodeSizeSlider
+    , linkToNodeSlider
+    , nodeToWidthSlider
+    , gameControlWidth
+    , gameControlHeight
     , keyConfig
     ) where
 
@@ -24,19 +25,23 @@ import Event
 data AppParameters = AppParameters
     { _apGridColumnsSlider :: ConfigSlider
     , _apGridRowsSlider    :: ConfigSlider
-    , _apLinkWidthSlider   :: ConfigSlider
-    , _apLinkSizeSlider    :: ConfigSlider
-    , _apNodeSizeSlider    :: ConfigSlider
+    , _apLinkToNodeSlider  :: ConfigSlider
+    , _apNodeToWidthSlider :: ConfigSlider
+    , _apGameControlWidth  :: Double
+    , _apGameControlHeight :: Double
     , _apKeyConfig         :: [(Text, AppEvent)]
     } deriving (Eq, Show)
 
 instance Default AppParameters where
     def = AppParameters
-        { _apGridColumnsSlider = ConfigSlider 5 2 9     "Columns:"
-        , _apGridRowsSlider    = ConfigSlider 5 2 9     "Rows:"
-        , _apLinkWidthSlider   = ConfigSlider 4 1 16    "Link width:"
-        , _apLinkSizeSlider    = ConfigSlider 64 24 256 "Link size:"
-        , _apNodeSizeSlider    = ConfigSlider 12 1 128  "Node size:"
+        { _apGridColumnsSlider = ConfigSlider 5 2 32 "Columns:"
+        , _apGridRowsSlider    = ConfigSlider 5 2 32 "Rows:"
+        , _apLinkToNodeSlider  = ConfigSlider 5 3 12
+            "Link size to node size ratio:"
+        , _apNodeToWidthSlider = ConfigSlider 3 2 12
+            "Node size to link width ratio:"
+        , _apGameControlWidth  = 400
+        , _apGameControlHeight = 500
         , _apKeyConfig =
             [ ("Esc",   ResetPilgrim)
             , ("Up",    MovePilgrim North)

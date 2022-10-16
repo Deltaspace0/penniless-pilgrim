@@ -25,18 +25,20 @@ import Grid
 data GameControlCfg = GameControlCfg
     { _colorLink :: Color
     , _colorNode :: Color
-    , _linkWidth :: Double
-    , _linkSize  :: Double
-    , _nodeSize  :: Double
+    , _linkToNodeRatio  :: Double
+    , _nodeToWidthRatio :: Double
+    , _gcWidth  :: Double
+    , _gcHeight :: Double
     } deriving (Eq, Show)
 
 instance Default GameControlCfg where
     def = GameControlCfg
         { _colorLink = darkGray
         , _colorNode = darkGray
-        , _linkWidth = 4
-        , _linkSize  = 64
-        , _nodeSize  = 12
+        , _linkToNodeRatio  = 5
+        , _nodeToWidthRatio = 3
+        , _gcWidth  = 400
+        , _gcHeight = 500
         }
 
 makeFields 'Link
@@ -56,18 +58,22 @@ gameControl_ game config = widgetNode where
     grid = gridMap nodeTransform linkTransform $ _grid game
     colorLink = _colorLink config
     colorNode = _colorNode config
-    linkWidth = _linkWidth config
-    linkSize  = _linkSize  config
-    nodeSize  = _nodeSize  config
+    linkToNodeRatio  = _linkToNodeRatio config
+    nodeToWidthRatio = _nodeToWidthRatio config
+    width  = _gcWidth config
+    height = _gcHeight config
+    (cols, rows) = getBounds grid
+    linkSizeW = width/(fromIntegral cols)
+    linkSizeH = height/(fromIntegral rows)
+    linkSize  = min linkSizeW linkSizeH
+    nodeSize  = linkSize/linkToNodeRatio
+    linkWidth = nodeSize/nodeToWidthRatio
     handleEvent wenv node target evt = case evt of
         Click p _ _ | isPointInNodeVp node p ->
             Just $ resultReqs node reqs
         _ -> Nothing
         where reqs = [SetFocus $ node ^. L.info . L.widgetId]
-    getSizeReq wenv node = (fixedSize width, fixedSize height) where
-        (cols, rows) = getBounds grid
-        width  = linkSize*(fromIntegral cols) + nodeSize*2
-        height = linkSize*(fromIntegral rows) + nodeSize*2
+    getSizeReq wenv node = (fixedSize width, fixedSize height)
     render wenv node renderer = do
         let style = currentStyle wenv node
             vp = getContentArea node style
