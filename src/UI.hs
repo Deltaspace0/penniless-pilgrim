@@ -62,7 +62,7 @@ taxLabel model = label' `styleBasic` styleParameters where
     label' = label $ "Tax total: " <> pack t'
     styleParameters =
         [ textCenter
-        , textSize 32
+        , textSize 24
         , sizeReqW $ expandSize 800 1
         ]
 

@@ -10,7 +10,8 @@ import UI
 main :: IO ()
 main = do
     let config =
-            [ appWindowTitle "Penniless Pilgrim"
+            [ appWindowState $ MainWindowNormal (1000, 600)
+            , appWindowTitle "Penniless Pilgrim"
             , appTheme darkTheme
             , appFontDef "Regular" "./assets/font/laconic.otf"
             , appInitEvent AppInit
