@@ -13,11 +13,14 @@ module Model
     , showConfig
     , parameters
     , initModel
+    , initModel_
     , handleEvent
+    , gameFromParameters
     ) where
 
 import Control.Lens
 import Data.Default
+import Data.Text (Text)
 import Monomer
 
 import Event
@@ -36,13 +39,17 @@ type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
 
 makeLensesWith abbreviatedFields 'AppModel
 
-initModel :: Game -> AppModel
-initModel game = AppModel
+initModel :: AppModel
+initModel = initModel_ def
+
+initModel_ :: AppParameters -> AppModel
+initModel_ p = AppModel
     { _appInitialGame = game
     , _appCurrentGame = game
     , _appShowConfig  = False
-    , _appParameters  = def
-    }
+    , _appParameters  = p
+    } where
+        game = gameFromParameters p
 
 movePilgrimHandle :: Direction -> EventHandle
 movePilgrimHandle d model = [Model $ model & updateGame] where
@@ -64,10 +71,8 @@ toggleConfigHandle :: EventHandle
 toggleConfigHandle model = [Model $ model & showConfig %~ not]
 
 resizeGridHandle :: EventHandle
-resizeGridHandle model = [Model $ model & updateGame] where
-    updateGame = currentGame .~ makeGame (floor gc) (floor gr)
-    gc = model ^. parameters . gridColumnsSlider . csCurrent
-    gr = model ^. parameters . gridRowsSlider . csCurrent
+resizeGridHandle model = [Model $ model & currentGame .~ game] where
+    game = gameFromParameters $ model ^. parameters
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
@@ -76,3 +81,8 @@ handleEvent wenv node model evt = case evt of
     ResetPilgrim  -> resetPilgrimHandle model
     ToggleConfig  -> toggleConfigHandle model
     ResizeGrid    -> resizeGridHandle model
+
+gameFromParameters :: AppParameters -> Game
+gameFromParameters p = makeGame (floor gc) (floor gr) where
+    gc = p ^. gridColumnsSlider . csCurrent
+    gr = p ^. gridRowsSlider    . csCurrent

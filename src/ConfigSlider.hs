@@ -1,4 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module ConfigSlider
     ( ConfigSlider(..)
@@ -9,6 +10,7 @@ module ConfigSlider
     ) where
 
 import Control.Lens
+import Data.Aeson
 import Data.Text (Text)
 
 data ConfigSlider = ConfigSlider
@@ -17,5 +19,12 @@ data ConfigSlider = ConfigSlider
     , _csMax     :: Double
     , _csCaption :: Text
     } deriving (Eq, Show)
+
+instance FromJSON ConfigSlider where
+    parseJSON = withObject "ConfigSlider" $ \v -> ConfigSlider
+        <$> v .: "default"
+        <*> v .: "min"
+        <*> v .: "max"
+        <*> v .: "caption"
 
 makeLenses 'ConfigSlider

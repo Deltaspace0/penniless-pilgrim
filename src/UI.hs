@@ -52,7 +52,7 @@ gameControlM model = keystroke kc $ gameControl_ game def
     } where
         game = model ^. currentGame
         get f = model ^. parameters . f
-        kc = get keyConfig
+        kc = toKeyStroke $ get keyConfig
 
 taxLabel :: AppModel -> WidgetNode AppModel AppEvent
 taxLabel model = label' `styleBasic` styleParameters where
