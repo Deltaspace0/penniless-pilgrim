@@ -22,6 +22,7 @@ import Monomer
 
 import Event
 import Game
+import Grid
 import Parameters
 
 data AppModel = AppModel
@@ -48,8 +49,16 @@ movePilgrimHandle d model = [Model $ model & updateGame] where
     updateGame = currentGame %~ movePilgrim d
 
 resetPilgrimHandle :: EventHandle
-resetPilgrimHandle model = [Model $ model & updateGame] where
-    updateGame = currentGame .~ model ^. initialGame
+resetPilgrimHandle model = [Model model'] where
+    model' = model & updateGame & updateSliders
+    updateSliders = updateColumns . updateRows
+    updateColumns = currentValue gridColumnsSlider .~ cols'
+    updateRows    = currentValue gridRowsSlider    .~ rows'
+    updateGame    = currentGame .~ model ^. initialGame
+    currentValue slider = parameters . slider . csCurrent
+    (cols, rows) = getBounds $ _grid $ model ^. initialGame
+    cols' = fromIntegral $ cols+1
+    rows' = fromIntegral $ rows+1
 
 toggleConfigHandle :: EventHandle
 toggleConfigHandle model = [Model $ model & showConfig %~ not]
