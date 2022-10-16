@@ -17,12 +17,19 @@ import Model
 buildUI :: UIBuilder AppModel AppEvent
 buildUI wenv model = widgetTree where
     spacingCfg = [childSpacing_ 16]
+    vstack' = vstack_ spacingCfg
+    hstack' = hstack_ spacingCfg
+    boxCenter = box_ [alignCenter]
     crCfg = [onChange (const ResizeGrid :: Double -> AppEvent)]
-    centralWidgets =
-        [ gameControlM model `nodeKey` "mainGrid"
-        , separatorLine `nodeVisible` model ^. showConfig
-        , vstack_ spacingCfg
-            [ configLabel   model gridColumnsSlider
+    widgetTree = hstack'
+        [ boxCenter $ gameControlM model `nodeKey` "mainGrid"
+        , separatorLine
+        , side
+        ] `styleBasic` [padding 32]
+    side = if model ^. showConfig
+        then vstack' $ sideWidgets <>
+            [ separatorLine
+            , configLabel   model gridColumnsSlider
             , configSlider_ model gridColumnsSlider crCfg
             , configLabel   model gridRowsSlider
             , configSlider_ model gridRowsSlider crCfg
@@ -32,17 +39,15 @@ buildUI wenv model = widgetTree where
             , configSlider  model linkSizeSlider
             , configLabel   model nodeSizeSlider
             , configSlider  model nodeSizeSlider
-            ] `nodeVisible` model ^. showConfig
-        ]
-    widgetTree = vstack_ spacingCfg
-        [ box_ [alignCenter] $ taxLabel model
-        , separatorLine
-        , box_ [alignCenter] $ hstack_ spacingCfg centralWidgets
-        , box_ [alignCenter] $ hstack_ spacingCfg
+            ]
+        else boxCenter $ vstack' sideWidgets
+    sideWidgets =
+        [ taxLabel model
+        , boxCenter $ hstack'
             [ button "Reset" ResetPilgrim
             , button "Config" ToggleConfig
             ]
-        ] `styleBasic` [padding 64]
+        ]
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = keystroke kc $ gameControl_ game def
@@ -55,11 +60,16 @@ gameControlM model = keystroke kc $ gameControl_ game def
         kc = getParameter keyConfig
 
 taxLabel :: AppModel -> WidgetNode AppModel AppEvent
-taxLabel model = label t'' `styleBasic` [textSize 32] where
+taxLabel model = label' `styleBasic` styleParameters where
     t = show $ _tax $ _pilgrim $ model ^. currentGame
-    (i, m) = break (== '.') t
     t' = if m == ".0" then i else t
-    t'' = "Tax total: " <> pack t'
+    (i, m) = break (== '.') t
+    label' = label $ "Tax total: " <> pack t'
+    styleParameters =
+        [ textCenter
+        , textSize 32
+        , sizeReqW $ expandSize 800 1
+        ]
 
 configLabel
     :: AppModel
