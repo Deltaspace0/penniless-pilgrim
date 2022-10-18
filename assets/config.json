@@ -1,0 +1,35 @@
+{
+    "grid_columns_slider": {
+        "default": 5,
+        "min": 2,
+        "max": 32,
+        "caption": "Columns:"
+    },
+    "grid_rows_slider": {
+        "default": 5,
+        "min": 2,
+        "max": 32,
+        "caption": "Rows:"
+    },
+    "link_to_node_slider": {
+        "default": 5,
+        "min": 3,
+        "max": 12,
+        "caption": "Link size to node size ratio:"
+    },
+    "node_to_width_slider": {
+        "default": 2,
+        "min": 2,
+        "max": 12,
+        "caption": "Node size to link width ratio:"
+    },
+    "game_control_width": 400,
+    "game_control_height": 500,
+    "key_config": {
+        "reset_pilgrim": ["Esc"],
+        "move_pilgrim_north": ["Up", "w", "q"],
+        "move_pilgrim_south": ["Down", "s"],
+        "move_pilgrim_west": ["Left", "a"],
+        "move_pilgrim_east": ["Right", "d"]
+    }
+}

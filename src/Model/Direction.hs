@@ -1,4 +1,4 @@
-module Direction
+module Model.Direction
     ( Direction(..)
     , getOpposite
     , nextPosition

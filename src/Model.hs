@@ -4,25 +4,29 @@
 {-# LANGUAGE TemplateHaskell        #-}
 
 module Model
-    ( module Event
-    , module Game
-    , module Parameters
+    ( module Model.Event
+    , module Model.Game
+    , module Model.Parameters
     , AppModel(..)
     , initialGame
     , currentGame
     , showConfig
     , parameters
     , initModel
+    , initModel_
     , handleEvent
+    , gameFromParameters
     ) where
 
 import Control.Lens
 import Data.Default
+import Data.Text (Text)
 import Monomer
 
-import Event
-import Game
-import Parameters
+import Model.Event
+import Model.Game
+import Model.Grid
+import Model.Parameters
 
 data AppModel = AppModel
     { _appInitialGame :: Game
@@ -35,30 +39,40 @@ type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
 
 makeLensesWith abbreviatedFields 'AppModel
 
-initModel :: Game -> AppModel
-initModel game = AppModel
+initModel :: AppModel
+initModel = initModel_ def
+
+initModel_ :: AppParameters -> AppModel
+initModel_ p = AppModel
     { _appInitialGame = game
     , _appCurrentGame = game
     , _appShowConfig  = False
-    , _appParameters  = def
-    }
+    , _appParameters  = p
+    } where
+        game = gameFromParameters p
 
 movePilgrimHandle :: Direction -> EventHandle
 movePilgrimHandle d model = [Model $ model & updateGame] where
     updateGame = currentGame %~ movePilgrim d
 
 resetPilgrimHandle :: EventHandle
-resetPilgrimHandle model = [Model $ model & updateGame] where
-    updateGame = currentGame .~ model ^. initialGame
+resetPilgrimHandle model = [Model model'] where
+    model' = model & updateGame & updateSliders
+    updateSliders = updateColumns . updateRows
+    updateColumns = currentValue gridColumnsSlider .~ cols'
+    updateRows    = currentValue gridRowsSlider    .~ rows'
+    updateGame    = currentGame .~ model ^. initialGame
+    currentValue slider = parameters . slider . csCurrent
+    (cols, rows) = getBounds $ _grid $ model ^. initialGame
+    cols' = fromIntegral $ cols+1
+    rows' = fromIntegral $ rows+1
 
 toggleConfigHandle :: EventHandle
 toggleConfigHandle model = [Model $ model & showConfig %~ not]
 
 resizeGridHandle :: EventHandle
-resizeGridHandle model = [Model $ model & updateGame] where
-    updateGame = currentGame .~ makeGame (floor gc) (floor gr)
-    gc = model ^. parameters . gridColumnsSlider . csCurrent
-    gr = model ^. parameters . gridRowsSlider . csCurrent
+resizeGridHandle model = [Model $ model & currentGame .~ game] where
+    game = gameFromParameters $ model ^. parameters
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
@@ -67,3 +81,8 @@ handleEvent wenv node model evt = case evt of
     ResetPilgrim  -> resetPilgrimHandle model
     ToggleConfig  -> toggleConfigHandle model
     ResizeGrid    -> resizeGridHandle model
+
+gameFromParameters :: AppParameters -> Game
+gameFromParameters p = makeGame (floor gc) (floor gr) where
+    gc = p ^. gridColumnsSlider . csCurrent
+    gr = p ^. gridRowsSlider    . csCurrent

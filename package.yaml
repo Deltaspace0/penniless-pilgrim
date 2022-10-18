@@ -20,13 +20,15 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/Deltaspace0/Penniless-Pilgrim#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- lens
-- text
-- monomer
-- data-default
-- text-show
+- aeson
 - array
+- base >= 4.7 && < 5
+- data-default
+- lens
+- monomer
+- text
+- text-show
+- utf8-string
 
 library:
   source-dirs: src

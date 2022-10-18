@@ -16,73 +16,75 @@ import Model
 
 buildUI :: UIBuilder AppModel AppEvent
 buildUI wenv model = widgetTree where
-    spacingCfg = [childSpacing_ 16]
+    vstack' = vstack_ [childSpacing_ 16]
+    hstack' = hstack_ [childSpacing_ 32]
+    boxCenter = box_ [alignCenter]
     crCfg = [onChange (const ResizeGrid :: Double -> AppEvent)]
-    centralWidgets =
-        [ gameControlM model `nodeKey` "mainGrid"
-        , separatorLine `nodeVisible` model ^. showConfig
-        , vstack_ spacingCfg
-            [ configLabel   model gridColumnsSlider
-            , configSlider_ model gridColumnsSlider crCfg
-            , configLabel   model gridRowsSlider
-            , configSlider_ model gridRowsSlider crCfg
-            , configLabel   model linkWidthSlider
-            , configSlider  model linkWidthSlider
-            , configLabel   model linkSizeSlider
-            , configSlider  model linkSizeSlider
-            , configLabel   model nodeSizeSlider
-            , configSlider  model nodeSizeSlider
-            ] `nodeVisible` model ^. showConfig
-        ]
-    widgetTree = vstack_ spacingCfg
-        [ box_ [alignCenter] $ taxLabel model
+    widgetTree = hstack'
+        [ boxCenter $ gameControlM model `nodeKey` "mainGrid"
         , separatorLine
-        , box_ [alignCenter] $ hstack_ spacingCfg centralWidgets
-        , box_ [alignCenter] $ hstack_ spacingCfg
+        , side
+        ] `styleBasic` [padding 32]
+    side = if model ^. showConfig
+        then vstack' $ concat
+            [ sideWidgets
+            , [separatorLine]
+            , configSlider_ model gridColumnsSlider crCfg
+            , configSlider_ model gridRowsSlider crCfg
+            , configSlider  model linkToNodeSlider
+            , configSlider  model nodeToWidthSlider
+            ]
+        else boxCenter $ vstack' sideWidgets
+    sideWidgets =
+        [ taxLabel model
+        , boxCenter $ hstack'
             [ button "Reset" ResetPilgrim
             , button "Config" ToggleConfig
             ]
-        ] `styleBasic` [padding 64]
+        ]
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = keystroke kc $ gameControl_ game def
-    { _linkWidth = getParameter $ linkWidthSlider . csCurrent
-    , _linkSize  = getParameter $ linkSizeSlider . csCurrent
-    , _nodeSize  = getParameter $ nodeSizeSlider . csCurrent
+    { _gcWidth          = get gameControlWidth
+    , _gcHeight         = get gameControlHeight
+    , _linkToNodeRatio  = get $ linkToNodeSlider  . csCurrent
+    , _nodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
     } where
         game = model ^. currentGame
-        getParameter f = model ^. parameters . f
-        kc = getParameter keyConfig
+        get f = model ^. parameters . f
+        kc = toKeyStroke $ get keyConfig
 
 taxLabel :: AppModel -> WidgetNode AppModel AppEvent
-taxLabel model = label t'' `styleBasic` [textSize 32] where
+taxLabel model = label' `styleBasic` styleParameters where
     t = show $ _tax $ _pilgrim $ model ^. currentGame
-    (i, m) = break (== '.') t
     t' = if m == ".0" then i else t
-    t'' = "Tax total: " <> pack t'
-
-configLabel
-    :: AppModel
-    -> Lens' AppParameters ConfigSlider
-    -> WidgetNode AppModel AppEvent
-configLabel model slider = label $ caption <> " " <> t where
-    t = showt (floor value :: Int)
-    value   = model ^. parameters . slider . csCurrent
-    caption = model ^. parameters . slider . csCaption
+    (i, m) = break (== '.') t
+    label' = label $ "Tax total: " <> pack t'
+    styleParameters =
+        [ textCenter
+        , textSize 24
+        , sizeReqW $ expandSize 800 1
+        ]
 
 configSlider
     :: AppModel
     -> Lens' AppParameters ConfigSlider
-    -> WidgetNode AppModel AppEvent
+    -> [WidgetNode AppModel AppEvent]
 configSlider model slider = configSlider_ model slider []
 
 configSlider_
     :: AppModel
     -> Lens' AppParameters ConfigSlider
     -> [SliderCfg AppModel AppEvent Double]
-    -> WidgetNode AppModel AppEvent
-configSlider_ model slider cfg = hslider_ value a b cfg' where
-    value = parameters . slider . csCurrent
-    a = model ^. parameters . slider . csMin
-    b = model ^. parameters . slider . csMax
-    cfg' = [wheelRate 1, dragRate 1] ++ cfg
+    -> [WidgetNode AppModel AppEvent]
+configSlider_ model slider cfg =
+    [ label $ caption <> " " <> t
+    , hslider_ field a b cfg'
+    ] where
+        caption = model ^. parameters . slider . csCaption
+        t = showt (floor current :: Int)
+        field = parameters . slider . csCurrent
+        a = model ^. parameters . slider . csMin
+        b = model ^. parameters . slider . csMax
+        current = model ^. parameters . slider . csCurrent
+        cfg' = [wheelRate 1, dragRate 1] <> cfg

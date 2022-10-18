@@ -10,8 +10,8 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
-import Game hiding (Node)
-import qualified Game as G
+import Model.Game hiding (Node)
+import qualified Model.Game as G
 
 data Node = Node
     { _nodeColor     :: Maybe Color
