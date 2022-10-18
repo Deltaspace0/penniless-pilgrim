@@ -19,8 +19,8 @@ import qualified Monomer.Lens as L
 
 import GameControl.Link
 import GameControl.Node
-import Game (Game(..))
-import Grid
+import Model.Game (Game(..))
+import Model.Grid
 
 data GameControlCfg = GameControlCfg
     { _colorLink :: Color

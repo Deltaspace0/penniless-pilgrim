@@ -4,9 +4,9 @@
 {-# LANGUAGE TemplateHaskell        #-}
 
 module Model
-    ( module Event
-    , module Game
-    , module Parameters
+    ( module Model.Event
+    , module Model.Game
+    , module Model.Parameters
     , AppModel(..)
     , initialGame
     , currentGame
@@ -23,10 +23,10 @@ import Data.Default
 import Data.Text (Text)
 import Monomer
 
-import Event
-import Game
-import Grid
-import Parameters
+import Model.Event
+import Model.Game
+import Model.Grid
+import Model.Parameters
 
 data AppModel = AppModel
     { _appInitialGame :: Game

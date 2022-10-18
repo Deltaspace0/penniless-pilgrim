@@ -1,5 +1,5 @@
-module Pilgrim
-    ( module Direction
+module Model.Pilgrim
+    ( module Model.Direction
     , Pilgrim(..)
     , updateTax
     , isBack
@@ -8,7 +8,7 @@ module Pilgrim
 
 import Data.Default
 
-import Direction
+import Model.Direction
 
 data Pilgrim = Pilgrim
     { _position :: (Int, Int)

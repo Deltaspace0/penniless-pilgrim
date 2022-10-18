@@ -3,9 +3,9 @@
 {-# LANGUAGE OverloadedStrings      #-}
 {-# LANGUAGE TemplateHaskell        #-}
 
-module Parameters
-    ( module ConfigSlider
-    , module KeyConfig
+module Model.Parameters
+    ( module Model.Parameters.ConfigSlider
+    , module Model.Parameters.KeyConfig
     , AppParameters(..)
     , gridColumnsSlider
     , gridRowsSlider
@@ -25,8 +25,8 @@ import Data.Default
 import Data.Maybe
 import System.IO
 
-import ConfigSlider
-import KeyConfig
+import Model.Parameters.ConfigSlider
+import Model.Parameters.KeyConfig
 
 data AppParameters = AppParameters
     { _apGridColumnsSlider :: ConfigSlider

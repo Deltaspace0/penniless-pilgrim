@@ -2,7 +2,7 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TemplateHaskell        #-}
 
-module Grid
+module Model.Grid
     ( Grid(..)
     , makeGrid
     , isInside
@@ -29,7 +29,7 @@ import Control.Lens hiding (indices)
 import Data.Array.IArray
 import Data.Maybe
 
-import Direction
+import Model.Direction
 
 type Point = (Int, Int)
 

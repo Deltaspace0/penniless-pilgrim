@@ -1,9 +1,9 @@
-module Event
-    ( module Direction
+module Model.Event
+    ( module Model.Direction
     , AppEvent(..)
     ) where
 
-import Direction
+import Model.Direction
 
 data AppEvent
     = AppInit

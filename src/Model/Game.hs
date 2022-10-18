@@ -1,5 +1,5 @@
-module Game
-    ( module Pilgrim
+module Model.Game
+    ( module Model.Pilgrim
     , Node(..)
     , Link(..)
     , Game(..)
@@ -12,8 +12,8 @@ module Game
 import Data.Default
 import Data.Maybe
 
-import Grid
-import Pilgrim
+import Model.Grid
+import Model.Pilgrim
 
 data Node
     = NodePilgrim

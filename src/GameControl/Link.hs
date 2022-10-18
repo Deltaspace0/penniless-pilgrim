@@ -7,7 +7,7 @@ module GameControl.Link
 import Data.Maybe
 import Monomer
 
-import qualified Game as G
+import qualified Model.Game as G
 
 data LinkForm = LinkBack | LinkForward deriving (Eq, Show)
 

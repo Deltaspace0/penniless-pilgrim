@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module KeyConfig
+module Model.Parameters.KeyConfig
     ( KeyConfig(..)
     , toKeyStroke
     ) where
@@ -9,7 +9,7 @@ import Data.Aeson
 import Data.Default
 import Data.Text (Text)
 
-import Event
+import Model.Event
 
 data KeyConfig = KeyConfig
     { _kcResetPilgrim     :: [Text]

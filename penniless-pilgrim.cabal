@@ -24,18 +24,18 @@ source-repository head
 
 library
   exposed-modules:
-      ConfigSlider
-      Direction
-      Event
-      Game
       GameControl
       GameControl.Link
       GameControl.Node
-      Grid
-      KeyConfig
       Model
-      Parameters
-      Pilgrim
+      Model.Direction
+      Model.Event
+      Model.Game
+      Model.Grid
+      Model.Parameters
+      Model.Parameters.ConfigSlider
+      Model.Parameters.KeyConfig
+      Model.Pilgrim
       UI
   other-modules:
       Paths_penniless_pilgrim
