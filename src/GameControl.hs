@@ -15,6 +15,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Single
+import Monomer.Widgets.Util.Drawing
 import qualified Monomer.Lens as L
 
 import GameControl.Link
@@ -68,6 +69,9 @@ gameControl_ game config = widgetNode where
     linkSize  = min (width/factorW) (height/factorH)
     nodeSize  = linkSize/linkToNodeRatio
     linkWidth = nodeSize/nodeToWidthRatio
+    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
+    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
+    ars = linkWidth*1.5
     handleEvent wenv node target evt = case evt of
         Click p _ _ | isPointInNodeVp node p ->
             Just $ resultReqs node reqs
@@ -80,20 +84,15 @@ gameControl_ game config = widgetNode where
         mapM_ (drawHlink renderer vp) $ getHlinkIndices grid
         mapM_ (drawVlink renderer vp) $ getVlinkIndices grid
         mapM_ (drawNode renderer vp)  $ getNodeIndices grid
-    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
-    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
     drawNode renderer vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i)
             y = (vy vp) + linkSize*(fromIntegral j)
             d = nodeSize*2
             node = getNode (i, j) grid
-        beginPath renderer
-        setFillColor renderer $ if null node
+        drawEllipse renderer (Rect x y d d) $ Just $ if null node
             then colorNode
             else fromMaybe colorNode $ (head node) ^. color
-        renderEllipse renderer $ Rect x y d d
-        fill renderer
-    drawHlink renderer vp (i, j) = do
+    drawHlink r vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
             y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
             linkM = getHlink (i, j) grid
@@ -101,40 +100,26 @@ gameControl_ game config = widgetNode where
             (color', form') = if null linkM
                 then (colorLink, Nothing)
                 else (link ^. color, link ^. form)
-        beginPath renderer
-        setStrokeWidth renderer linkWidth
-        setStrokeColor renderer color'
-        setFillColor renderer color'
-        let x' = x + linkSize - nodeSize
-            ars = linkWidth*1.5
+            c = Just color'
+            x' = x + linkSize - nodeSize
+            drawLineH a b = drawLine' r p1 p2 c where
+                p1 = Point a y
+                p2 = Point b y
+            drawTriangleH a b = drawTriangle r p1 p2 p3 c where
+                p1 = Point a y
+                p2 = Point b $ y - ars
+                p3 = Point b $ y + ars
         case form' of
             Just LinkBack -> do
                 let x'' = x + nodeSize + ars*2
-                moveTo renderer $ Point (x'' - 1) y
-                renderLineTo renderer $ Point (x' + 1) y
-                stroke renderer
-                beginPath renderer
-                moveTo renderer $ Point (x + nodeSize) y
-                renderLineTo renderer $ Point x'' (y - ars)
-                renderLineTo renderer $ Point x'' (y + ars)
-                closePath renderer
-                fill renderer
+                drawLineH (x'' - 1) (x' + 1)
+                drawTriangleH (x + nodeSize) x''
             Just LinkForward -> do
                 let x'' = x' - ars*2
-                moveTo renderer $ Point (x + nodeSize - 1) y
-                renderLineTo renderer $ Point (x'' + 1) y
-                stroke renderer
-                beginPath renderer
-                moveTo renderer $ Point x' y
-                renderLineTo renderer $ Point x'' (y - ars)
-                renderLineTo renderer $ Point x'' (y + ars)
-                closePath renderer
-                fill renderer
-            _ -> do
-                moveTo renderer $ Point (x + nodeSize - 1) y
-                renderLineTo renderer $ Point (x' + 1) y
-                stroke renderer
-    drawVlink renderer vp (i, j) = do
+                drawLineH (x + nodeSize - 1) (x'' + 1)
+                drawTriangleH x' x''
+            _ -> drawLineH (x + nodeSize - 1) (x' + 1)
+    drawVlink r vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
             y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
             linkM = getVlink (i, j) grid
@@ -142,36 +127,23 @@ gameControl_ game config = widgetNode where
             (color', form') = if null linkM
                 then (colorLink, Nothing)
                 else (link ^. color, link ^. form)
-        beginPath renderer
-        setStrokeWidth renderer linkWidth
-        setStrokeColor renderer color'
-        setFillColor renderer color'
-        let y' = y + linkSize - nodeSize
-            ars = linkWidth*1.5
+            c = Just color'
+            y' = y + linkSize - nodeSize
+            drawLineV a b = drawLine' r p1 p2 c where
+                p1 = Point x a
+                p2 = Point x b
+            drawTriangleV a b = drawTriangle r p1 p2 p3 c where
+                p1 = Point x a
+                p2 = Point (x + ars) b
+                p3 = Point (x - ars) b
         case form' of
             Just LinkBack -> do
                 let y'' = y + nodeSize + ars*2
-                moveTo renderer $ Point x (y'' - 1)
-                renderLineTo renderer $ Point x (y' + 1)
-                stroke renderer
-                beginPath renderer
-                moveTo renderer $ Point x (y + nodeSize)
-                renderLineTo renderer $ Point (x + ars) y''
-                renderLineTo renderer $ Point (x - ars) y''
-                closePath renderer
-                fill renderer
+                drawLineV (y'' - 1) (y' + 1)
+                drawTriangleV (y + nodeSize) y''
             Just LinkForward -> do
                 let y'' = y' - ars*2
-                moveTo renderer $ Point x (y + nodeSize - 1)
-                renderLineTo renderer $ Point x (y'' + 1)
-                stroke renderer
-                beginPath renderer
-                moveTo renderer $ Point x y'
-                renderLineTo renderer $ Point (x + ars) y''
-                renderLineTo renderer $ Point (x - ars) y''
-                closePath renderer
-                fill renderer
-            _ -> do
-                moveTo renderer $ Point x (y + nodeSize - 1)
-                renderLineTo renderer $ Point x (y' + 1)
-                stroke renderer
+                drawLineV (y + nodeSize - 1) (y'' + 1)
+                drawTriangleV y' y''
+            _ -> drawLineV (y + nodeSize - 1) (y' + 1)
+    drawLine' r a b c = drawLine r a b linkWidth c
