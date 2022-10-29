@@ -18,6 +18,7 @@ module Model.Parameters
     , fromJSON
     ) where
 
+import Control.Exception
 import Control.Lens
 import Data.Aeson
 import qualified Data.ByteString.Lazy.UTF8 as BLU
@@ -65,9 +66,8 @@ makeLensesWith abbreviatedFields 'AppParameters
 
 fromFile :: String -> IO AppParameters
 fromFile path = do
-    file <- readFile path
+    let handler = const $ return "" :: SomeException -> IO String
+    file <- catch (readFile path) handler
     let contents = BLU.fromString file
         parameters = decode contents :: Maybe AppParameters
-    if parameters == Nothing
-        then return def
-        else return $ fromJust parameters
+    return $ fromMaybe def parameters
