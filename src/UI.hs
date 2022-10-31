@@ -15,7 +15,7 @@ import Widgets.GameControl
 import Model
 
 buildUI :: UIBuilder AppModel AppEvent
-buildUI wenv model = widgetTree where
+buildUI _ model = widgetTree where
     vstack' = vstack_ [childSpacing_ 16]
     hstack' = hstack_ [childSpacing_ 32]
     boxCenter = box_ [alignCenter]
@@ -44,13 +44,12 @@ buildUI wenv model = widgetTree where
         ]
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
-gameControlM model = gameControl_ game def
+gameControlM model = gameControl_ currentGame def
     { _gcWidth          = get gameControlWidth
     , _gcHeight         = get gameControlHeight
     , _linkToNodeRatio  = get $ linkToNodeSlider  . csCurrent
     , _nodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
     } where
-        game = model ^. currentGame
         get f = model ^. parameters . f
 
 taxLabel :: AppModel -> WidgetNode AppModel AppEvent

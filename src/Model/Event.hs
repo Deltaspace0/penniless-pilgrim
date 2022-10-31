@@ -7,7 +7,6 @@ import Model.Direction
 
 data AppEvent
     = AppInit
-    | MovePilgrim Direction
     | ResetPilgrim
     | ToggleConfig
     | ResizeGrid

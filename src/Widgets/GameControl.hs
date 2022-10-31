@@ -20,7 +20,7 @@ import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
 import Widgets.GameControl.Node
-import Model.Game (Game(..))
+import Model.Game hiding (Node, Link, LinkBack, LinkForward)
 import Model.Grid
 
 data GameControlCfg = GameControlCfg
@@ -42,48 +42,81 @@ instance Default GameControlCfg where
         , _gcHeight = 500
         }
 
+newtype GameControlState = GameControlState
+    { _gcsGrid :: Grid Node Link
+    }
+
 makeFields 'Link
 makeFields 'Node
 
-gameControl :: Game -> WidgetNode s e
-gameControl game = gameControl_ game def
+gridFromGame :: Game -> Grid Node Link
+gridFromGame = gridMap nodeTransform linkTransform . _grid
 
-gameControl_ :: Game -> GameControlCfg -> WidgetNode s e
-gameControl_ game config = widgetNode where
-    widgetNode = defaultWidgetNode "gameControl" widget
-    widget = createSingle () def
-        { singleHandleEvent = handleEvent
+gameControl :: ALens' s Game -> WidgetNode s e
+gameControl field = gameControl_ field def
+
+gameControl_ :: ALens' s Game -> GameControlCfg -> WidgetNode s e
+gameControl_ field config = gameControlNode where
+    gameControlNode = defaultWidgetNode "gameControl" widget
+    widget = makeGameControl (WidgetLens field) config state
+    state = GameControlState $ makeGrid 2 2
+
+makeGameControl
+    :: WidgetData s Game
+    -> GameControlCfg
+    -> GameControlState
+    -> Widget s e
+makeGameControl field config state = widget where
+    widget = createSingle state def
+        { singleInit        = init
+        , singleMerge       = merge
+        , singleHandleEvent = handleEvent
         , singleGetSizeReq  = getSizeReq
         , singleRender      = render
         }
-    grid = gridMap nodeTransform linkTransform $ _grid game
-    colorLink = _colorLink config
-    colorNode = _colorNode config
-    linkToNodeRatio  = _linkToNodeRatio config
-    nodeToWidthRatio = _nodeToWidthRatio config
-    width  = _gcWidth config
-    height = _gcHeight config
-    (cols, rows) = getBounds grid
-    factorW = (fromIntegral cols)+2/linkToNodeRatio
-    factorH = (fromIntegral rows)+2/linkToNodeRatio
-    linkSize  = min (width/factorW) (height/factorH)
-    nodeSize  = linkSize/linkToNodeRatio
-    linkWidth = nodeSize/nodeToWidthRatio
-    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
-    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
-    ars = linkWidth*1.5
+
+    init wenv node = resultNode resNode where
+        resNode = node & L.widget .~ w
+        w = makeGameControl field config state'
+        state' = GameControlState $ gridFromGame game
+        game = widgetDataGet (wenv ^. L.model) field
+    
+    merge wenv newNode _ _ = init wenv newNode
+
     handleEvent wenv node target evt = case evt of
-        Click p _ _ | isPointInNodeVp node p ->
-            Just $ resultReqs node reqs
+        KeyAction _ code KeyPressed
+            | isKeyNorth code -> handleDirection North
+            | isKeySouth code -> handleDirection South
+            | isKeyWest  code -> handleDirection West
+            | isKeyEast  code -> handleDirection East
+            where
+                isKeyNorth code = isKeyUp    code || isKeyW code
+                isKeySouth code = isKeyDown  code || isKeyS code
+                isKeyWest  code = isKeyLeft  code || isKeyA code
+                isKeyEast  code = isKeyRight code || isKeyD code
+        ButtonAction _ _ BtnPressed _ -> Just result where
+            result = resultReqs node [SetFocus widgetId]
         _ -> Nothing
-        where reqs = [SetFocus $ node ^. L.info . L.widgetId]
+        where
+            handleDirection direction = Just result where
+                result = resultReqs newNode $ RenderOnce:reqs
+                newNode = node & L.widget .~ w
+                w       = makeGameControl field config state'
+                state'  = GameControlState $ gridFromGame game'
+                reqs  = widgetDataSet field game'
+                game' = movePilgrim direction game
+                game  = widgetDataGet (wenv ^. L.model) field
+            widgetId = node ^. L.info . L.widgetId
+
     getSizeReq wenv node = (fixedSize width, fixedSize height)
+
     render wenv node renderer = do
         let style = currentStyle wenv node
             vp = getContentArea node style
         mapM_ (drawHlink renderer vp) $ getHlinkIndices grid
         mapM_ (drawVlink renderer vp) $ getVlinkIndices grid
         mapM_ (drawNode renderer vp)  $ getNodeIndices grid
+
     drawNode renderer vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i)
             y = (vy vp) + linkSize*(fromIntegral j)
@@ -92,6 +125,7 @@ gameControl_ game config = widgetNode where
         drawEllipse renderer (Rect x y d d) $ Just $ if null node
             then colorNode
             else fromMaybe colorNode $ (head node) ^. color
+
     drawHlink r vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
             y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
@@ -119,6 +153,7 @@ gameControl_ game config = widgetNode where
                 drawLineH (x + nodeSize - 1) (x'' + 1)
                 drawTriangleH x' x''
             _ -> drawLineH (x + nodeSize - 1) (x' + 1)
+
     drawVlink r vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
             y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
@@ -146,4 +181,22 @@ gameControl_ game config = widgetNode where
                 drawLineV (y + nodeSize - 1) (y'' + 1)
                 drawTriangleV y' y''
             _ -> drawLineV (y + nodeSize - 1) (y' + 1)
+
     drawLine' r a b c = drawLine r a b linkWidth c
+
+    grid = _gcsGrid state
+    colorLink        = _colorLink config
+    colorNode        = _colorNode config
+    linkToNodeRatio  = _linkToNodeRatio config
+    nodeToWidthRatio = _nodeToWidthRatio config
+    width            = _gcWidth config
+    height           = _gcHeight config
+    (cols, rows) = getBounds grid
+    factorW      = (fromIntegral cols)+2/linkToNodeRatio
+    factorH      = (fromIntegral rows)+2/linkToNodeRatio
+    linkSize     = min (width/factorW) (height/factorH)
+    nodeSize     = linkSize/linkToNodeRatio
+    linkWidth    = nodeSize/nodeToWidthRatio
+    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
+    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
+    ars = linkWidth*1.5

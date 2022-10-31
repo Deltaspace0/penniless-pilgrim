@@ -51,10 +51,6 @@ initModel_ p = AppModel
     } where
         game = gameFromParameters p
 
-movePilgrimHandle :: Direction -> EventHandle
-movePilgrimHandle d model = [Model $ model & updateGame] where
-    updateGame = currentGame %~ movePilgrim d
-
 resetPilgrimHandle :: EventHandle
 resetPilgrimHandle model = [Model model'] where
     model' = model & updateGame & updateSliders
@@ -77,7 +73,6 @@ resizeGridHandle model = [Model $ model & currentGame .~ game] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit       -> [SetFocusOnKey "mainGrid"]
-    MovePilgrim d -> movePilgrimHandle d model
     ResetPilgrim  -> resetPilgrimHandle model
     ToggleConfig  -> toggleConfigHandle model
     ResizeGrid    -> resizeGridHandle model
