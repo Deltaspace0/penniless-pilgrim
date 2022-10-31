@@ -44,7 +44,7 @@ buildUI wenv model = widgetTree where
         ]
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
-gameControlM model = keystroke kc $ gameControl_ game def
+gameControlM model = gameControl_ game def
     { _gcWidth          = get gameControlWidth
     , _gcHeight         = get gameControlHeight
     , _linkToNodeRatio  = get $ linkToNodeSlider  . csCurrent
@@ -52,7 +52,6 @@ gameControlM model = keystroke kc $ gameControl_ game def
     } where
         game = model ^. currentGame
         get f = model ^. parameters . f
-        kc = toKeyStroke $ get keyConfig
 
 taxLabel :: AppModel -> WidgetNode AppModel AppEvent
 taxLabel model = label' `styleBasic` styleParameters where

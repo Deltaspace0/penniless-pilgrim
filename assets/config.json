@@ -24,12 +24,5 @@
         "caption": "Node size to link width ratio:"
     },
     "game_control_width": 400,
-    "game_control_height": 500,
-    "key_config": {
-        "reset_pilgrim": ["Esc"],
-        "move_pilgrim_north": ["Up", "w", "q"],
-        "move_pilgrim_south": ["Down", "s"],
-        "move_pilgrim_west": ["Left", "a"],
-        "move_pilgrim_east": ["Right", "d"]
-    }
+    "game_control_height": 500
 }
