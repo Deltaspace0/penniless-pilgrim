@@ -15,7 +15,6 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Single
-import Monomer.Widgets.Util.Drawing
 import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
