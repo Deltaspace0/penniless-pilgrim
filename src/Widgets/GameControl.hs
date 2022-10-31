@@ -4,7 +4,7 @@
 {-# LANGUAGE OverloadedStrings      #-}
 {-# LANGUAGE TemplateHaskell        #-}
 
-module GameControl
+module Widgets.GameControl
     ( GameControlCfg(..)
     , gameControl
     , gameControl_
@@ -18,8 +18,8 @@ import Monomer.Widgets.Single
 import Monomer.Widgets.Util.Drawing
 import qualified Monomer.Lens as L
 
-import GameControl.Link
-import GameControl.Node
+import Widgets.GameControl.Link
+import Widgets.GameControl.Node
 import Model.Game (Game(..))
 import Model.Grid
 

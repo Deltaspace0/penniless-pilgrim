@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GameControl.Node
+module Widgets.GameControl.Node
     ( Node(..)
     , nodeTransform
     ) where

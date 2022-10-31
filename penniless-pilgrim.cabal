@@ -24,9 +24,6 @@ source-repository head
 
 library
   exposed-modules:
-      GameControl
-      GameControl.Link
-      GameControl.Node
       Model
       Model.Direction
       Model.Event
@@ -36,6 +33,9 @@ library
       Model.Parameters.ConfigSlider
       Model.Pilgrim
       UI
+      Widgets.GameControl
+      Widgets.GameControl.Link
+      Widgets.GameControl.Node
   other-modules:
       Paths_penniless_pilgrim
   hs-source-dirs:

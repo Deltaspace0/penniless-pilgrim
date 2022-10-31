@@ -11,7 +11,7 @@ import Data.Text (pack)
 import Monomer
 import TextShow (showt)
 
-import GameControl
+import Widgets.GameControl
 import Model
 
 buildUI :: UIBuilder AppModel AppEvent

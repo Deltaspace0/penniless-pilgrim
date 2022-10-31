@@ -1,4 +1,4 @@
-module GameControl.Link
+module Widgets.GameControl.Link
     ( LinkForm(..)
     , Link(..)
     , linkTransform
