@@ -14,7 +14,7 @@ import Control.Lens
 import Data.Default
 import Data.Maybe
 import Monomer
-import Monomer.Widgets.Single
+import Monomer.Widgets.Container
 import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
@@ -66,12 +66,12 @@ makeGameControl
     -> GameControlState
     -> Widget s e
 makeGameControl field config state = widget where
-    widget = createSingle state def
-        { singleInit        = init
-        , singleMerge       = merge
-        , singleHandleEvent = handleEvent
-        , singleGetSizeReq  = getSizeReq
-        , singleRender      = render
+    widget = createContainer state def
+        { containerInit        = init
+        , containerMerge       = merge
+        , containerHandleEvent = handleEvent
+        , containerGetSizeReq  = getSizeReq
+        , containerRender      = render
         }
 
     init wenv node = resultNode resNode where
@@ -107,7 +107,7 @@ makeGameControl field config state = widget where
                 game  = widgetDataGet (wenv ^. L.model) field
             widgetId = node ^. L.info . L.widgetId
 
-    getSizeReq wenv node = (fixedSize width, fixedSize height)
+    getSizeReq wenv node _ = (fixedSize width, fixedSize height)
 
     render wenv node renderer = do
         let style = currentStyle wenv node
