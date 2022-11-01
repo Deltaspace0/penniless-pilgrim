@@ -24,6 +24,6 @@ linkTransform colors (Just G.LinkBack) = Just Link
     , _linkForm  = Just LinkBack
     }
 linkTransform colors (Just G.LinkForward) = Just Link
-    { _linkColor = _linkBack colors
+    { _linkColor = _linkForward colors
     , _linkForm  = Just LinkForward
     }
