@@ -15,6 +15,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Container
+import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
@@ -72,6 +73,7 @@ makeGameControl field config state = widget where
         , containerHandleEvent = handleEvent
         , containerGetSizeReq  = getSizeReq
         , containerRender      = render
+        , containerResize      = resize
         }
 
     init wenv node = resultNode resNode where
@@ -115,6 +117,10 @@ makeGameControl field config state = widget where
         mapM_ (drawHlink renderer vp) $ getHlinkIndices grid
         mapM_ (drawVlink renderer vp) $ getVlinkIndices grid
         mapM_ (drawNode renderer vp)  $ getNodeIndices grid
+    
+    resize wenv node vp children = resized where
+        resized = (resultNode node, assignedAreas)
+        assignedAreas = Seq.empty
 
     drawNode renderer vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i)
