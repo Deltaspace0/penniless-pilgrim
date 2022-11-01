@@ -20,45 +20,39 @@ import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
 
 import Model.Game hiding (Node)
+import Model.Parameters.Colors
 import qualified Model.Game as G
 
 data Node = Node
-    { _nodeColor       :: Maybe Color
-    , _nodeHoverColor  :: Maybe Color
-    , _nodeActiveColor :: Maybe Color
+    { _nodeColor       :: Color
+    , _nodeHoverColor  :: Color
+    , _nodeActiveColor :: Color
     } deriving (Eq, Show)
-
-instance Default Node where
-    def = Node
-        { _nodeColor       = Nothing
-        , _nodeHoverColor  = Nothing
-        , _nodeActiveColor = Nothing
-        }
 
 data NodeCfg = NodeCfg
     { _defaultColor       :: Color
-    , _defaultHoverColor  :: Maybe Color
-    , _defaultActiveColor :: Maybe Color
+    , _defaultHoverColor  :: Color
+    , _defaultActiveColor :: Color
     } deriving (Eq, Show)
 
 makeFields 'Node
 
-nodeTransform :: [G.Node] -> [Node]
-nodeTransform = map $ \node -> case node of
-    NodePilgrim -> def
-        { _nodeColor       = Just $ rgb 60 247 53
-        , _nodeHoverColor  = Just $ rgb 116 248 111
-        , _nodeActiveColor = Just $ rgb 36 181 31
+nodeTransform :: Colors -> [G.Node] -> [Node]
+nodeTransform colors = map $ \node -> case node of
+    NodePilgrim -> Node
+        { _nodeColor       = _nodePilgrimDefault colors
+        , _nodeHoverColor  = _nodePilgrimHover colors
+        , _nodeActiveColor = _nodePilgrimActive colors
         }
-    NodePath -> def
-        { _nodeColor       = Just $ rgb 247 105 70
-        , _nodeHoverColor  = Just $ rgb 245 132 105
-        , _nodeActiveColor = Just $ rgb 185 75 48
+    NodePath -> Node
+        { _nodeColor       = _nodePathDefault colors
+        , _nodeHoverColor  = _nodePathHover colors
+        , _nodeActiveColor = _nodePathActive colors
         }
-    NodeGoal -> def
-        { _nodeColor       = Just $ rgb 221 230 58
-        , _nodeHoverColor  = Just $ rgb 230 238 98
-        , _nodeActiveColor = Just $ rgb 162 169 42
+    NodeGoal -> Node
+        { _nodeColor       = _nodeGoalDefault colors
+        , _nodeHoverColor  = _nodeGoalHover colors
+        , _nodeActiveColor = _nodeGoalActive colors
         }
 
 gameControlNode :: [Node] -> NodeCfg -> WidgetNode s e
@@ -76,13 +70,19 @@ makeGameControlNode nodeStack config = widget where
 
     getBaseStyle _ _ = Just $ def
         { _styleBasic = Just $ def
-            { _sstFgColor = Just basicColor
+            { _sstFgColor = Just $ if null nodeStack
+                then _defaultColor config
+                else nodeHead ^. color
             }
         , _styleHover = Just $ def
-            { _sstFgColor = Just hoverColor'
+            { _sstFgColor = Just $ if null nodeStack
+                then _defaultHoverColor config
+                else nodeHead ^. hoverColor
             }
         , _styleActive = Just $ def
-            { _sstFgColor = Just activeColor'
+            { _sstFgColor = Just $ if null nodeStack
+                then _defaultActiveColor config
+                else nodeHead ^. activeColor
             }
         }
 
@@ -97,14 +97,4 @@ makeGameControlNode nodeStack config = widget where
             vp = getContentArea node style
         drawEllipse renderer vp $ _sstFgColor style
 
-    defaultColor = _defaultColor config
-    basicColor = if null nodeStack
-        then defaultColor
-        else fromMaybe defaultColor $ nodeHead ^. color
-    hoverColor' = fromMaybe basicColor $ if null nodeStack
-        then _defaultHoverColor config
-        else nodeHead ^. hoverColor
-    activeColor' = fromMaybe basicColor $ if null nodeStack
-        then _defaultActiveColor config
-        else nodeHead ^. activeColor
     nodeHead = head nodeStack

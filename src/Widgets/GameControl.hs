@@ -20,16 +20,14 @@ import Widgets.GameControl.Link
 import Widgets.GameControl.Node
 import Model.Game hiding (Node, Link, LinkBack, LinkForward)
 import Model.Grid
+import Model.Parameters.Colors
 
 data GameControlCfg = GameControlCfg
-    { _colorLink        :: Color
-    , _colorNode        :: Color
-    , _colorHoverNode   :: Maybe Color
-    , _colorActiveNode  :: Maybe Color
+    { _colors :: Colors
     , _linkToNodeRatio  :: Double
     , _nodeToWidthRatio :: Double
-    , _gcWidth          :: Double
-    , _gcHeight         :: Double
+    , _gcWidth  :: Double
+    , _gcHeight :: Double
     } deriving (Eq, Show)
 
 newtype GameControlState = GameControlState
@@ -38,8 +36,10 @@ newtype GameControlState = GameControlState
 
 makeFields 'Link
 
-gridFromGame :: Game -> Grid Node Link
-gridFromGame = gridMap nodeTransform linkTransform . _grid
+gridFromGame :: Game -> GameControlCfg -> Grid Node Link
+gridFromGame game config = gridMap nt lt $ _grid game where
+    nt = nodeTransform $ _colors config
+    lt = linkTransform $ _colors config
 
 gameControl :: ALens' s Game -> GameControlCfg -> WidgetNode s e
 gameControl field config = gameControlNode where
@@ -68,12 +68,12 @@ makeGameControl field config state = widget where
             & L.children .~ fmap (f . snd) nodeSequence
         w = makeGameControl field config $ GameControlState grid
         game = widgetDataGet (wenv ^. L.model) field
-        grid = gridFromGame game
+        grid = gridFromGame game config
         nodeSequence = getNodeSequence grid
         f = flip gameControlNode $ NodeCfg
-            { _defaultColor       = _colorNode config
-            , _defaultHoverColor  = _colorHoverNode config
-            , _defaultActiveColor = _colorActiveNode config
+            { _defaultColor       = _nodeDefault colors
+            , _defaultHoverColor  = _nodeHover colors
+            , _defaultActiveColor = _nodeActive colors
             }
 
     merge wenv newNode _ _ = init wenv newNode
@@ -97,10 +97,11 @@ makeGameControl field config state = widget where
                 result = resultReqs newNode $ RenderOnce:reqs
                 newNode = node & L.widget .~ w
                 w       = makeGameControl field config state'
-                state'  = GameControlState $ gridFromGame game'
+                state'  = GameControlState grid
                 reqs  = widgetDataSet field game'
                 game' = movePilgrim direction game
                 game  = widgetDataGet (wenv ^. L.model) field
+                grid  = gridFromGame game' config
             widgetId = node ^. L.info . L.widgetId
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
@@ -180,11 +181,12 @@ makeGameControl field config state = widget where
         d = nodeSize*2
 
     grid = _gcsGrid state
-    colorLink        = _colorLink config
+    colorLink = _linkDefault colors
+    colors = _colors config
     linkToNodeRatio  = _linkToNodeRatio config
     nodeToWidthRatio = _nodeToWidthRatio config
-    width            = _gcWidth config
-    height           = _gcHeight config
+    width  = _gcWidth config
+    height = _gcHeight config
     (cols, rows) = getBounds grid
     factorW      = (fromIntegral cols)+2/linkToNodeRatio
     factorH      = (fromIntegral rows)+2/linkToNodeRatio

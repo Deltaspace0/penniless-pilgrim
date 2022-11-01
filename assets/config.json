@@ -24,5 +24,82 @@
         "caption": "Node size to link width ratio:"
     },
     "game_control_width": 400,
-    "game_control_height": 500
+    "game_control_height": 500,
+    "colors": {
+        "link_default": {
+            "r": 120,
+            "g": 120,
+            "b": 117
+        },
+        "link_back": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "link_forward": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "node_default": {
+            "r": 120,
+            "g": 120,
+            "b": 117
+        },
+        "node_hover": {
+            "r": 157,
+            "g": 157,
+            "b": 149
+        },
+        "node_active": {
+            "r": 105,
+            "g": 104,
+            "b": 103
+        },
+        "node_pilgrim_default": {
+            "r": 60,
+            "g": 247,
+            "b": 53
+        },
+        "node_pilgrim_hover": {
+            "r": 116,
+            "g": 248,
+            "b": 111
+        },
+        "node_pilgrim_active": {
+            "r": 36,
+            "g": 181,
+            "b": 31
+        },
+        "node_path_default": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "node_path_hover": {
+            "r": 245,
+            "g": 132,
+            "b": 105
+        },
+        "node_path_active": {
+            "r": 185,
+            "g": 75,
+            "b": 48
+        },
+        "node_goal_default": {
+            "r": 221,
+            "g": 230,
+            "b": 58
+        },
+        "node_goal_hover": {
+            "r": 230,
+            "g": 238,
+            "b": 98
+        },
+        "node_goal_active": {
+            "r": 162,
+            "g": 169,
+            "b": 42
+        }
+    }
 }

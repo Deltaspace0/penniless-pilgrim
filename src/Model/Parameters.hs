@@ -5,6 +5,7 @@
 
 module Model.Parameters
     ( module Model.Parameters.ConfigSlider
+    , module Model.Parameters.Colors
     , AppParameters(..)
     , gridColumnsSlider
     , gridRowsSlider
@@ -12,6 +13,7 @@ module Model.Parameters
     , nodeToWidthSlider
     , gameControlWidth
     , gameControlHeight
+    , colors
     , fromFile
     , fromJSON
     ) where
@@ -25,6 +27,7 @@ import Data.Maybe
 import System.IO
 
 import Model.Parameters.ConfigSlider
+import Model.Parameters.Colors
 
 data AppParameters = AppParameters
     { _apGridColumnsSlider :: ConfigSlider
@@ -33,6 +36,7 @@ data AppParameters = AppParameters
     , _apNodeToWidthSlider :: ConfigSlider
     , _apGameControlWidth  :: Double
     , _apGameControlHeight :: Double
+    , _apColors :: Colors
     } deriving (Eq, Show)
 
 instance Default AppParameters where
@@ -45,6 +49,7 @@ instance Default AppParameters where
             "Node size to link width ratio:"
         , _apGameControlWidth  = 400
         , _apGameControlHeight = 500
+        , _apColors = def
         }
 
 instance FromJSON AppParameters where
@@ -55,6 +60,7 @@ instance FromJSON AppParameters where
         <*> v .: "node_to_width_slider"
         <*> v .: "game_control_width"
         <*> v .: "game_control_height"
+        <*> v .: "colors"
 
 makeLensesWith abbreviatedFields 'AppParameters
 

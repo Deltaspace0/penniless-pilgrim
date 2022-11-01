@@ -30,6 +30,7 @@ library
       Model.Game
       Model.Grid
       Model.Parameters
+      Model.Parameters.Colors
       Model.Parameters.ConfigSlider
       Model.Pilgrim
       UI
