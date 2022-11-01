@@ -89,13 +89,12 @@ makeGameControlNode nodeStack config = widget where
         }
 
     getCurrentStyle wenv node = style where
-        style' = currentStyle wenv node
-        vp = getContentArea node style'
+        vp = node ^. L.info . L.viewport
         style = currentStyle_ c wenv node
         c = def & L.isHovered .~ isNodeHoveredEllipse_ vp
 
     render wenv node renderer = do
-        let style = getCurrentStyle wenv node
+        let style = currentStyle wenv node
             vp = getContentArea node style
         drawEllipse renderer vp $ _sstFgColor style
 
