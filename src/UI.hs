@@ -44,11 +44,15 @@ buildUI _ model = widgetTree where
         ]
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
-gameControlM model = gameControl_ currentGame def
-    { _gcWidth          = get gameControlWidth
-    , _gcHeight         = get gameControlHeight
+gameControlM model = gameControl currentGame $ GameControlCfg
+    { _colorLink        = rgb 120 120 117
+    , _colorNode        = rgb 120 120 117
+    , _colorHoverNode   = Just $ rgb 157 157 149
+    , _colorActiveNode  = Just $ rgb 82 82 80
     , _linkToNodeRatio  = get $ linkToNodeSlider  . csCurrent
     , _nodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
+    , _gcWidth          = get gameControlWidth
+    , _gcHeight         = get gameControlHeight
     } where
         get f = model ^. parameters . f
 

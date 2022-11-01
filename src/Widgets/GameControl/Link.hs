@@ -19,10 +19,10 @@ data Link = Link
 linkTransform :: Maybe G.Link -> Maybe Link
 linkTransform Nothing = Nothing
 linkTransform (Just G.LinkBack) = Just Link
-    { _linkColor = white
+    { _linkColor = rgb 247 105 70
     , _linkForm  = Just LinkBack
     }
 linkTransform (Just G.LinkForward) = Just Link
-    { _linkColor = white
+    { _linkColor = rgb 247 105 70
     , _linkForm  = Just LinkForward
     }
