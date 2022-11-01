@@ -78,11 +78,13 @@ makeGameControlNode nodeStack config = widget where
             { _sstFgColor = Just $ if null nodeStack
                 then _defaultHoverColor config
                 else nodeHead ^. hoverColor
+            , _sstCursorIcon = Just CursorHand
             }
         , _styleActive = Just $ def
             { _sstFgColor = Just $ if null nodeStack
                 then _defaultActiveColor config
                 else nodeHead ^. activeColor
+            , _sstCursorIcon = Just CursorHand
             }
         }
 
