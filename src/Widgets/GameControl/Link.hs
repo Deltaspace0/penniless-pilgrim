@@ -1,7 +1,8 @@
 module Widgets.GameControl.Link
     ( LinkForm(..)
     , Link(..)
-    , linkTransform
+    , hlinkTransform
+    , vlinkTransform
     ) where
 
 import Data.Maybe
@@ -17,13 +18,24 @@ data Link = Link
     , _linkForm  :: Maybe LinkForm
     } deriving (Eq, Show)
 
-linkTransform :: Colors -> Maybe G.Link -> Maybe Link
-linkTransform _ Nothing = Nothing
-linkTransform colors (Just G.LinkBack) = Just Link
-    { _linkColor = _linkBack colors
+hlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
+hlinkTransform _ Nothing = Nothing
+hlinkTransform colors (Just G.LinkBack) = Just Link
+    { _linkColor = _linkWest colors
     , _linkForm  = Just LinkBack
     }
-linkTransform colors (Just G.LinkForward) = Just Link
-    { _linkColor = _linkForward colors
+hlinkTransform colors (Just G.LinkForward) = Just Link
+    { _linkColor = _linkEast colors
+    , _linkForm  = Just LinkForward
+    }
+
+vlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
+vlinkTransform _ Nothing = Nothing
+vlinkTransform colors (Just G.LinkBack) = Just Link
+    { _linkColor = _linkNorth colors
+    , _linkForm  = Just LinkBack
+    }
+vlinkTransform colors (Just G.LinkForward) = Just Link
+    { _linkColor = _linkSouth colors
     , _linkForm  = Just LinkForward
     }

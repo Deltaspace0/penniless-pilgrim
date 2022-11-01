@@ -18,8 +18,10 @@ instance FromJSON RGB where
 
 data Colors = Colors
     { _linkDefault        :: Color
-    , _linkBack           :: Color
-    , _linkForward        :: Color
+    , _linkNorth          :: Color
+    , _linkSouth          :: Color
+    , _linkWest           :: Color
+    , _linkEast           :: Color
     , _nodeDefault        :: Color
     , _nodeHover          :: Color
     , _nodeActive         :: Color
@@ -37,8 +39,10 @@ data Colors = Colors
 instance Default Colors where
     def = Colors
         { _linkDefault        = rgb 120 120 117
-        , _linkBack           = rgb 247 105 70
-        , _linkForward        = rgb 247 105 70
+        , _linkNorth          = rgb 247 105 70
+        , _linkSouth          = rgb 247 105 70
+        , _linkWest           = rgb 247 105 70
+        , _linkEast           = rgb 247 105 70
         , _nodeDefault        = rgb 120 120 117
         , _nodeHover          = rgb 157 157 149
         , _nodeActive         = rgb 105 104 103
@@ -57,8 +61,10 @@ instance FromJSON Colors where
     parseJSON = withObject "Colors" func where
         func v = Colors
             <$> f "link_default"
-            <*> f "link_back"
-            <*> f "link_forward"
+            <*> f "link_north"
+            <*> f "link_south"
+            <*> f "link_west"
+            <*> f "link_east"
             <*> f "node_default"
             <*> f "node_hover"
             <*> f "node_active"

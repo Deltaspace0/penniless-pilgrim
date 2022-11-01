@@ -37,9 +37,10 @@ newtype GameControlState = GameControlState
 makeFields 'Link
 
 gridFromGame :: Game -> GameControlCfg -> Grid Node Link
-gridFromGame game config = gridMap nt lt $ _grid game where
-    nt = nodeTransform $ _colors config
-    lt = linkTransform $ _colors config
+gridFromGame game config = gridMap nt hlt vlt $ _grid game where
+    nt  = nodeTransform $ _colors config
+    hlt = hlinkTransform $ _colors config
+    vlt = vlinkTransform $ _colors config
 
 gameControl :: ALens' s Game -> GameControlCfg -> WidgetNode s e
 gameControl field config = gameControlNode where

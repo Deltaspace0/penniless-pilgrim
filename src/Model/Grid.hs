@@ -136,10 +136,11 @@ getBounds grid = snd $ bounds $ grid ^. nodes
 gridMap
     :: ([a] -> [a'])
     -> (Maybe b -> Maybe b')
+    -> (Maybe b -> Maybe b')
     -> Grid a b
     -> Grid a' b'
-gridMap nodeTransform linkTransform grid = Grid
+gridMap nodeTransform hlinkTransform vlinkTransform grid = Grid
     { _gridNodes  = amap nodeTransform $ grid ^. nodes
-    , _gridHlinks = amap linkTransform $ grid ^. hlinks
-    , _gridVlinks = amap linkTransform $ grid ^. vlinks
+    , _gridHlinks = amap hlinkTransform $ grid ^. hlinks
+    , _gridVlinks = amap vlinkTransform $ grid ^. vlinks
     }
