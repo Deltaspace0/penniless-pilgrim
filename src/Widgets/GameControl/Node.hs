@@ -14,16 +14,16 @@ import Model.Game hiding (Node)
 import qualified Model.Game as G
 
 data Node = Node
-    { _nodeColor     :: Maybe Color
-    , _nodeTextColor :: Maybe Color
-    , _nodeText      :: Text
+    { _nodeColor       :: Maybe Color
+    , _nodeHoverColor  :: Maybe Color
+    , _nodeActiveColor :: Maybe Color
     } deriving (Eq, Show)
 
 instance Default Node where
     def = Node
-        { _nodeColor     = Nothing
-        , _nodeTextColor = Nothing
-        , _nodeText      = ""
+        { _nodeColor       = Nothing
+        , _nodeHoverColor  = Nothing
+        , _nodeActiveColor = Nothing
         }
 
 nodeTransform :: [G.Node] -> [Node]
