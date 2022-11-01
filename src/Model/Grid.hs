@@ -18,9 +18,12 @@ module Model.Grid
     , setHlink
     , getVlink
     , setVlink
+    , getNodeIndices
     , getHlinkIndices
     , getVlinkIndices
-    , getNodeIndices
+    , getNodeSequence
+    , getHlinkSequence
+    , getVlinkSequence
     , getBounds
     , gridMap
     ) where
@@ -28,6 +31,8 @@ module Model.Grid
 import Control.Lens hiding (indices)
 import Data.Array.IArray
 import Data.Maybe
+import Data.Sequence (Seq(..))
+import qualified Data.Sequence as Seq
 
 import Model.Direction
 
@@ -109,6 +114,21 @@ getHlinkIndices grid = indices $ grid ^. hlinks
 
 getVlinkIndices :: Grid a b -> [Point]
 getVlinkIndices grid = indices $ grid ^. vlinks
+
+getNodeSequence :: Grid a b -> Seq (Point, [a])
+getNodeSequence grid = Seq.fromList $ f <$> xs where
+    xs = getNodeIndices grid
+    f p = (p, (grid ^. nodes)!p)
+
+getHlinkSequence :: Grid a b -> Seq (Point, Maybe b)
+getHlinkSequence grid = Seq.fromList $ f <$> xs where
+    xs = getHlinkIndices grid
+    f p = (p, (grid ^. hlinks)!p)
+
+getVlinkSequence :: Grid a b -> Seq (Point, Maybe b)
+getVlinkSequence grid = Seq.fromList $ f <$> xs where
+    xs = getVlinkIndices grid
+    f p = (p, (grid ^. vlinks)!p)
 
 getBounds :: Grid a b -> Point
 getBounds grid = snd $ bounds $ grid ^. nodes

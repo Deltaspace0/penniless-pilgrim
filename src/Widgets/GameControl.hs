@@ -15,7 +15,6 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Container
-import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
@@ -47,7 +46,6 @@ newtype GameControlState = GameControlState
     }
 
 makeFields 'Link
-makeFields 'Node
 
 gridFromGame :: Game -> Grid Node Link
 gridFromGame = gridMap nodeTransform linkTransform . _grid
@@ -77,10 +75,16 @@ makeGameControl field config state = widget where
         }
 
     init wenv node = resultNode resNode where
-        resNode = node & L.widget .~ w
-        w = makeGameControl field config state'
-        state' = GameControlState $ gridFromGame game
+        resNode = node
+            & L.widget .~ w
+            & L.children .~ fmap (f . snd) nodeSequence
+        w = makeGameControl field config $ GameControlState grid
         game = widgetDataGet (wenv ^. L.model) field
+        grid = gridFromGame game
+        nodeSequence = getNodeSequence grid
+        f = flip gameControlNode_ $ def
+            { _defaultColor = colorNode
+            }
     
     merge wenv newNode _ _ = init wenv newNode
 
@@ -116,20 +120,11 @@ makeGameControl field config state = widget where
             vp = getContentArea node style
         mapM_ (drawHlink renderer vp) $ getHlinkIndices grid
         mapM_ (drawVlink renderer vp) $ getVlinkIndices grid
-        mapM_ (drawNode renderer vp)  $ getNodeIndices grid
-    
+
     resize wenv node vp children = resized where
         resized = (resultNode node, assignedAreas)
-        assignedAreas = Seq.empty
-
-    drawNode renderer vp (i, j) = do
-        let x = (vx vp) + linkSize*(fromIntegral i)
-            y = (vy vp) + linkSize*(fromIntegral j)
-            d = nodeSize*2
-            node = getNode (i, j) grid
-        drawEllipse renderer (Rect x y d d) $ Just $ if null node
-            then colorNode
-            else fromMaybe colorNode $ (head node) ^. color
+        assignedAreas = (getNodeArea vp . fst) <$> nodeSequence
+        nodeSequence = getNodeSequence grid
 
     drawHlink r vp (i, j) = do
         let x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
@@ -188,6 +183,11 @@ makeGameControl field config state = widget where
             _ -> drawLineV (y + nodeSize - 1) (y' + 1)
 
     drawLine' r a b c = drawLine r a b linkWidth c
+
+    getNodeArea vp (i, j) = Rect x y d d where
+        x = (vx vp) + linkSize*(fromIntegral i)
+        y = (vy vp) + linkSize*(fromIntegral j)
+        d = nodeSize*2
 
     grid = _gcsGrid state
     colorLink        = _colorLink config
