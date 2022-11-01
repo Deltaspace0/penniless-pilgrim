@@ -14,7 +14,6 @@ module Widgets.GameControl.Node
 import Control.Lens
 import Data.Default
 import Data.Maybe
-import Data.Text (Text)
 import Monomer
 import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
