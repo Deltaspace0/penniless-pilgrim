@@ -69,41 +69,39 @@ makeGameControlNode nodeStack config = widget where
         , singleRender = render
         }
 
-    getBaseStyle _ _ = Just $ def
-        { _styleBasic = Just $ def
-            { _sstFgColor = Just $ if null nodeStack
-                then _ncColor config
-                else nodeHead ^. color
+    getBaseStyle _ _ = if null direction
+        then Just basicStyle
+        else Just $ basicStyle
+            { _styleHover = Just $ def
+                { _sstFgColor = Just $ if null nodeStack
+                    then _ncHoverColor config
+                    else nodeHead ^. hoverColor
+                , _sstCursorIcon = Just CursorHand
+                }
+            , _styleActive = Just $ def
+                { _sstFgColor = Just $ if null nodeStack
+                    then _ncActiveColor config
+                    else nodeHead ^. activeColor
+                , _sstCursorIcon = Just CursorHand
+                }
             }
-        , _styleHover = Just $ def
-            { _sstFgColor = Just $ if null nodeStack
-                then _ncHoverColor config
-                else nodeHead ^. hoverColor
-            , _sstCursorIcon = Just CursorHand
-            }
-        , _styleActive = Just $ def
-            { _sstFgColor = Just $ if null nodeStack
-                then _ncActiveColor config
-                else nodeHead ^. activeColor
-            , _sstCursorIcon = Just CursorHand
-            }
-        }
 
     getCurrentStyle wenv node = style where
         vp = node ^. L.info . L.viewport
         style = currentStyle_ c wenv node
         c = def & L.isHovered .~ isNodeHoveredEllipse_ vp
-    
+
     handleEvent wenv node target evt = case evt of
         Click p _ _
             | isPointInNodeVp node p && isDirection -> Just result
         _ -> Nothing
         where
             isDirection = not $ null direction
-            result = resultReqs node [SendMessage id direction']
-            id = _ncGameControlId config
-            direction = _ncDirection config
+            result = resultReqs node reqs
+            reqs = [SendMessage gcId direction', ResetCursorIcon id]
+            gcId = _ncGameControlId config
             direction' = fromJust direction
+            id = node ^. L.info . L.widgetId
 
     render wenv node renderer = do
         let style = currentStyle wenv node
@@ -111,3 +109,11 @@ makeGameControlNode nodeStack config = widget where
         drawEllipse renderer vp $ _sstFgColor style
 
     nodeHead = head nodeStack
+    direction = _ncDirection config
+    basicStyle = def
+        { _styleBasic = Just $ def
+            { _sstFgColor = Just $ if null nodeStack
+                then _ncColor config
+                else nodeHead ^. color
+            }
+        }
