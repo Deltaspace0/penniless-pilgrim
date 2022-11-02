@@ -1,8 +1,4 @@
-{-# LANGUAGE FlexibleContexts       #-}
-{-# LANGUAGE FlexibleInstances      #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl
     ( GameControlCfg(..)
@@ -35,8 +31,6 @@ data GameControlCfg = GameControlCfg
 newtype GameControlState = GameControlState
     { _gcsGrid :: Grid Node Link
     }
-
-makeFields 'Link
 
 gridFromGame :: Game -> GameControlCfg -> Grid Node Link
 gridFromGame game config = gridMap nt hlt vlt $ _grid game where
