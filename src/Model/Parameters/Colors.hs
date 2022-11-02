@@ -22,6 +22,7 @@ data Colors = Colors
     , _linkSouth          :: Color
     , _linkWest           :: Color
     , _linkEast           :: Color
+    , _nodeHighlight      :: Color
     , _nodeDefault        :: Color
     , _nodeHover          :: Color
     , _nodeActive         :: Color
@@ -43,6 +44,7 @@ instance Default Colors where
         , _linkSouth          = rgb 247 105 70
         , _linkWest           = rgb 247 105 70
         , _linkEast           = rgb 247 105 70
+        , _nodeHighlight      = rgb 234 232 233
         , _nodeDefault        = rgb 120 120 117
         , _nodeHover          = rgb 157 157 149
         , _nodeActive         = rgb 105 104 103
@@ -65,6 +67,7 @@ instance FromJSON Colors where
             <*> f "link_south"
             <*> f "link_west"
             <*> f "link_east"
+            <*> f "node_highlight"
             <*> f "node_default"
             <*> f "node_hover"
             <*> f "node_active"

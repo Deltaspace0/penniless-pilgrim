@@ -78,6 +78,7 @@ makeGameControl field config state = widget where
             { _ncColor = _nodeDefault colors
             , _ncHoverColor = _nodeHover colors
             , _ncActiveColor = _nodeActive colors
+            , _ncHighlightColor = _nodeHighlight colors
             , _ncGameControlId = widgetId
             , _ncDirection = directionFromGame p game
             }
