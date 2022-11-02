@@ -7,6 +7,7 @@ module Model.Game
     , makeGame_
     , movePilgrim
     , movePilgrim_
+    , directionFromGame
     ) where
 
 import Data.Default
@@ -62,3 +63,12 @@ movePilgrim_ d game = if inside && (goingBack || linkEmpty)
         link | goingBack = Nothing
              | p == min p p' = Just LinkForward
              | otherwise = Just LinkBack
+
+directionFromGame :: (Int, Int) -> Game -> Maybe Direction
+directionFromGame (x, y) game
+    | null direction = Nothing
+    | snd (movePilgrim_ (fromJust direction) game) = direction
+    | otherwise = Nothing
+    where
+        direction = relativeDirection p (x, y)
+        p = _position $ _pilgrim game

@@ -73,12 +73,12 @@ makeGameControl field config state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-        fn ((i, j), nodeStack) = gameControlNode nodeStack $ NodeCfg
+        fn (p, nodeStack) = gameControlNode nodeStack $ NodeCfg
             { _ncColor = _nodeDefault colors
             , _ncHoverColor = _nodeHover colors
             , _ncActiveColor = _nodeActive colors
             , _ncGameControlId = node ^. L.info . L.widgetId
-            , _ncDirection = relativeDirection p (i, j)
+            , _ncDirection = directionFromGame p game
             }
         fh = flip gameControlHlink linkConfig
         fl = flip gameControlVlink linkConfig
@@ -86,7 +86,6 @@ makeGameControl field config state = widget where
             { _lcColor = _linkDefault colors
             , _lcNodeToWidthRatio = nodeToWidthRatio
             }
-        p = _position $ _pilgrim game
 
     merge wenv newNode _ _ = init wenv newNode
 
