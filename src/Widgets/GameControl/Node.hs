@@ -6,7 +6,7 @@
 
 module Widgets.GameControl.Node
     ( Node(..)
-    , NodeCfg(..)
+    , NodeData(..)
     , nodeTransform
     , gameControlNode
     ) where
@@ -28,15 +28,16 @@ data Node = Node
     , _nodeActiveColor :: Color
     } deriving (Eq, Show)
 
-data NodeCfg s = NodeCfg
-    { _ncColor :: Color
-    , _ncHoverColor :: Color
-    , _ncActiveColor :: Color
-    , _ncHighlightColor :: Color
-    , _ncGameControlId :: WidgetId
-    , _ncDirection :: Maybe G.Direction
-    , _ncNextTax :: Maybe Double
-    , _ncNextTaxField :: WidgetData s (Maybe Double)
+data NodeData s = NodeData
+    { _ndNodeStack :: [Node]
+    , _ndColor :: Color
+    , _ndHoverColor :: Color
+    , _ndActiveColor :: Color
+    , _ndHighlightColor :: Color
+    , _ndGameControlId :: WidgetId
+    , _ndDirection :: Maybe G.Direction
+    , _ndNextTax :: Maybe Double
+    , _ndNextTaxField :: WidgetData s (Maybe Double)
     }
 
 makeFields 'Node
@@ -59,13 +60,13 @@ nodeTransform colors = map $ \node -> case node of
         , _nodeActiveColor = _nodeGoalActive colors
         }
 
-gameControlNode :: [Node] -> NodeCfg s -> WidgetNode s e
-gameControlNode nodeStack config = gameControlNodeNode where
+gameControlNode :: NodeData s -> WidgetNode s e
+gameControlNode nodeData = gameControlNodeNode where
     gameControlNodeNode = defaultWidgetNode "gameControlNode" widget
-    widget = makeGameControlNode nodeStack config
+    widget = makeGameControlNode nodeData
 
-makeGameControlNode :: [Node] -> NodeCfg s -> Widget s e
-makeGameControlNode nodeStack config = widget where
+makeGameControlNode :: NodeData s -> Widget s e
+makeGameControlNode nodeData = widget where
     widget = createSingle () def
         { singleGetBaseStyle = getBaseStyle
         , singleGetCurrentStyle = getCurrentStyle
@@ -78,13 +79,13 @@ makeGameControlNode nodeStack config = widget where
         else Just $ basicStyle
             { _styleHover = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ncHoverColor config
+                    then _ndHoverColor nodeData
                     else nodeHead ^. hoverColor
                 , _sstCursorIcon = Just CursorHand
                 }
             , _styleActive = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ncActiveColor config
+                    then _ndActiveColor nodeData
                     else nodeHead ^. activeColor
                 , _sstCursorIcon = Just CursorHand
                 }
@@ -113,25 +114,26 @@ makeGameControlNode nodeStack config = widget where
             direction' = fromJust direction
         _ -> Nothing
         where
-            gcId = _ncGameControlId config
+            gcId = _ndGameControlId nodeData
             id = node ^. L.info . L.widgetId
-            nextTaxField = _ncNextTaxField config
-            nextTax = _ncNextTax config
+            nextTaxField = _ndNextTaxField nodeData
+            nextTax = _ndNextTax nodeData
 
     render wenv node renderer = do
         let style = currentStyle wenv node
             vp = getContentArea node style
-            hc = Just $ _ncHighlightColor config
+            hc = Just $ _ndHighlightColor nodeData
         drawEllipse renderer vp $ _sstFgColor style
         when (not $ null direction) $ do
             drawEllipseBorder renderer vp hc 2
 
+    nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack
-    direction = _ncDirection config
+    direction = _ndDirection nodeData
     basicStyle = def
         { _styleBasic = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _ncColor config
+                then _ndColor nodeData
                 else nodeHead ^. color
             }
         }

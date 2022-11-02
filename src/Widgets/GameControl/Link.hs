@@ -7,7 +7,7 @@
 module Widgets.GameControl.Link
     ( LinkForm(..)
     , Link(..)
-    , LinkCfg(..)
+    , LinkData(..)
     , hlinkTransform
     , vlinkTransform
     , gameControlHlink
@@ -31,9 +31,10 @@ data Link = Link
     , _linkForm :: Maybe LinkForm
     } deriving (Eq, Show)
 
-data LinkCfg = LinkCfg
-    { _lcColor :: Color
-    , _lcNodeToWidthRatio :: Double
+data LinkData = LinkData
+    { _ldLink :: Maybe Link
+    , _ldColor :: Color
+    , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)
 
 makeFields 'Link
@@ -60,33 +61,34 @@ vlinkTransform colors (Just G.LinkForward) = Just Link
     , _linkForm = Just LinkForward
     }
 
-gameControlHlink :: Maybe Link -> LinkCfg -> WidgetNode s e
-gameControlHlink link config = node where
+gameControlHlink :: LinkData -> WidgetNode s e
+gameControlHlink linkData = node where
     node = defaultWidgetNode "gameControlLink" widget
-    widget = makeGameControlLink True link config
+    widget = makeGameControlLink True linkData
 
-gameControlVlink :: Maybe Link -> LinkCfg -> WidgetNode s e
-gameControlVlink link config = node where
+gameControlVlink :: LinkData -> WidgetNode s e
+gameControlVlink linkData = node where
     node = defaultWidgetNode "gameControlLink" widget
-    widget = makeGameControlLink False link config
+    widget = makeGameControlLink False linkData
 
-makeGameControlLink :: Bool -> Maybe Link -> LinkCfg -> Widget s e
-makeGameControlLink isHz link config = widget where
+makeGameControlLink :: Bool -> LinkData -> Widget s e
+makeGameControlLink isHz linkData = widget where
     widget = createSingle () def
         { singleRender = render
         }
 
     render wenv node r = do
-        let style = currentStyle wenv node
+        let link = _ldLink linkData
+            style = currentStyle wenv node
             Rect x y linkSize nodeSize = getContentArea node style
             Just link' = link
             (color', form') = if null link
-                then (_lcColor config, Nothing)
+                then (_ldColor linkData, Nothing)
                 else (link' ^. color, link' ^. form)
             c = Just color'
             s = if isHz then x else y
             b = s + linkSize - nodeSize
-            linkWidth = nodeSize/(_lcNodeToWidthRatio config)
+            linkWidth = nodeSize/(_ldNodeToWidthRatio linkData)
             ars = linkWidth*1.5
             drawLine' a b = drawLine r p1 p2 linkWidth c where
                 p1 = if isHz then Point a y else Point x a

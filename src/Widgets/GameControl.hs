@@ -75,21 +75,23 @@ makeGameControl gcData state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-        fn (p, nodeStack) = gameControlNode nodeStack $ NodeCfg
-            { _ncColor = _nodeDefault colors
-            , _ncHoverColor = _nodeHover colors
-            , _ncActiveColor = _nodeActive colors
-            , _ncHighlightColor = _nodeHighlight colors
-            , _ncGameControlId = widgetId
-            , _ncDirection = directionFromGame p game
-            , _ncNextTax = taxFromGame p game
-            , _ncNextTaxField = nextTaxField
+        fn (p, nodeStack) = gameControlNode $ NodeData
+            { _ndNodeStack = nodeStack
+            , _ndColor = _nodeDefault colors
+            , _ndHoverColor = _nodeHover colors
+            , _ndActiveColor = _nodeActive colors
+            , _ndHighlightColor = _nodeHighlight colors
+            , _ndGameControlId = widgetId
+            , _ndDirection = directionFromGame p game
+            , _ndNextTax = taxFromGame p game
+            , _ndNextTaxField = nextTaxField
             }
-        fh = flip gameControlHlink linkConfig
-        fl = flip gameControlVlink linkConfig
-        linkConfig = LinkCfg
-            { _lcColor = _linkDefault colors
-            , _lcNodeToWidthRatio = nodeToWidthRatio
+        fh = gameControlHlink . linkData
+        fl = gameControlVlink . linkData
+        linkData link = LinkData
+            { _ldLink = link
+            , _ldColor = _linkDefault colors
+            , _ldNodeToWidthRatio = nodeToWidthRatio
             }
         widgetId = node ^. L.info . L.widgetId
 
