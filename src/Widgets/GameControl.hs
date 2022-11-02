@@ -60,13 +60,14 @@ makeGameControl field config state = widget where
         , containerResize = resize
         }
 
-    init wenv node = resultNode resNode where
+    init wenv node = resultReqs resNode reqs where
         resNode = node
             & L.widget .~ w
             & L.children .~
                    fmap fn nodeSequence
                 >< fmap (fh . snd) hlinkSequence
                 >< fmap (fl . snd) vlinkSequence
+        reqs = [ResizeWidgets widgetId]
         w = makeGameControl field config $ GameControlState grid
         game = widgetDataGet (wenv ^. L.model) field
         grid = gridFromGame game config
@@ -77,7 +78,7 @@ makeGameControl field config state = widget where
             { _ncColor = _nodeDefault colors
             , _ncHoverColor = _nodeHover colors
             , _ncActiveColor = _nodeActive colors
-            , _ncGameControlId = node ^. L.info . L.widgetId
+            , _ncGameControlId = widgetId
             , _ncDirection = directionFromGame p game
             }
         fh = flip gameControlHlink linkConfig
@@ -86,6 +87,7 @@ makeGameControl field config state = widget where
             { _lcColor = _linkDefault colors
             , _lcNodeToWidthRatio = nodeToWidthRatio
             }
+        widgetId = node ^. L.info . L.widgetId
 
     merge wenv newNode _ _ = init wenv newNode
 
@@ -120,7 +122,7 @@ makeGameControl field config state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-    
+
     handleDirection wenv node direction = Just result where
         result = resultReqs newNode $ RenderOnce:reqs
         newNode = node & L.widget .~ w
