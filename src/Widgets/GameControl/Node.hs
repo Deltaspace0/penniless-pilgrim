@@ -19,7 +19,6 @@ import Monomer
 import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
 
-import Model.Game hiding (Node)
 import Model.Parameters.Colors
 import qualified Model.Game as G
 
@@ -39,17 +38,17 @@ makeFields 'Node
 
 nodeTransform :: Colors -> [G.Node] -> [Node]
 nodeTransform colors = map $ \node -> case node of
-    NodePilgrim -> Node
+    G.NodePilgrim -> Node
         { _nodeColor       = _nodePilgrimDefault colors
         , _nodeHoverColor  = _nodePilgrimHover colors
         , _nodeActiveColor = _nodePilgrimActive colors
         }
-    NodePath -> Node
+    G.NodePath -> Node
         { _nodeColor       = _nodePathDefault colors
         , _nodeHoverColor  = _nodePathHover colors
         , _nodeActiveColor = _nodePathActive colors
         }
-    NodeGoal -> Node
+    G.NodeGoal -> Node
         { _nodeColor       = _nodeGoalDefault colors
         , _nodeHoverColor  = _nodeGoalHover colors
         , _nodeActiveColor = _nodeGoalActive colors
