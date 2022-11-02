@@ -32,6 +32,7 @@ data NodeCfg = NodeCfg
     { _ncColor :: Color
     , _ncHoverColor :: Color
     , _ncActiveColor :: Color
+    , _ncHighlightColor :: Color
     , _ncGameControlId :: WidgetId
     , _ncDirection :: Maybe G.Direction
     } deriving (Eq, Show)
@@ -107,9 +108,10 @@ makeGameControlNode nodeStack config = widget where
     render wenv node renderer = do
         let style = currentStyle wenv node
             vp = getContentArea node style
+            hc = Just $ _ncHighlightColor config
         drawEllipse renderer vp $ _sstFgColor style
         when (not $ null direction) $ do
-            drawEllipseBorder renderer vp (Just white) 2
+            drawEllipseBorder renderer vp hc 2
 
     nodeHead = head nodeStack
     direction = _ncDirection config
