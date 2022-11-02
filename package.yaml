@@ -1,10 +1,10 @@
 name:                penniless-pilgrim
 version:             0.1.0.0
-github:              "Deltaspace0/Penniless-Pilgrim"
+github:              Deltaspace0/penniless-pilgrim
 license:             MIT
-author:              "Deltaspace0"
-maintainer:          "rgadeew@yandex.ru"
-copyright:           "2022 Deltaspace0"
+author:              Ruslan Gadeev
+maintainer:          rgadeew@yandex.ru
+copyright:           2022 Ruslan Gadeev
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/Deltaspace0/Penniless-Pilgrim#readme>
+description:         Please see the README on GitHub at <https://github.com/Deltaspace0/penniless-pilgrim#readme>
 
 dependencies:
 - aeson
