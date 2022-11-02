@@ -14,7 +14,6 @@ module Widgets.GameControl.Node
 import Control.Lens
 import Data.Default
 import Data.Maybe
-import Data.Text (Text)
 import Monomer
 import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
@@ -29,9 +28,9 @@ data Node = Node
     } deriving (Eq, Show)
 
 data NodeCfg = NodeCfg
-    { _defaultColor       :: Color
-    , _defaultHoverColor  :: Color
-    , _defaultActiveColor :: Color
+    { _ncColor       :: Color
+    , _ncHoverColor  :: Color
+    , _ncActiveColor :: Color
     } deriving (Eq, Show)
 
 makeFields 'Node
@@ -70,18 +69,18 @@ makeGameControlNode nodeStack config = widget where
     getBaseStyle _ _ = Just $ def
         { _styleBasic = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _defaultColor config
+                then _ncColor config
                 else nodeHead ^. color
             }
         , _styleHover = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _defaultHoverColor config
+                then _ncHoverColor config
                 else nodeHead ^. hoverColor
             , _sstCursorIcon = Just CursorHand
             }
         , _styleActive = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _defaultActiveColor config
+                then _ncActiveColor config
                 else nodeHead ^. activeColor
             , _sstCursorIcon = Just CursorHand
             }
