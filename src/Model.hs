@@ -12,6 +12,7 @@ module Model
     , currentGame
     , showConfig
     , parameters
+    , nextTax
     , initModel
     , initModel_
     , handleEvent
@@ -20,6 +21,7 @@ module Model
 
 import Control.Lens
 import Data.Default
+import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
@@ -31,8 +33,9 @@ import Model.Parameters
 data AppModel = AppModel
     { _appInitialGame :: Game
     , _appCurrentGame :: Game
-    , _appShowConfig  :: Bool
-    , _appParameters  :: AppParameters
+    , _appShowConfig :: Bool
+    , _appParameters :: AppParameters
+    , _appNextTax :: Maybe Double
     } deriving (Eq, Show)
 
 type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
@@ -46,8 +49,9 @@ initModel_ :: AppParameters -> AppModel
 initModel_ p = AppModel
     { _appInitialGame = game
     , _appCurrentGame = game
-    , _appShowConfig  = False
-    , _appParameters  = p
+    , _appShowConfig = False
+    , _appParameters = p
+    , _appNextTax = Nothing
     } where
         game = gameFromParameters p
 
@@ -56,8 +60,8 @@ resetPilgrimHandle model = [Model model'] where
     model' = model & updateGame & updateSliders
     updateSliders = updateColumns . updateRows
     updateColumns = currentValue gridColumnsSlider .~ cols'
-    updateRows    = currentValue gridRowsSlider    .~ rows'
-    updateGame    = currentGame .~ model ^. initialGame
+    updateRows = currentValue gridRowsSlider .~ rows'
+    updateGame = currentGame .~ model ^. initialGame
     currentValue slider = parameters . slider . csCurrent
     (cols, rows) = getBounds $ _grid $ model ^. initialGame
     cols' = fromIntegral $ cols+1
@@ -72,12 +76,12 @@ resizeGridHandle model = [Model $ model & currentGame .~ game] where
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
-    AppInit       -> [SetFocusOnKey "mainGrid"]
-    ResetPilgrim  -> resetPilgrimHandle model
-    ToggleConfig  -> toggleConfigHandle model
-    ResizeGrid    -> resizeGridHandle model
+    AppInit -> [SetFocusOnKey "mainGrid"]
+    ResetPilgrim -> resetPilgrimHandle model
+    ToggleConfig -> toggleConfigHandle model
+    ResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game
 gameFromParameters p = makeGame (floor gc) (floor gr) where
     gc = p ^. gridColumnsSlider . csCurrent
-    gr = p ^. gridRowsSlider    . csCurrent
+    gr = p ^. gridRowsSlider . csCurrent

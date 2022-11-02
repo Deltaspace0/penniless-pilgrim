@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl
-    ( GameControlCfg(..)
+    ( GameControlData(..)
     , gameControl
     ) where
 
@@ -21,36 +21,37 @@ import Model.Game hiding (Node, Link)
 import Model.Grid
 import Model.Parameters.Colors
 
-data GameControlCfg = GameControlCfg
-    { _colors :: Colors
-    , _linkToNodeRatio  :: Double
-    , _nodeToWidthRatio :: Double
-    , _gcWidth  :: Double
-    , _gcHeight :: Double
-    } deriving (Eq, Show)
+data GameControlData s = GameControlData
+    { _gcdGame :: ALens' s Game
+    , _gcdNextTax :: ALens' s (Maybe Double)
+    , _gcdColors :: Colors
+    , _gcdLinkToNodeRatio :: Double
+    , _gcdNodeToWidthRatio :: Double
+    , _gcdWidth :: Double
+    , _gcdHeight :: Double
+    }
 
 newtype GameControlState = GameControlState
     { _gcsGrid :: Grid Node Link
     }
 
-gridFromGame :: Game -> GameControlCfg -> Grid Node Link
-gridFromGame game config = gridMap nt hlt vlt $ _grid game where
-    nt  = nodeTransform $ _colors config
-    hlt = hlinkTransform $ _colors config
-    vlt = vlinkTransform $ _colors config
+gridFromGame :: Game -> Colors -> Grid Node Link
+gridFromGame game colors = gridMap nt hlt vlt $ _grid game where
+    nt  = nodeTransform colors
+    hlt = hlinkTransform colors
+    vlt = vlinkTransform colors
 
-gameControl :: ALens' s Game -> GameControlCfg -> WidgetNode s e
-gameControl field config = gameControlNode where
+gameControl :: GameControlData s -> WidgetNode s e
+gameControl gcData = gameControlNode where
     gameControlNode = defaultWidgetNode "gameControl" widget
-    widget = makeGameControl (WidgetLens field) config state
+    widget = makeGameControl gcData state
     state = GameControlState $ makeGrid 2 2
 
 makeGameControl
-    :: WidgetData s Game
-    -> GameControlCfg
+    :: GameControlData s
     -> GameControlState
     -> Widget s e
-makeGameControl field config state = widget where
+makeGameControl gcData state = widget where
     widget = createContainer state def
         { containerInit = init
         , containerMerge = merge
@@ -68,25 +69,29 @@ makeGameControl field config state = widget where
                 >< fmap (fh . snd) hlinkSequence
                 >< fmap (fl . snd) vlinkSequence
         reqs = [ResizeWidgets widgetId]
-        w = makeGameControl field config $ GameControlState grid
-        game = widgetDataGet (wenv ^. L.model) field
-        grid = gridFromGame game config
+        w = makeGameControl gcData $ GameControlState grid
+        game = widgetDataGet (wenv ^. L.model) gameField
+        grid = gridFromGame game colors
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-        fn (p, nodeStack) = gameControlNode nodeStack $ NodeCfg
-            { _ncColor = _nodeDefault colors
-            , _ncHoverColor = _nodeHover colors
-            , _ncActiveColor = _nodeActive colors
-            , _ncHighlightColor = _nodeHighlight colors
-            , _ncGameControlId = widgetId
-            , _ncDirection = directionFromGame p game
+        fn (p, nodeStack) = gameControlNode $ NodeData
+            { _ndNodeStack = nodeStack
+            , _ndColor = _nodeDefault colors
+            , _ndHoverColor = _nodeHover colors
+            , _ndActiveColor = _nodeActive colors
+            , _ndHighlightColor = _nodeHighlight colors
+            , _ndGameControlId = widgetId
+            , _ndDirection = directionFromGame p game
+            , _ndNextTax = taxFromGame p game
+            , _ndNextTaxField = nextTaxField
             }
-        fh = flip gameControlHlink linkConfig
-        fl = flip gameControlVlink linkConfig
-        linkConfig = LinkCfg
-            { _lcColor = _linkDefault colors
-            , _lcNodeToWidthRatio = nodeToWidthRatio
+        fh = gameControlHlink . linkData
+        fl = gameControlVlink . linkData
+        linkData link = LinkData
+            { _ldLink = link
+            , _ldColor = _linkDefault colors
+            , _ldNodeToWidthRatio = nodeToWidthRatio
             }
         widgetId = node ^. L.info . L.widgetId
 
@@ -96,13 +101,13 @@ makeGameControl field config state = widget where
         KeyAction _ code KeyPressed
             | isKeyNorth code -> handleDirection wenv node North
             | isKeySouth code -> handleDirection wenv node South
-            | isKeyWest  code -> handleDirection wenv node West
-            | isKeyEast  code -> handleDirection wenv node East
+            | isKeyWest code -> handleDirection wenv node West
+            | isKeyEast code -> handleDirection wenv node East
             where
-                isKeyNorth code = isKeyUp    code || isKeyW code
-                isKeySouth code = isKeyDown  code || isKeyS code
-                isKeyWest  code = isKeyLeft  code || isKeyA code
-                isKeyEast  code = isKeyRight code || isKeyD code
+                isKeyNorth code = isKeyUp code || isKeyW code
+                isKeySouth code = isKeyDown code || isKeyS code
+                isKeyWest code = isKeyLeft code || isKeyA code
+                isKeyEast code = isKeyRight code || isKeyD code
         ButtonAction _ _ BtnPressed _ -> Just result where
             result = resultReqs node [SetFocus widgetId]
         _ -> Nothing
@@ -125,13 +130,17 @@ makeGameControl field config state = widget where
         vlinkSequence = getVlinkSequence grid
 
     handleDirection wenv node direction = Just result where
-        result = resultReqs newNode $ RenderOnce:reqs
+        result = resultReqs newNode reqs
         newNode = node & L.widget .~ w
-        reqs = widgetDataSet field game'
-        w = makeGameControl field config state'
+        reqs = concat $
+            [ [RenderOnce]
+            , widgetDataSet gameField game'
+            , widgetDataSet nextTaxField Nothing
+            ]
+        w = makeGameControl gcData state'
         game' = movePilgrim direction game
-        game = widgetDataGet (wenv ^. L.model) field
-        state' = GameControlState $ gridFromGame game' config
+        game = widgetDataGet (wenv ^. L.model) gameField
+        state' = GameControlState $ gridFromGame game' colors
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
@@ -142,16 +151,18 @@ makeGameControl field config state = widget where
         x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
         y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
 
+    gameField = WidgetLens $ _gcdGame gcData
+    nextTaxField = WidgetLens $ _gcdNextTax gcData
     grid = _gcsGrid state
-    colors = _colors config
-    linkToNodeRatio = _linkToNodeRatio config
-    nodeToWidthRatio = _nodeToWidthRatio config
-    width = _gcWidth config
-    height = _gcHeight config
+    colors = _gcdColors gcData
+    linkToNodeRatio = _gcdLinkToNodeRatio gcData
+    nodeToWidthRatio = _gcdNodeToWidthRatio gcData
+    width = _gcdWidth gcData
+    height = _gcdHeight gcData
     (cols, rows) = getBounds grid
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
     linkSize = min (width/factorW) (height/factorH)
     nodeSize = linkSize/linkToNodeRatio
-    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
+    vx vp = (width-linkSize*factorW)/2 + vp ^. L.x
     vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
