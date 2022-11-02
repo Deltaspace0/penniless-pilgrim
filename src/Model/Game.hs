@@ -8,6 +8,7 @@ module Model.Game
     , movePilgrim
     , movePilgrim_
     , directionFromGame
+    , taxFromGame
     ) where
 
 import Data.Default
@@ -72,3 +73,11 @@ directionFromGame (x, y) game
     where
         direction = relativeDirection p (x, y)
         p = _position $ _pilgrim game
+
+taxFromGame :: (Int, Int) -> Game -> Maybe Double
+taxFromGame p game
+    | null direction = Nothing
+    | otherwise = Just $ _tax $ _pilgrim game'
+    where
+        direction = directionFromGame p game
+        game' = movePilgrim (fromJust direction) game

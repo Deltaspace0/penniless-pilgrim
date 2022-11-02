@@ -28,14 +28,16 @@ data Node = Node
     , _nodeActiveColor :: Color
     } deriving (Eq, Show)
 
-data NodeCfg = NodeCfg
+data NodeCfg s = NodeCfg
     { _ncColor :: Color
     , _ncHoverColor :: Color
     , _ncActiveColor :: Color
     , _ncHighlightColor :: Color
     , _ncGameControlId :: WidgetId
     , _ncDirection :: Maybe G.Direction
-    } deriving (Eq, Show)
+    , _ncNextTax :: Maybe Double
+    , _ncNextTaxField :: WidgetData s (Maybe Double)
+    }
 
 makeFields 'Node
 
@@ -57,12 +59,12 @@ nodeTransform colors = map $ \node -> case node of
         , _nodeActiveColor = _nodeGoalActive colors
         }
 
-gameControlNode :: [Node] -> NodeCfg -> WidgetNode s e
+gameControlNode :: [Node] -> NodeCfg s -> WidgetNode s e
 gameControlNode nodeStack config = gameControlNodeNode where
     gameControlNodeNode = defaultWidgetNode "gameControlNode" widget
     widget = makeGameControlNode nodeStack config
 
-makeGameControlNode :: [Node] -> NodeCfg -> Widget s e
+makeGameControlNode :: [Node] -> NodeCfg s -> Widget s e
 makeGameControlNode nodeStack config = widget where
     widget = createSingle () def
         { singleGetBaseStyle = getBaseStyle
@@ -94,16 +96,27 @@ makeGameControlNode nodeStack config = widget where
         c = def & L.isHovered .~ isNodeHoveredEllipse_ vp
 
     handleEvent wenv node target evt = case evt of
-        Click p _ _
-            | isPointInNodeVp node p && isDirection -> Just result
+        Enter _ -> Just result where
+            result = resultReqs node reqs
+            reqs = widgetDataSet nextTaxField nextTax
+        Leave _ -> Just result where
+            result = resultReqs node reqs
+            reqs = widgetDataSet nextTaxField Nothing
+        Click p _ _ | valid -> Just result where
+            valid = isPointInNodeVp node p && isDirection
+            result = resultReqs node reqs
+            reqs =
+                [ SendMessage gcId direction'
+                , ResetCursorIcon id
+                ]
+            isDirection = not $ null direction
+            direction' = fromJust direction
         _ -> Nothing
         where
-            isDirection = not $ null direction
-            result = resultReqs node reqs
-            reqs = [SendMessage gcId direction', ResetCursorIcon id]
             gcId = _ncGameControlId config
-            direction' = fromJust direction
             id = node ^. L.info . L.widgetId
+            nextTaxField = _ncNextTaxField config
+            nextTax = _ncNextTax config
 
     render wenv node renderer = do
         let style = currentStyle wenv node

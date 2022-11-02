@@ -82,6 +82,8 @@ makeGameControl gcData state = widget where
             , _ncHighlightColor = _nodeHighlight colors
             , _ncGameControlId = widgetId
             , _ncDirection = directionFromGame p game
+            , _ncNextTax = taxFromGame p game
+            , _ncNextTaxField = nextTaxField
             }
         fh = flip gameControlHlink linkConfig
         fl = flip gameControlVlink linkConfig
