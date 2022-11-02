@@ -99,13 +99,13 @@ makeGameControl gcData state = widget where
         KeyAction _ code KeyPressed
             | isKeyNorth code -> handleDirection wenv node North
             | isKeySouth code -> handleDirection wenv node South
-            | isKeyWest  code -> handleDirection wenv node West
-            | isKeyEast  code -> handleDirection wenv node East
+            | isKeyWest code -> handleDirection wenv node West
+            | isKeyEast code -> handleDirection wenv node East
             where
-                isKeyNorth code = isKeyUp    code || isKeyW code
-                isKeySouth code = isKeyDown  code || isKeyS code
-                isKeyWest  code = isKeyLeft  code || isKeyA code
-                isKeyEast  code = isKeyRight code || isKeyD code
+                isKeyNorth code = isKeyUp code || isKeyW code
+                isKeySouth code = isKeyDown code || isKeyS code
+                isKeyWest code = isKeyLeft code || isKeyA code
+                isKeyEast code = isKeyRight code || isKeyD code
         ButtonAction _ _ BtnPressed _ -> Just result where
             result = resultReqs node [SetFocus widgetId]
         _ -> Nothing
@@ -128,9 +128,13 @@ makeGameControl gcData state = widget where
         vlinkSequence = getVlinkSequence grid
 
     handleDirection wenv node direction = Just result where
-        result = resultReqs newNode $ RenderOnce:reqs
+        result = resultReqs newNode reqs
         newNode = node & L.widget .~ w
-        reqs = widgetDataSet gameField game'
+        reqs = concat $
+            [ [RenderOnce]
+            , widgetDataSet gameField game'
+            , widgetDataSet nextTaxField Nothing
+            ]
         w = makeGameControl gcData state'
         game' = movePilgrim direction game
         game = widgetDataGet (wenv ^. L.model) gameField
