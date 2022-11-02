@@ -92,10 +92,10 @@ makeGameControl field config state = widget where
 
     handleEvent wenv node target evt = case evt of
         KeyAction _ code KeyPressed
-            | isKeyNorth code -> handleDirection North
-            | isKeySouth code -> handleDirection South
-            | isKeyWest  code -> handleDirection West
-            | isKeyEast  code -> handleDirection East
+            | isKeyNorth code -> handleDirection wenv node North
+            | isKeySouth code -> handleDirection wenv node South
+            | isKeyWest  code -> handleDirection wenv node West
+            | isKeyEast  code -> handleDirection wenv node East
             where
                 isKeyNorth code = isKeyUp    code || isKeyW code
                 isKeySouth code = isKeyDown  code || isKeyS code
@@ -105,15 +105,6 @@ makeGameControl field config state = widget where
             result = resultReqs node [SetFocus widgetId]
         _ -> Nothing
         where
-            handleDirection direction = Just result where
-                result = resultReqs newNode $ RenderOnce:reqs
-                newNode = node & L.widget .~ w
-                w = makeGameControl field config state'
-                state' = GameControlState grid
-                reqs = widgetDataSet field game'
-                game' = movePilgrim direction game
-                game = widgetDataGet (wenv ^. L.model) field
-                grid = gridFromGame game' config
             widgetId = node ^. L.info . L.widgetId
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
@@ -127,6 +118,15 @@ makeGameControl field config state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
+    
+    handleDirection wenv node direction = Just result where
+        result = resultReqs newNode $ RenderOnce:reqs
+        newNode = node & L.widget .~ w
+        reqs = widgetDataSet field game'
+        w = makeGameControl field config state'
+        game' = movePilgrim direction game
+        game = widgetDataGet (wenv ^. L.model) field
+        state' = GameControlState $ gridFromGame game' config
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
