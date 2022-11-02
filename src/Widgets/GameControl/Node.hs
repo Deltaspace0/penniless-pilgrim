@@ -32,6 +32,7 @@ data NodeCfg = NodeCfg
     , _ncHoverColor :: Color
     , _ncActiveColor :: Color
     , _ncGameControlId :: WidgetId
+    , _ncDirection :: Maybe G.Direction
     } deriving (Eq, Show)
 
 makeFields 'Node
@@ -95,11 +96,14 @@ makeGameControlNode nodeStack config = widget where
     
     handleEvent wenv node target evt = case evt of
         Click p _ _
-            | isPointInNodeVp node p -> Just result
+            | isPointInNodeVp node p && isDirection -> Just result
         _ -> Nothing
         where
-            result = resultReqs node [SendMessage id G.North]
+            isDirection = not $ null direction
+            result = resultReqs node [SendMessage id direction']
             id = _ncGameControlId config
+            direction = _ncDirection config
+            direction' = fromJust direction
 
     render wenv node renderer = do
         let style = currentStyle wenv node

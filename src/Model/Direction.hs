@@ -2,7 +2,11 @@ module Model.Direction
     ( Direction(..)
     , getOpposite
     , nextPosition
+    , relativeDirection
     ) where
+
+import Data.List
+import Data.Maybe
 
 data Direction
     = North
@@ -22,3 +26,11 @@ nextPosition North (x, y) = (x, y-1)
 nextPosition South (x, y) = (x, y+1)
 nextPosition West  (x, y) = (x-1, y)
 nextPosition East  (x, y) = (x+1, y)
+
+relativeDirection :: (Int, Int) -> (Int, Int) -> Maybe Direction
+relativeDirection (x, y) (x1, y1) = if null ix
+    then Nothing
+    else Just $ directions!!(fromJust ix) where
+        ix = elemIndex (x1, y1) positions
+        directions = [North, South, West, East]
+        positions = [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]
