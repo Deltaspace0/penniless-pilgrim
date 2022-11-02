@@ -42,22 +42,22 @@ hlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
 hlinkTransform _ Nothing = Nothing
 hlinkTransform colors (Just G.LinkBack) = Just Link
     { _linkColor = _linkWest colors
-    , _linkForm  = Just LinkBack
+    , _linkForm = Just LinkBack
     }
 hlinkTransform colors (Just G.LinkForward) = Just Link
     { _linkColor = _linkEast colors
-    , _linkForm  = Just LinkForward
+    , _linkForm = Just LinkForward
     }
 
 vlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
 vlinkTransform _ Nothing = Nothing
 vlinkTransform colors (Just G.LinkBack) = Just Link
     { _linkColor = _linkNorth colors
-    , _linkForm  = Just LinkBack
+    , _linkForm = Just LinkBack
     }
 vlinkTransform colors (Just G.LinkForward) = Just Link
     { _linkColor = _linkSouth colors
-    , _linkForm  = Just LinkForward
+    , _linkForm = Just LinkForward
     }
 
 gameControlHlink :: Maybe Link -> LinkCfg -> WidgetNode s e

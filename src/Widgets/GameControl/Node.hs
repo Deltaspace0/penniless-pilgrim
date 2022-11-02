@@ -22,15 +22,16 @@ import Model.Parameters.Colors
 import qualified Model.Game as G
 
 data Node = Node
-    { _nodeColor       :: Color
-    , _nodeHoverColor  :: Color
+    { _nodeColor :: Color
+    , _nodeHoverColor :: Color
     , _nodeActiveColor :: Color
     } deriving (Eq, Show)
 
 data NodeCfg = NodeCfg
-    { _ncColor       :: Color
-    , _ncHoverColor  :: Color
+    { _ncColor :: Color
+    , _ncHoverColor :: Color
     , _ncActiveColor :: Color
+    , _ncGameControlId :: WidgetId
     } deriving (Eq, Show)
 
 makeFields 'Node
@@ -38,18 +39,18 @@ makeFields 'Node
 nodeTransform :: Colors -> [G.Node] -> [Node]
 nodeTransform colors = map $ \node -> case node of
     G.NodePilgrim -> Node
-        { _nodeColor       = _nodePilgrimDefault colors
-        , _nodeHoverColor  = _nodePilgrimHover colors
+        { _nodeColor = _nodePilgrimDefault colors
+        , _nodeHoverColor = _nodePilgrimHover colors
         , _nodeActiveColor = _nodePilgrimActive colors
         }
     G.NodePath -> Node
-        { _nodeColor       = _nodePathDefault colors
-        , _nodeHoverColor  = _nodePathHover colors
+        { _nodeColor = _nodePathDefault colors
+        , _nodeHoverColor = _nodePathHover colors
         , _nodeActiveColor = _nodePathActive colors
         }
     G.NodeGoal -> Node
-        { _nodeColor       = _nodeGoalDefault colors
-        , _nodeHoverColor  = _nodeGoalHover colors
+        { _nodeColor = _nodeGoalDefault colors
+        , _nodeHoverColor = _nodeGoalHover colors
         , _nodeActiveColor = _nodeGoalActive colors
         }
 
@@ -61,9 +62,10 @@ gameControlNode nodeStack config = gameControlNodeNode where
 makeGameControlNode :: [Node] -> NodeCfg -> Widget s e
 makeGameControlNode nodeStack config = widget where
     widget = createSingle () def
-        { singleGetBaseStyle    = getBaseStyle
+        { singleGetBaseStyle = getBaseStyle
         , singleGetCurrentStyle = getCurrentStyle
-        , singleRender          = render
+        , singleHandleEvent = handleEvent
+        , singleRender = render
         }
 
     getBaseStyle _ _ = Just $ def
@@ -90,6 +92,14 @@ makeGameControlNode nodeStack config = widget where
         vp = node ^. L.info . L.viewport
         style = currentStyle_ c wenv node
         c = def & L.isHovered .~ isNodeHoveredEllipse_ vp
+    
+    handleEvent wenv node target evt = case evt of
+        Click p _ _
+            | isPointInNodeVp node p -> Just result
+        _ -> Nothing
+        where
+            result = resultReqs node [SendMessage id G.North]
+            id = _ncGameControlId config
 
     render wenv node renderer = do
         let style = currentStyle wenv node

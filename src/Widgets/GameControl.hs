@@ -13,6 +13,7 @@ import Control.Lens
 import Data.Default
 import Data.Maybe
 import Data.Sequence ((><))
+import Data.Typeable
 import Monomer
 import Monomer.Widgets.Container
 import qualified Monomer.Lens as L
@@ -56,11 +57,12 @@ makeGameControl
     -> Widget s e
 makeGameControl field config state = widget where
     widget = createContainer state def
-        { containerInit        = init
-        , containerMerge       = merge
+        { containerInit = init
+        , containerMerge = merge
         , containerHandleEvent = handleEvent
-        , containerGetSizeReq  = getSizeReq
-        , containerResize      = resize
+        , containerHandleMessage = handleMessage
+        , containerGetSizeReq = getSizeReq
+        , containerResize = resize
         }
 
     init wenv node = resultNode resNode where
@@ -80,6 +82,7 @@ makeGameControl field config state = widget where
             { _ncColor = _nodeDefault colors
             , _ncHoverColor = _nodeHover colors
             , _ncActiveColor = _nodeActive colors
+            , _ncGameControlId = node ^. L.info . L.widgetId
             }
         fh = flip gameControlHlink linkConfig
         fl = flip gameControlVlink linkConfig
@@ -106,6 +109,9 @@ makeGameControl field config state = widget where
         _ -> Nothing
         where
             widgetId = node ^. L.info . L.widgetId
+
+    handleMessage wenv node target message = result where
+        result = cast message >>= handleDirection wenv node
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
 
