@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl
-    ( GameControlCfg(..)
+    ( GameControlData(..)
     , gameControl
     ) where
 
@@ -21,36 +21,37 @@ import Model.Game hiding (Node, Link)
 import Model.Grid
 import Model.Parameters.Colors
 
-data GameControlCfg = GameControlCfg
-    { _colors :: Colors
-    , _linkToNodeRatio  :: Double
-    , _nodeToWidthRatio :: Double
-    , _gcWidth  :: Double
-    , _gcHeight :: Double
-    } deriving (Eq, Show)
+data GameControlData s = GameControlData
+    { _gcdGame :: ALens' s Game
+    , _gcdNextTax :: ALens' s (Maybe Double)
+    , _gcdColors :: Colors
+    , _gcdLinkToNodeRatio :: Double
+    , _gcdNodeToWidthRatio :: Double
+    , _gcdWidth :: Double
+    , _gcdHeight :: Double
+    }
 
 newtype GameControlState = GameControlState
     { _gcsGrid :: Grid Node Link
     }
 
-gridFromGame :: Game -> GameControlCfg -> Grid Node Link
-gridFromGame game config = gridMap nt hlt vlt $ _grid game where
-    nt  = nodeTransform $ _colors config
-    hlt = hlinkTransform $ _colors config
-    vlt = vlinkTransform $ _colors config
+gridFromGame :: Game -> Colors -> Grid Node Link
+gridFromGame game colors = gridMap nt hlt vlt $ _grid game where
+    nt  = nodeTransform colors
+    hlt = hlinkTransform colors
+    vlt = vlinkTransform colors
 
-gameControl :: ALens' s Game -> GameControlCfg -> WidgetNode s e
-gameControl field config = gameControlNode where
+gameControl :: GameControlData s -> WidgetNode s e
+gameControl gcData = gameControlNode where
     gameControlNode = defaultWidgetNode "gameControl" widget
-    widget = makeGameControl (WidgetLens field) config state
+    widget = makeGameControl gcData state
     state = GameControlState $ makeGrid 2 2
 
 makeGameControl
-    :: WidgetData s Game
-    -> GameControlCfg
+    :: GameControlData s
     -> GameControlState
     -> Widget s e
-makeGameControl field config state = widget where
+makeGameControl gcData state = widget where
     widget = createContainer state def
         { containerInit = init
         , containerMerge = merge
@@ -68,9 +69,9 @@ makeGameControl field config state = widget where
                 >< fmap (fh . snd) hlinkSequence
                 >< fmap (fl . snd) vlinkSequence
         reqs = [ResizeWidgets widgetId]
-        w = makeGameControl field config $ GameControlState grid
-        game = widgetDataGet (wenv ^. L.model) field
-        grid = gridFromGame game config
+        w = makeGameControl gcData $ GameControlState grid
+        game = widgetDataGet (wenv ^. L.model) gameField
+        grid = gridFromGame game colors
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
@@ -127,11 +128,11 @@ makeGameControl field config state = widget where
     handleDirection wenv node direction = Just result where
         result = resultReqs newNode $ RenderOnce:reqs
         newNode = node & L.widget .~ w
-        reqs = widgetDataSet field game'
-        w = makeGameControl field config state'
+        reqs = widgetDataSet gameField game'
+        w = makeGameControl gcData state'
         game' = movePilgrim direction game
-        game = widgetDataGet (wenv ^. L.model) field
-        state' = GameControlState $ gridFromGame game' config
+        game = widgetDataGet (wenv ^. L.model) gameField
+        state' = GameControlState $ gridFromGame game' colors
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
@@ -142,16 +143,18 @@ makeGameControl field config state = widget where
         x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
         y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
 
+    gameField = WidgetLens $ _gcdGame gcData
+    nextTaxField = WidgetLens $ _gcdNextTax gcData
     grid = _gcsGrid state
-    colors = _colors config
-    linkToNodeRatio = _linkToNodeRatio config
-    nodeToWidthRatio = _nodeToWidthRatio config
-    width = _gcWidth config
-    height = _gcHeight config
+    colors = _gcdColors gcData
+    linkToNodeRatio = _gcdLinkToNodeRatio gcData
+    nodeToWidthRatio = _gcdNodeToWidthRatio gcData
+    width = _gcdWidth gcData
+    height = _gcdHeight gcData
     (cols, rows) = getBounds grid
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
     linkSize = min (width/factorW) (height/factorH)
     nodeSize = linkSize/linkToNodeRatio
-    vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
+    vx vp = (width-linkSize*factorW)/2 + vp ^. L.x
     vy vp = (height-linkSize*factorH)/2 + vp ^. L.y

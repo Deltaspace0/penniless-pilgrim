@@ -50,12 +50,14 @@ buildUI _ model = widgetTree where
     nextTax' = model ^. nextTax
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
-gameControlM model = gameControl currentGame $ GameControlCfg
-    { _colors = get colors
-    , _linkToNodeRatio = get $ linkToNodeSlider  . csCurrent
-    , _nodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
-    , _gcWidth = get gameControlWidth
-    , _gcHeight = get gameControlHeight
+gameControlM model = gameControl $ GameControlData
+    { _gcdGame = currentGame
+    , _gcdNextTax = nextTax
+    , _gcdColors = get colors
+    , _gcdLinkToNodeRatio = get $ linkToNodeSlider  . csCurrent
+    , _gcdNodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
+    , _gcdWidth = get gameControlWidth
+    , _gcdHeight = get gameControlHeight
     } where
         get f = model ^. parameters . f
 
