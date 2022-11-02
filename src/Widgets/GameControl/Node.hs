@@ -12,6 +12,7 @@ module Widgets.GameControl.Node
     ) where
 
 import Control.Lens
+import Control.Monad
 import Data.Default
 import Data.Maybe
 import Monomer
@@ -107,6 +108,8 @@ makeGameControlNode nodeStack config = widget where
         let style = currentStyle wenv node
             vp = getContentArea node style
         drawEllipse renderer vp $ _sstFgColor style
+        when (not $ null direction) $ do
+            drawEllipseBorder renderer vp (Just white) 2
 
     nodeHead = head nodeStack
     direction = _ncDirection config

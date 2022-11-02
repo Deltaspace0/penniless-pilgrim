@@ -120,7 +120,7 @@ makeGameControl field config state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-    
+
     handleDirection wenv node direction = Just result where
         result = resultReqs newNode $ RenderOnce:reqs
         newNode = node & L.widget .~ w
