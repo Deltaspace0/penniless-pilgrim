@@ -28,12 +28,12 @@ data LinkForm = LinkBack | LinkForward deriving (Eq, Show)
 
 data Link = Link
     { _linkColor :: Color
-    , _linkForm  :: Maybe LinkForm
+    , _linkForm :: Maybe LinkForm
     } deriving (Eq, Show)
 
 data LinkCfg = LinkCfg
     { _lcColor :: Color
-    , _lcLinkWidth    :: Double
+    , _lcNodeToWidthRatio :: Double
     } deriving (Eq, Show)
 
 makeFields 'Link
@@ -86,7 +86,7 @@ makeGameControlLink isHz link config = widget where
             c = Just color'
             s = if isHz then x else y
             b = s + linkSize - nodeSize
-            linkWidth = _lcLinkWidth config
+            linkWidth = nodeSize/(_lcNodeToWidthRatio config)
             ars = linkWidth*1.5
             drawLine' a b = drawLine r p1 p2 linkWidth c where
                 p1 = if isHz then Point a y else Point x a

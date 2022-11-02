@@ -66,25 +66,26 @@ makeGameControl field config state = widget where
     init wenv node = resultNode resNode where
         resNode = node
             & L.widget .~ w
-            & L.children .~ fmap (f . snd) nodeSequence
-                >< fmap (gh . snd) hlinkSequence
-                >< fmap (gl . snd) vlinkSequence
+            & L.children .~
+                   fmap (fn . snd) nodeSequence
+                >< fmap (fh . snd) hlinkSequence
+                >< fmap (fl . snd) vlinkSequence
         w = makeGameControl field config $ GameControlState grid
         game = widgetDataGet (wenv ^. L.model) field
         grid = gridFromGame game config
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
-        f = flip gameControlNode $ NodeCfg
-            { _ncColor       = _nodeDefault colors
-            , _ncHoverColor  = _nodeHover colors
+        fn = flip gameControlNode $ NodeCfg
+            { _ncColor = _nodeDefault colors
+            , _ncHoverColor = _nodeHover colors
             , _ncActiveColor = _nodeActive colors
             }
-        gh = flip gameControlHlink linkConfig
-        gl = flip gameControlVlink linkConfig
+        fh = flip gameControlHlink linkConfig
+        fl = flip gameControlVlink linkConfig
         linkConfig = LinkCfg
             { _lcColor = _linkDefault colors
-            , _lcLinkWidth = linkWidth
+            , _lcNodeToWidthRatio = nodeToWidthRatio
             }
 
     merge wenv newNode _ _ = init wenv newNode
@@ -107,19 +108,20 @@ makeGameControl field config state = widget where
             handleDirection direction = Just result where
                 result = resultReqs newNode $ RenderOnce:reqs
                 newNode = node & L.widget .~ w
-                w       = makeGameControl field config state'
-                state'  = GameControlState grid
-                reqs  = widgetDataSet field game'
+                w = makeGameControl field config state'
+                state' = GameControlState grid
+                reqs = widgetDataSet field game'
                 game' = movePilgrim direction game
-                game  = widgetDataGet (wenv ^. L.model) field
-                grid  = gridFromGame game' config
+                game = widgetDataGet (wenv ^. L.model) field
+                grid = gridFromGame game' config
             widgetId = node ^. L.info . L.widgetId
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
 
     resize wenv node vp children = resized where
         resized = (resultNode node, assignedAreas)
-        assignedAreas = fmap (getNodeArea vp . fst) nodeSequence
+        assignedAreas =
+               fmap (getNodeArea vp . fst) nodeSequence
             >< fmap (getLinkArea vp . fst) hlinkSequence
             >< fmap (getLinkArea vp . fst) vlinkSequence
         nodeSequence = getNodeSequence grid
@@ -137,15 +139,14 @@ makeGameControl field config state = widget where
 
     grid = _gcsGrid state
     colors = _colors config
-    linkToNodeRatio  = _linkToNodeRatio config
+    linkToNodeRatio = _linkToNodeRatio config
     nodeToWidthRatio = _nodeToWidthRatio config
-    width  = _gcWidth config
+    width = _gcWidth config
     height = _gcHeight config
     (cols, rows) = getBounds grid
-    factorW   = (fromIntegral cols)+2/linkToNodeRatio
-    factorH   = (fromIntegral rows)+2/linkToNodeRatio
-    linkSize  = min (width/factorW) (height/factorH)
-    nodeSize  = linkSize/linkToNodeRatio
-    linkWidth = nodeSize/nodeToWidthRatio
+    factorW = (fromIntegral cols)+2/linkToNodeRatio
+    factorH = (fromIntegral rows)+2/linkToNodeRatio
+    linkSize = min (width/factorW) (height/factorH)
+    nodeSize = linkSize/linkToNodeRatio
     vx vp = (width-linkSize*factorW)/2  + vp ^. L.x
     vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
