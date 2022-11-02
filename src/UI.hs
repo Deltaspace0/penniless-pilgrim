@@ -7,7 +7,8 @@ module UI
 
 import Control.Lens
 import Data.Default
-import Data.Text (pack)
+import Data.Maybe
+import Data.Text (Text, pack)
 import Monomer
 import TextShow (showt)
 
@@ -36,34 +37,44 @@ buildUI _ model = widgetTree where
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
-        [ taxLabel model
+        [ taxTotalLabel
+        , nextTaxLabel
         , boxCenter $ hstack'
             [ button "Reset" ResetPilgrim
             , button "Config" ToggleConfig
             ]
         ]
+    taxTotalLabel = bigNumberLabel taxTotal "Tax total: "
+    nextTaxLabel = bigNumberLabel nextTax' "Next tax: "
+    taxTotal = Just $ _tax $ _pilgrim $ model ^. currentGame
+    nextTax' = model ^. nextTax
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = gameControl currentGame $ GameControlCfg
     { _colors = get colors
-    , _linkToNodeRatio  = get $ linkToNodeSlider  . csCurrent
+    , _linkToNodeRatio = get $ linkToNodeSlider  . csCurrent
     , _nodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
-    , _gcWidth  = get gameControlWidth
+    , _gcWidth = get gameControlWidth
     , _gcHeight = get gameControlHeight
     } where
         get f = model ^. parameters . f
 
-taxLabel :: AppModel -> WidgetNode AppModel AppEvent
-taxLabel model = label' `styleBasic` styleParameters where
-    t = show $ _tax $ _pilgrim $ model ^. currentGame
-    t' = if m == ".0" then i else t
-    (i, m) = break (== '.') t
-    label' = label $ "Tax total: " <> pack t'
-    styleParameters =
+bigNumberLabel
+    :: Maybe Double
+    -> Text
+    -> WidgetNode AppModel AppEvent
+bigNumberLabel number text = styledLabel where
+    styledLabel = styleBasic label'
         [ textCenter
         , textSize 24
         , sizeReqW $ expandSize 800 1
         ]
+    label' = if null number
+        then label text
+        else label $ text <> pack t'
+    t = show $ fromJust number
+    t' = if m == ".0" then i else t
+    (i, m) = break (== '.') t
 
 configSlider
     :: AppModel
