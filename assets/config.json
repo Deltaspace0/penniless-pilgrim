@@ -1,1 +1,120 @@
-{"colors":{"link_default":{"b":117,"g":120,"r":120},"link_east":{"b":70,"g":105,"r":247},"link_north":{"b":70,"g":105,"r":247},"link_south":{"b":70,"g":105,"r":247},"link_west":{"b":70,"g":105,"r":247},"node_active":{"b":103,"g":104,"r":105},"node_default":{"b":117,"g":120,"r":120},"node_goal_active":{"b":42,"g":169,"r":162},"node_goal_default":{"b":58,"g":230,"r":221},"node_goal_hover":{"b":98,"g":238,"r":230},"node_highlight":{"b":233,"g":232,"r":234},"node_hover":{"b":149,"g":157,"r":157},"node_path_active":{"b":48,"g":75,"r":185},"node_path_default":{"b":70,"g":105,"r":247},"node_path_hover":{"b":105,"g":132,"r":245},"node_pilgrim_active":{"b":31,"g":181,"r":36},"node_pilgrim_default":{"b":53,"g":247,"r":60},"node_pilgrim_hover":{"b":111,"g":248,"r":116}},"game_control_height":500,"game_control_width":400,"grid_columns_slider":{"caption":"Columns:","default":5,"max":32,"min":2},"grid_rows_slider":{"caption":"Rows:","default":5,"max":32,"min":2},"link_to_node_slider":{"caption":"Link size to node size ratio:","default":5,"max":12,"min":3},"node_to_width_slider":{"caption":"Node size to link width ratio:","default":3,"max":12,"min":2}}
+{
+    "node_to_width_slider": {
+        "min": 2,
+        "max": 12,
+        "default": 3,
+        "caption": "Node size to link width ratio:"
+    },
+    "link_to_node_slider": {
+        "min": 3,
+        "max": 12,
+        "default": 5,
+        "caption": "Link size to node size ratio:"
+    },
+    "grid_rows_slider": {
+        "min": 2,
+        "max": 32,
+        "default": 5,
+        "caption": "Rows:"
+    },
+    "grid_columns_slider": {
+        "min": 2,
+        "max": 32,
+        "default": 5,
+        "caption": "Columns:"
+    },
+    "game_control_width": 400,
+    "game_control_height": 500,
+    "colors": {
+        "node_pilgrim_hover": {
+            "r": 116,
+            "g": 248,
+            "b": 111
+        },
+        "node_pilgrim_default": {
+            "r": 60,
+            "g": 247,
+            "b": 53
+        },
+        "node_pilgrim_active": {
+            "r": 36,
+            "g": 181,
+            "b": 31
+        },
+        "node_path_hover": {
+            "r": 245,
+            "g": 132,
+            "b": 105
+        },
+        "node_path_default": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "node_path_active": {
+            "r": 185,
+            "g": 75,
+            "b": 48
+        },
+        "node_hover": {
+            "r": 157,
+            "g": 157,
+            "b": 149
+        },
+        "node_highlight": {
+            "r": 234,
+            "g": 232,
+            "b": 233
+        },
+        "node_goal_hover": {
+            "r": 230,
+            "g": 238,
+            "b": 98
+        },
+        "node_goal_default": {
+            "r": 221,
+            "g": 230,
+            "b": 58
+        },
+        "node_goal_active": {
+            "r": 162,
+            "g": 169,
+            "b": 42
+        },
+        "node_default": {
+            "r": 120,
+            "g": 120,
+            "b": 117
+        },
+        "node_active": {
+            "r": 105,
+            "g": 104,
+            "b": 103
+        },
+        "link_west": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "link_south": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "link_north": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "link_east": {
+            "r": 247,
+            "g": 105,
+            "b": 70
+        },
+        "link_default": {
+            "r": 120,
+            "g": 120,
+            "b": 117
+        }
+    }
+}

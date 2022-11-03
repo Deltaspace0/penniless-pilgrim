@@ -21,6 +21,7 @@ module Model.Parameters
 import Control.Exception
 import Control.Lens hiding ((.=))
 import Data.Aeson
+import Data.Aeson.Encode.Pretty
 import Data.Default
 import Data.Maybe
 import System.IO
@@ -85,7 +86,8 @@ fromFile path = do
 
 toFile :: AppParameters -> String -> IO Bool
 toFile parameters path = do
-    let converted = encode parameters
+    let config = defConfig {confCompare = flip compare}
+        converted = encodePretty' config parameters
         contents = BLU.toString converted
         operation = writeFile path contents
     result <- try operation :: IO (Either SomeException ())
