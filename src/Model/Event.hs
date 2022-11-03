@@ -9,5 +9,7 @@ data AppEvent
     = AppInit
     | ResetPilgrim
     | ToggleConfig
+    | SaveConfig
+    | SaveConfigResult Bool
     | ResizeGrid
     deriving (Eq, Show)

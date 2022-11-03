@@ -32,8 +32,8 @@ buildUI _ model = widgetTree where
             , [separatorLine]
             , configSlider_ model gridColumnsSlider crCfg
             , configSlider_ model gridRowsSlider crCfg
-            , configSlider  model linkToNodeSlider
-            , configSlider  model nodeToWidthSlider
+            , configSlider model linkToNodeSlider
+            , configSlider model nodeToWidthSlider
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
@@ -42,6 +42,7 @@ buildUI _ model = widgetTree where
         , boxCenter $ hstack'
             [ button "Reset" ResetPilgrim
             , button "Config" ToggleConfig
+            , button "Save config" SaveConfig
             ]
         ]
     taxTotalLabel = bigNumberLabel taxTotal "Tax total: "

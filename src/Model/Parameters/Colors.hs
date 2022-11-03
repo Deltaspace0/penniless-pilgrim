@@ -1,12 +1,15 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Parameters.Colors
     ( Colors(..)
     ) where
 
+import Control.Lens ((^.))
 import Data.Aeson
 import Data.Default
 import Monomer
+import qualified Monomer.Lens as L
 
 data RGB = RGB Int Int Int
 
@@ -15,6 +18,13 @@ instance FromJSON RGB where
         <$> v .: "r"
         <*> v .: "g"
         <*> v .: "b"
+
+instance ToJSON RGB where
+    toJSON (RGB r g b) = object
+        [ "r" .= r
+        , "g" .= g
+        , "b" .= b
+        ]
 
 data Colors = Colors
     { _linkDefault        :: Color
@@ -81,6 +91,30 @@ instance FromJSON Colors where
             <*> f "node_goal_hover"
             <*> f "node_goal_active" where
                 f t = fromRGB <$> v .: t
+                fromRGB (RGB r g b) = rgb r g b
 
-fromRGB :: RGB -> Color
-fromRGB (RGB r g b) = rgb r g b
+instance ToJSON Colors where
+    toJSON colors = object
+        [ "link_default" .= f (_linkDefault colors)
+        , "link_north" .= f (_linkNorth colors)
+        , "link_south" .= f (_linkSouth colors)
+        , "link_west" .= f (_linkWest colors)
+        , "link_east" .= f (_linkEast colors)
+        , "node_highlight" .= f (_nodeHighlight colors)
+        , "node_default" .= f (_nodeDefault colors)
+        , "node_hover" .= f (_nodeHover colors)
+        , "node_active" .= f (_nodeActive colors)
+        , "node_pilgrim_default" .= f (_nodePilgrimDefault colors)
+        , "node_pilgrim_hover" .= f (_nodePilgrimHover colors)
+        , "node_pilgrim_active" .= f (_nodePilgrimActive colors)
+        , "node_path_default" .= f (_nodePathDefault colors)
+        , "node_path_hover" .= f (_nodePathHover colors)
+        , "node_path_active" .= f (_nodePathActive colors)
+        , "node_goal_default" .= f (_nodeGoalDefault colors)
+        , "node_goal_hover" .= f (_nodeGoalHover colors)
+        , "node_goal_active" .= f (_nodeGoalActive colors)
+        ] where
+            f color = RGB r g b where
+                r = (color :: Color) ^. L.r
+                g = (color :: Color) ^. L.g
+                b = (color :: Color) ^. L.b

@@ -73,6 +73,21 @@ resetPilgrimHandle model = [Model model'] where
 toggleConfigHandle :: EventHandle
 toggleConfigHandle model = [Model $ model & showConfig %~ not]
 
+saveConfigHandle :: EventHandle
+saveConfigHandle model = [Task taskHandler] where
+    taskHandler = do
+        let configPath' = model ^. configPath
+            parameters' = model ^. parameters
+        result <- if null configPath'
+            then return False
+            else toFile parameters' $ fromJust configPath'
+        return $ SaveConfigResult result
+
+saveConfigResultHandle :: Bool -> EventHandle
+saveConfigResultHandle result model = if result
+    then []
+    else []
+
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model $ model & currentGame .~ game] where
     game = gameFromParameters $ model ^. parameters
@@ -82,6 +97,8 @@ handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
     ResetPilgrim -> resetPilgrimHandle model
     ToggleConfig -> toggleConfigHandle model
+    SaveConfig -> saveConfigHandle model
+    SaveConfigResult result -> saveConfigResultHandle result model
     ResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game
