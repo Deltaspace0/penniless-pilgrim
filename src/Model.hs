@@ -8,13 +8,13 @@ module Model
     , module Model.Game
     , module Model.Parameters
     , AppModel(..)
+    , configPath
     , initialGame
     , currentGame
     , showConfig
     , parameters
     , nextTax
     , initModel
-    , initModel_
     , handleEvent
     , gameFromParameters
     ) where
@@ -31,7 +31,8 @@ import Model.Grid
 import Model.Parameters
 
 data AppModel = AppModel
-    { _appInitialGame :: Game
+    { _appConfigPath :: Maybe String
+    , _appInitialGame :: Game
     , _appCurrentGame :: Game
     , _appShowConfig :: Bool
     , _appParameters :: AppParameters
@@ -42,18 +43,20 @@ type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
 
 makeLensesWith abbreviatedFields 'AppModel
 
-initModel :: AppModel
-initModel = initModel_ def
-
-initModel_ :: AppParameters -> AppModel
-initModel_ p = AppModel
-    { _appInitialGame = game
-    , _appCurrentGame = game
-    , _appShowConfig = False
-    , _appParameters = p
-    , _appNextTax = Nothing
-    } where
-        game = gameFromParameters p
+initModel :: Maybe String -> IO AppModel
+initModel path = do
+    p <- if null path
+        then return def
+        else fromFile $ fromJust path
+    let game = gameFromParameters p
+    return $ AppModel
+        { _appConfigPath = path
+        , _appInitialGame = game
+        , _appCurrentGame = game
+        , _appShowConfig = False
+        , _appParameters = p
+        , _appNextTax = Nothing
+        }
 
 resetPilgrimHandle :: EventHandle
 resetPilgrimHandle model = [Model model'] where
