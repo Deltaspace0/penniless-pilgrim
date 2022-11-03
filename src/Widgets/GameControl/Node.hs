@@ -61,8 +61,8 @@ nodeTransform colors = map $ \node -> case node of
         }
 
 gameControlNode :: NodeData s -> WidgetNode s e
-gameControlNode nodeData = gameControlNodeNode where
-    gameControlNodeNode = defaultWidgetNode "gameControlNode" widget
+gameControlNode nodeData = node where
+    node = defaultWidgetNode "gameControlNode" widget
     widget = makeGameControlNode nodeData
 
 makeGameControlNode :: NodeData s -> Widget s e
