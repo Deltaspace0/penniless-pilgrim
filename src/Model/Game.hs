@@ -1,5 +1,6 @@
 module Model.Game
-    ( module Model.Pilgrim
+    ( module Model.Grid
+    , module Model.Pilgrim
     , Node(..)
     , Link(..)
     , Game(..)

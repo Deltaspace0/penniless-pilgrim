@@ -17,9 +17,7 @@ import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
 import Widgets.GameControl.Node
-import Model.Game hiding (Node, Link)
-import Model.Grid
-import Model.Parameters.Colors
+import Model hiding (Node, Link)
 
 data GameControlData s = GameControlData
     { _gcdGame :: ALens' s Game
