@@ -26,7 +26,6 @@ library
   exposed-modules:
       Model
       Model.Direction
-      Model.Event
       Model.Game
       Model.Grid
       Model.Parameters

@@ -4,9 +4,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model
-    ( module Model.Event
-    , module Model.Game
+    ( module Model.Game
     , module Model.Parameters
+    , AppEvent(..)
     , AppModel(..)
     , initialGame
     , currentGame
@@ -25,10 +25,16 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
-import Model.Event
 import Model.Game
 import Model.Grid
 import Model.Parameters
+
+data AppEvent
+    = AppInit
+    | AppResetPilgrim
+    | AppToggleConfig
+    | AppResizeGrid
+    deriving (Eq, Show)
 
 data AppModel = AppModel
     { _appInitialGame :: Game
@@ -77,9 +83,9 @@ resizeGridHandle model = [Model $ model & currentGame .~ game] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    ResetPilgrim -> resetPilgrimHandle model
-    ToggleConfig -> toggleConfigHandle model
-    ResizeGrid -> resizeGridHandle model
+    AppResetPilgrim -> resetPilgrimHandle model
+    AppToggleConfig -> toggleConfigHandle model
+    AppResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game
 gameFromParameters p = makeGame (floor gc) (floor gr) where
