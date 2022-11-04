@@ -17,46 +17,46 @@ instance FromJSON RGB where
         <*> v .: "b"
 
 data Colors = Colors
-    { _linkDefault        :: Color
-    , _linkNorth          :: Color
-    , _linkSouth          :: Color
-    , _linkWest           :: Color
-    , _linkEast           :: Color
-    , _nodeHighlight      :: Color
-    , _nodeDefault        :: Color
-    , _nodeHover          :: Color
-    , _nodeActive         :: Color
+    { _linkDefault :: Color
+    , _linkNorth :: Color
+    , _linkSouth :: Color
+    , _linkWest :: Color
+    , _linkEast :: Color
+    , _nodeHighlight :: Color
+    , _nodeDefault :: Color
+    , _nodeHover :: Color
+    , _nodeActive :: Color
     , _nodePilgrimDefault :: Color
-    , _nodePilgrimHover   :: Color
-    , _nodePilgrimActive  :: Color
-    , _nodePathDefault    :: Color
-    , _nodePathHover      :: Color
-    , _nodePathActive     :: Color
-    , _nodeGoalDefault    :: Color
-    , _nodeGoalHover      :: Color
-    , _nodeGoalActive     :: Color
+    , _nodePilgrimHover :: Color
+    , _nodePilgrimActive :: Color
+    , _nodePathDefault :: Color
+    , _nodePathHover :: Color
+    , _nodePathActive :: Color
+    , _nodeGoalDefault :: Color
+    , _nodeGoalHover :: Color
+    , _nodeGoalActive :: Color
     } deriving (Eq, Show)
 
 instance Default Colors where
     def = Colors
-        { _linkDefault        = rgb 120 120 117
-        , _linkNorth          = rgb 247 105 70
-        , _linkSouth          = rgb 247 105 70
-        , _linkWest           = rgb 247 105 70
-        , _linkEast           = rgb 247 105 70
-        , _nodeHighlight      = rgb 234 232 233
-        , _nodeDefault        = rgb 120 120 117
-        , _nodeHover          = rgb 157 157 149
-        , _nodeActive         = rgb 105 104 103
+        { _linkDefault = rgb 120 120 117
+        , _linkNorth = rgb 247 105 70
+        , _linkSouth = rgb 247 105 70
+        , _linkWest = rgb 247 105 70
+        , _linkEast = rgb 247 105 70
+        , _nodeHighlight = rgb 234 232 233
+        , _nodeDefault = rgb 120 120 117
+        , _nodeHover = rgb 157 157 149
+        , _nodeActive = rgb 105 104 103
         , _nodePilgrimDefault = rgb 60 247 53
-        , _nodePilgrimHover   = rgb 116 248 111
-        , _nodePilgrimActive  = rgb 36 181 31
-        , _nodePathDefault    = rgb 247 105 70
-        , _nodePathHover      = rgb 245 132 105
-        , _nodePathActive     = rgb 185 75 48
-        , _nodeGoalDefault    = rgb 221 230 58
-        , _nodeGoalHover      = rgb 230 238 98
-        , _nodeGoalActive     = rgb 162 169 42
+        , _nodePilgrimHover = rgb 116 248 111
+        , _nodePilgrimActive = rgb 36 181 31
+        , _nodePathDefault = rgb 247 105 70
+        , _nodePathHover = rgb 245 132 105
+        , _nodePathActive = rgb 185 75 48
+        , _nodeGoalDefault = rgb 221 230 58
+        , _nodeGoalHover = rgb 230 238 98
+        , _nodeGoalActive = rgb 162 169 42
         }
 
 instance FromJSON Colors where

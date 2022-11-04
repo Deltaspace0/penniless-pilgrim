@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters.ConfigSlider
     ( ConfigSlider(..)
@@ -15,8 +15,8 @@ import Data.Text (Text)
 
 data ConfigSlider = ConfigSlider
     { _csCurrent :: Double
-    , _csMin     :: Double
-    , _csMax     :: Double
+    , _csMin :: Double
+    , _csMax :: Double
     , _csCaption :: Text
     } deriving (Eq, Show)
 

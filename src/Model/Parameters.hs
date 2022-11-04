@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters
     ( module Model.Parameters.ConfigSlider
@@ -31,10 +31,10 @@ import Model.Parameters.Colors
 
 data AppParameters = AppParameters
     { _apGridColumnsSlider :: ConfigSlider
-    , _apGridRowsSlider    :: ConfigSlider
-    , _apLinkToNodeSlider  :: ConfigSlider
+    , _apGridRowsSlider :: ConfigSlider
+    , _apLinkToNodeSlider :: ConfigSlider
     , _apNodeToWidthSlider :: ConfigSlider
-    , _apGameControlWidth  :: Double
+    , _apGameControlWidth :: Double
     , _apGameControlHeight :: Double
     , _apColors :: Colors
     } deriving (Eq, Show)
@@ -42,12 +42,12 @@ data AppParameters = AppParameters
 instance Default AppParameters where
     def = AppParameters
         { _apGridColumnsSlider = ConfigSlider 5 2 32 "Columns:"
-        , _apGridRowsSlider    = ConfigSlider 5 2 32 "Rows:"
-        , _apLinkToNodeSlider  = ConfigSlider 5 3 12
+        , _apGridRowsSlider = ConfigSlider 5 2 32 "Rows:"
+        , _apLinkToNodeSlider = ConfigSlider 5 3 12
             "Link size to node size ratio:"
         , _apNodeToWidthSlider = ConfigSlider 3 2 12
             "Node size to link width ratio:"
-        , _apGameControlWidth  = 400
+        , _apGameControlWidth = 400
         , _apGameControlHeight = 500
         , _apColors = def
         }
