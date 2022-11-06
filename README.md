@@ -11,6 +11,7 @@
 - Next tax shows when hovering over next node (if pilgrim can go there).
 - Grid can be resized to have different dimensions other than 5x5.
 - Interface can be customized via [config.json](assets/config.json).
+- Config can be saved and loaded from file.
 
 ## License
 - This project is licensed under the [MIT license](LICENSE.md).
