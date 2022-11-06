@@ -14,6 +14,8 @@ module Model
     , showConfig
     , parameters
     , nextTax
+    , initialSaveConfigCaption
+    , saveConfigCaption
     , initModel
     , handleEvent
     , gameFromParameters
@@ -31,10 +33,10 @@ import Model.Parameters
 
 data AppEvent
     = AppInit
-    | AppResetPilgrim
+    | AppResetGame
     | AppToggleConfig
     | AppSaveConfig
-    | AppSaveConfigResult Bool
+    | AppSetSaveConfigCaption Text
     | AppResizeGrid
     deriving (Eq, Show)
 
@@ -45,6 +47,8 @@ data AppModel = AppModel
     , _appShowConfig :: Bool
     , _appParameters :: AppParameters
     , _appNextTax :: Maybe Double
+    , _appInitialSaveConfigCaption :: Text
+    , _appSaveConfigCaption :: Text
     } deriving (Eq, Show)
 
 type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
@@ -57,6 +61,7 @@ initModel path = do
         then return def
         else fromFile $ fromJust path
     let game = gameFromParameters p
+        saveConfigCaption' = "Save config to file"
     return $ AppModel
         { _appConfigPath = path
         , _appInitialGame = game
@@ -64,6 +69,8 @@ initModel path = do
         , _appShowConfig = False
         , _appParameters = p
         , _appNextTax = Nothing
+        , _appInitialSaveConfigCaption = saveConfigCaption'
+        , _appSaveConfigCaption = saveConfigCaption'
         }
 
 resetPilgrimHandle :: EventHandle
@@ -89,12 +96,13 @@ saveConfigHandle model = [Task taskHandler] where
         success <- if null configPath'
             then return False
             else toFile parameters' $ fromJust configPath'
-        return $ AppSaveConfigResult success
+        return $ AppSetSaveConfigCaption $ if success
+            then "Successfully saved config to file"
+            else "Couldn't save config to file"
 
-saveConfigResultHandle :: Bool -> EventHandle
-saveConfigResultHandle success model = if success
-    then []
-    else []
+setSaveConfigCaptionHandle :: Text -> EventHandle
+setSaveConfigCaptionHandle text model = [Model model'] where
+    model' = model & saveConfigCaption .~ text
 
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model $ model & currentGame .~ game] where
@@ -103,10 +111,10 @@ resizeGridHandle model = [Model $ model & currentGame .~ game] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    AppResetPilgrim -> resetPilgrimHandle model
+    AppResetGame -> resetPilgrimHandle model
     AppToggleConfig -> toggleConfigHandle model
     AppSaveConfig -> saveConfigHandle model
-    AppSaveConfigResult s -> saveConfigResultHandle s model
+    AppSetSaveConfigCaption t -> setSaveConfigCaptionHandle t model
     AppResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game

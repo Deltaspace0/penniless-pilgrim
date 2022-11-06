@@ -34,14 +34,14 @@ buildUI _ model = widgetTree where
             , configSlider_ model gridRowsSlider crCfg
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
-            , [button "Save config to file" AppSaveConfig]
+            , [button (model ^. saveConfigCaption) AppSaveConfig]
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
         [ taxTotalLabel
         , nextTaxLabel
         , boxCenter $ hstack'
-            [ button "Reset" AppResetPilgrim
+            [ button "Reset" AppResetGame
             , button "Config" AppToggleConfig
             ]
         ]
@@ -90,9 +90,9 @@ configSlider_
     -> Lens' AppParameters ConfigSlider
     -> [SliderCfg AppModel AppEvent Double]
     -> [WidgetNode AppModel AppEvent]
-configSlider_ model slider cfg =
+configSlider_ model slider config =
     [ label $ caption <> " " <> t
-    , hslider_ field a b cfg'
+    , hslider_ field a b config'
     ] where
         caption = model ^. parameters . slider . csCaption
         t = showt (floor current :: Int)
@@ -100,4 +100,10 @@ configSlider_ model slider cfg =
         a = model ^. parameters . slider . csMin
         b = model ^. parameters . slider . csMax
         current = model ^. parameters . slider . csCurrent
-        cfg' = [wheelRate 1, dragRate 1] <> cfg
+        config' =
+            [ wheelRate 1
+            , dragRate 1
+            , onChange (const event :: Double -> AppEvent)
+            ] <> config
+        event = AppSetSaveConfigCaption saveConfigCaption'
+        saveConfigCaption' = model ^. initialSaveConfigCaption
