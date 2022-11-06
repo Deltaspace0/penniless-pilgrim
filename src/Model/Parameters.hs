@@ -76,13 +76,15 @@ instance ToJSON AppParameters where
         , "colors" .= (parameters ^. colors)
         ]
 
-fromFile :: String -> IO AppParameters
+fromFile :: String -> IO (Bool, AppParameters)
 fromFile path = do
     let handler = const $ return "" :: SomeException -> IO String
     file <- catch (readFile path) handler
     let contents = BLU.fromString file
         parameters = decode contents :: Maybe AppParameters
-    return $ fromMaybe def parameters
+    return $ if null parameters
+        then (False, def)
+        else (True, fromJust parameters)
 
 toFile :: AppParameters -> String -> IO Bool
 toFile parameters path = do

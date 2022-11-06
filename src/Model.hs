@@ -57,17 +57,17 @@ makeLensesWith abbreviatedFields 'AppModel
 
 initModel :: Maybe String -> IO AppModel
 initModel path = do
-    p <- if null path
+    parameters' <- if null path
         then return def
-        else fromFile $ fromJust path
-    let game = gameFromParameters p
+        else snd <$> fromFile (fromJust path)
+    let game = gameFromParameters parameters'
         saveConfigCaption' = "Save config to file"
     return $ AppModel
         { _appConfigPath = path
         , _appInitialGame = game
         , _appCurrentGame = game
         , _appShowConfig = False
-        , _appParameters = p
+        , _appParameters = parameters'
         , _appNextTax = Nothing
         , _appInitialSaveConfigCaption = saveConfigCaption'
         , _appSaveConfigCaption = saveConfigCaption'
@@ -119,6 +119,7 @@ handleEvent wenv node model evt = case evt of
     AppResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game
-gameFromParameters p = makeGame (floor gc) (floor gr) where
-    gc = p ^. gridColumnsSlider . csCurrent
-    gr = p ^. gridRowsSlider . csCurrent
+gameFromParameters parameters' = game where
+    game = makeGame (floor gridColumns) (floor gridRows)
+    gridColumns = parameters' ^. gridColumnsSlider . csCurrent
+    gridRows = parameters' ^. gridRowsSlider . csCurrent
