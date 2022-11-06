@@ -15,13 +15,16 @@ module Model
     , parameters
     , nextTax
     , initialSaveConfigCaption
+    , initialLoadConfigCaption
     , saveConfigCaption
+    , loadConfigCaption
     , initModel
     , handleEvent
     , gameFromParameters
     ) where
 
 import Control.Lens
+import Control.Monad
 import Data.Default
 import Data.Maybe
 import Data.Text (Text)
@@ -36,7 +39,10 @@ data AppEvent
     | AppResetGame
     | AppToggleConfig
     | AppSaveConfig
+    | AppLoadConfig
     | AppSetSaveConfigCaption Text
+    | AppSetLoadConfigCaption Text
+    | AppSetParameters AppParameters
     | AppResizeGrid
     deriving (Eq, Show)
 
@@ -48,7 +54,9 @@ data AppModel = AppModel
     , _appParameters :: AppParameters
     , _appNextTax :: Maybe Double
     , _appInitialSaveConfigCaption :: Text
+    , _appInitialLoadConfigCaption :: Text
     , _appSaveConfigCaption :: Text
+    , _appLoadConfigCaption :: Text
     } deriving (Eq, Show)
 
 type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
@@ -62,6 +70,7 @@ initModel path = do
         else snd <$> fromFile (fromJust path)
     let game = gameFromParameters parameters'
         saveConfigCaption' = "Save config to file"
+        loadConfigCaption' = "Load config from file"
     return $ AppModel
         { _appConfigPath = path
         , _appInitialGame = game
@@ -70,7 +79,9 @@ initModel path = do
         , _appParameters = parameters'
         , _appNextTax = Nothing
         , _appInitialSaveConfigCaption = saveConfigCaption'
+        , _appInitialLoadConfigCaption = loadConfigCaption'
         , _appSaveConfigCaption = saveConfigCaption'
+        , _appLoadConfigCaption = loadConfigCaption'
         }
 
 resetPilgrimHandle :: EventHandle
@@ -100,9 +111,33 @@ saveConfigHandle model = [Task taskHandler] where
             then "Successfully saved config to file"
             else "Couldn't save config to file"
 
+loadConfigHandle :: EventHandle
+loadConfigHandle model = [Producer producerHandler] where
+    producerHandler raiseEvent = do
+        let configPath' = model ^. configPath
+        (success, parameters') <- if null configPath'
+            then return (False, def)
+            else fromFile $ fromJust configPath'
+        let model' = model & parameters .~ parameters'
+            caption = if success
+                then "Successfully loaded config from file"
+                else "Couldn't load config from file"
+        when success $ do
+            raiseEvent $ AppSetParameters parameters'
+            raiseEvent AppResizeGrid
+        raiseEvent $ AppSetLoadConfigCaption caption
+
 setSaveConfigCaptionHandle :: Text -> EventHandle
 setSaveConfigCaptionHandle text model = [Model model'] where
     model' = model & saveConfigCaption .~ text
+
+setLoadConfigCaptionHandle :: Text -> EventHandle
+setLoadConfigCaptionHandle text model = [Model model'] where
+    model' = model & loadConfigCaption .~ text
+
+setParametersHandle :: AppParameters -> EventHandle
+setParametersHandle parameters' model = [Model model'] where
+    model' = model & parameters .~ parameters'
 
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model model'] where
@@ -115,7 +150,10 @@ handleEvent wenv node model evt = case evt of
     AppResetGame -> resetPilgrimHandle model
     AppToggleConfig -> toggleConfigHandle model
     AppSaveConfig -> saveConfigHandle model
+    AppLoadConfig -> loadConfigHandle model
     AppSetSaveConfigCaption t -> setSaveConfigCaptionHandle t model
+    AppSetLoadConfigCaption t -> setLoadConfigCaptionHandle t model
+    AppSetParameters p -> setParametersHandle p model
     AppResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game

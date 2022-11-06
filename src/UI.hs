@@ -35,6 +35,7 @@ buildUI _ model = widgetTree where
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
             , [button (model ^. saveConfigCaption) AppSaveConfig]
+            , [button (model ^. loadConfigCaption) AppLoadConfig]
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
@@ -103,7 +104,10 @@ configSlider_ model slider config =
         config' =
             [ wheelRate 1
             , dragRate 1
-            , onChange (const event :: Double -> AppEvent)
+            , onChange (const eventSave :: Double -> AppEvent)
+            , onChange (const eventLoad :: Double -> AppEvent)
             ] <> config
-        event = AppSetSaveConfigCaption saveConfigCaption'
+        eventSave = AppSetSaveConfigCaption saveConfigCaption'
+        eventLoad = AppSetLoadConfigCaption loadConfigCaption'
         saveConfigCaption' = model ^. initialSaveConfigCaption
+        loadConfigCaption' = model ^. initialLoadConfigCaption
