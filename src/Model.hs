@@ -1,12 +1,12 @@
-{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model
-    ( module Model.Event
-    , module Model.Game
+    ( module Model.Game
     , module Model.Parameters
+    , AppEvent(..)
     , AppModel(..)
     , configPath
     , initialGame
@@ -25,10 +25,18 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
-import Model.Event
 import Model.Game
 import Model.Grid
 import Model.Parameters
+
+data AppEvent
+    = AppInit
+    | AppResetPilgrim
+    | AppToggleConfig
+    | AppSaveConfig
+    | AppSaveConfigResult Bool
+    | AppResizeGrid
+    deriving (Eq, Show)
 
 data AppModel = AppModel
     { _appConfigPath :: Maybe String
@@ -78,13 +86,13 @@ saveConfigHandle model = [Task taskHandler] where
     taskHandler = do
         let configPath' = model ^. configPath
             parameters' = model ^. parameters
-        result <- if null configPath'
+        success <- if null configPath'
             then return False
             else toFile parameters' $ fromJust configPath'
-        return $ SaveConfigResult result
+        return $ AppSaveConfigResult success
 
 saveConfigResultHandle :: Bool -> EventHandle
-saveConfigResultHandle result model = if result
+saveConfigResultHandle success model = if success
     then []
     else []
 
@@ -95,11 +103,11 @@ resizeGridHandle model = [Model $ model & currentGame .~ game] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    ResetPilgrim -> resetPilgrimHandle model
-    ToggleConfig -> toggleConfigHandle model
-    SaveConfig -> saveConfigHandle model
-    SaveConfigResult result -> saveConfigResultHandle result model
-    ResizeGrid -> resizeGridHandle model
+    AppResetPilgrim -> resetPilgrimHandle model
+    AppToggleConfig -> toggleConfigHandle model
+    AppSaveConfig -> saveConfigHandle model
+    AppSaveConfigResult s -> saveConfigResultHandle s model
+    AppResizeGrid -> resizeGridHandle model
 
 gameFromParameters :: AppParameters -> Game
 gameFromParameters p = makeGame (floor gc) (floor gr) where

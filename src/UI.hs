@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes        #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module UI
@@ -20,7 +20,7 @@ buildUI _ model = widgetTree where
     vstack' = vstack_ [childSpacing_ 16]
     hstack' = hstack_ [childSpacing_ 32]
     boxCenter = box_ [alignCenter]
-    crCfg = [onChange (const ResizeGrid :: Double -> AppEvent)]
+    crCfg = [onChange (const AppResizeGrid :: Double -> AppEvent)]
     widgetTree = hstack'
         [ boxCenter $ gameControlM model `nodeKey` "mainGrid"
         , separatorLine
@@ -40,9 +40,9 @@ buildUI _ model = widgetTree where
         [ taxTotalLabel
         , nextTaxLabel
         , boxCenter $ hstack'
-            [ button "Reset" ResetPilgrim
-            , button "Config" ToggleConfig
-            , button "Save config" SaveConfig
+            [ button "Reset" AppResetPilgrim
+            , button "Config" AppToggleConfig
+            , button "Save config" AppSaveConfig
             ]
         ]
     taxTotalLabel = bigNumberLabel taxTotal "Tax total: "

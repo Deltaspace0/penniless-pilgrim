@@ -1,6 +1,6 @@
-{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Grid
     ( Grid(..)
@@ -39,7 +39,7 @@ import Model.Direction
 type Point = (Int, Int)
 
 data Grid a b = Grid
-    { _gridNodes  :: Array Point [a]
+    { _gridNodes :: Array Point [a]
     , _gridHlinks :: Array Point (Maybe b)
     , _gridVlinks :: Array Point (Maybe b)
     } deriving (Eq, Show)
@@ -52,7 +52,7 @@ makeGrid w h = grid where
     vbounds = ((0, 0), (w-1, h-2))
     ibounds = ((0, 0), (w-1, h-1))
     grid = Grid
-        { _gridNodes  = listArray ibounds $ repeat []
+        { _gridNodes = listArray ibounds $ repeat []
         , _gridHlinks = listArray hbounds $ repeat Nothing
         , _gridVlinks = listArray vbounds $ repeat Nothing
         }
@@ -140,7 +140,7 @@ gridMap
     -> Grid a b
     -> Grid a' b'
 gridMap nodeTransform hlinkTransform vlinkTransform grid = Grid
-    { _gridNodes  = amap nodeTransform $ grid ^. nodes
+    { _gridNodes = amap nodeTransform $ grid ^. nodes
     , _gridHlinks = amap hlinkTransform $ grid ^. hlinks
     , _gridVlinks = amap vlinkTransform $ grid ^. vlinks
     }
