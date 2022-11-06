@@ -105,7 +105,8 @@ setSaveConfigCaptionHandle text model = [Model model'] where
     model' = model & saveConfigCaption .~ text
 
 resizeGridHandle :: EventHandle
-resizeGridHandle model = [Model $ model & currentGame .~ game] where
+resizeGridHandle model = [Model model'] where
+    model' = model & currentGame .~ game & initialGame .~ game
     game = gameFromParameters $ model ^. parameters
 
 handleEvent :: AppEventHandler AppModel AppEvent
