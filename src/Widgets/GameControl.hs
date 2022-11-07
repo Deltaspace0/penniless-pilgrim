@@ -84,6 +84,7 @@ makeGameControl gcData state = widget where
             , _ndDirection = directionFromGame p game
             , _ndNextTax = taxFromGame p game
             , _ndNextTaxField = nextTaxField
+            , _ndAnimationDuration = animationDuration
             }
         fh = gameControlHlink . linkData
         fl = gameControlVlink . linkData
