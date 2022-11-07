@@ -66,14 +66,14 @@ instance FromJSON AppParameters where
         <*> v .: "colors"
 
 instance ToJSON AppParameters where
-    toJSON parameters = object
-        [ "grid_columns_slider" .= (parameters ^. gridColumnsSlider)
-        , "grid_rows_slider" .= (parameters ^. gridRowsSlider)
-        , "link_to_node_slider" .= (parameters ^. linkToNodeSlider)
-        , "node_to_width_slider" .= (parameters ^. nodeToWidthSlider)
-        , "game_control_width" .= (parameters ^. gameControlWidth)
-        , "game_control_height" .= (parameters ^. gameControlHeight)
-        , "colors" .= (parameters ^. colors)
+    toJSON p = object
+        [ "grid_columns_slider" .= (p ^. gridColumnsSlider)
+        , "grid_rows_slider" .= (p ^. gridRowsSlider)
+        , "link_to_node_slider" .= (p ^. linkToNodeSlider)
+        , "node_to_width_slider" .= (p ^. nodeToWidthSlider)
+        , "game_control_width" .= (p ^. gameControlWidth)
+        , "game_control_height" .= (p ^. gameControlHeight)
+        , "colors" .= (p ^. colors)
         ]
 
 fromFile :: String -> IO (Bool, AppParameters)
