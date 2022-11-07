@@ -137,7 +137,7 @@ makeGameControlLink isHz linkData state = widget where
             running = _lsRunning state
             start = _lsStart state
             style = currentStyle wenv node
-            contentArea = getContentArea node style
+            vp = getContentArea node style
             delta = fromIntegral $ ts-start
             progress = max 0 $ min 1 $ delta/animationDuration
             Just newLink' = newLink
@@ -150,12 +150,12 @@ makeGameControlLink isHz linkData state = widget where
                 else (oldLink' ^. color, oldLink' ^. form)
         if running && progress < 1
             then if null newForm
-                then renderForm r oldData contentArea (1-progress)
-                else renderForm r newData contentArea progress
-            else renderForm r newData contentArea 1
+                then renderForm r oldData vp (1-progress)
+                else renderForm r newData vp progress
+            else renderForm r newData vp 1
 
-    renderForm r (color', form') contentArea progress = do
-        let Rect x y linkSize nodeSize = contentArea
+    renderForm r (color', form') vp progress = do
+        let Rect x y linkSize nodeSize = vp
             c = Just color'
             totalSize = linkSize-nodeSize*2
             totalSize' = totalSize*progress
