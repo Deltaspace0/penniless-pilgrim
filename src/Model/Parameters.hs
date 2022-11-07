@@ -49,7 +49,7 @@ instance Default AppParameters where
         { _apGridColumnsSlider = ConfigSlider 5 2 32 "Columns:"
         , _apGridRowsSlider = ConfigSlider 5 2 32 "Rows:"
         , _apGridAnimationSlider = ConfigSlider 500 0 1000
-            "Animation duration:"
+            "Animation duration (in milliseconds):"
         , _apLinkToNodeSlider = ConfigSlider 5 3 12
             "Link size to node size ratio:"
         , _apNodeToWidthSlider = ConfigSlider 2 2 12

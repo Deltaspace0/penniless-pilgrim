@@ -27,7 +27,7 @@
         "min": 0,
         "max": 1000,
         "default": 500,
-        "caption": "Animation duration:"
+        "caption": "Animation duration (in milliseconds):"
     },
     "game_control_width": 400,
     "game_control_height": 500,
