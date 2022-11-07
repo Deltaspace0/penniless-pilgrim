@@ -32,6 +32,8 @@ buildUI _ model = widgetTree where
             , [separatorLine]
             , configSlider_ model gridColumnsSlider crCfg
             , configSlider_ model gridRowsSlider crCfg
+            , configSlider_ model gridAnimationSlider
+                [wheelRate 10, dragRate 10]
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
             , [button (model ^. saveConfigCaption) AppSaveConfig]
@@ -56,6 +58,7 @@ gameControlM model = gameControl $ GameControlData
     { _gcdGame = currentGame
     , _gcdNextTax = nextTax
     , _gcdColors = get colors
+    , _gcdAnimationDuration = get $ gridAnimationSlider . csCurrent
     , _gcdLinkToNodeRatio = get $ linkToNodeSlider  . csCurrent
     , _gcdNodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
     , _gcdWidth = get gameControlWidth

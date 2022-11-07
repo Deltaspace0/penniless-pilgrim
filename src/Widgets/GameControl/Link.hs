@@ -59,6 +59,7 @@ vlinkTransform colors (Just G.LinkForward) = Just Link
 data LinkData = LinkData
     { _ldLink :: Maybe Link
     , _ldColor :: Color
+    , _ldAnimationDuration :: Double
     , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)
 
@@ -121,11 +122,13 @@ makeGameControlLink isHz linkData state = widget where
         newLink = _ldLink linkData
         oldLink = _lsLink oldState
         oldStart = _lsStart oldState
-        newStart = ts - 500 + (min 500 (ts-oldStart))
+        delta = min animationDuration' (ts-oldStart)
+        newStart = ts - animationDuration' + delta
         ts = wenv ^. L.timestamp
         widgetId = newNode ^. L.info . L.widgetId
         period = 10
-        steps = fromIntegral $ 500 `div` period
+        steps = fromIntegral $ animationDuration' `div` period
+        animationDuration' = floor animationDuration
 
     render wenv node r = do
         let ts = wenv ^. L.timestamp
@@ -136,7 +139,7 @@ makeGameControlLink isHz linkData state = widget where
             style = currentStyle wenv node
             contentArea = getContentArea node style
             delta = fromIntegral $ ts-start
-            progress = max 0 $ min 1 $ delta/500
+            progress = max 0 $ min 1 $ delta/animationDuration
             Just newLink' = newLink
             Just oldLink' = oldLink
             newData@(newColor, newForm) = if null newLink
@@ -185,3 +188,5 @@ makeGameControlLink isHz linkData state = widget where
                 drawLine' s (b'+1)
                 drawTriangle' b b'
             _ -> drawLine' s b
+
+    animationDuration = _ldAnimationDuration linkData

@@ -23,6 +23,7 @@ data GameControlData s = GameControlData
     { _gcdGame :: ALens' s Game
     , _gcdNextTax :: ALens' s (Maybe Double)
     , _gcdColors :: Colors
+    , _gcdAnimationDuration :: Double
     , _gcdLinkToNodeRatio :: Double
     , _gcdNodeToWidthRatio :: Double
     , _gcdWidth :: Double
@@ -89,6 +90,7 @@ makeGameControl gcData state = widget where
         linkData link = LinkData
             { _ldLink = link
             , _ldColor = _linkDefault colors
+            , _ldAnimationDuration = animationDuration
             , _ldNodeToWidthRatio = nodeToWidthRatio
             }
         widgetId = node ^. L.info . L.widgetId
@@ -153,6 +155,7 @@ makeGameControl gcData state = widget where
     nextTaxField = WidgetLens $ _gcdNextTax gcData
     grid = _gcsGrid state
     colors = _gcdColors gcData
+    animationDuration = _gcdAnimationDuration gcData
     linkToNodeRatio = _gcdLinkToNodeRatio gcData
     nodeToWidthRatio = _gcdNodeToWidthRatio gcData
     width = _gcdWidth gcData

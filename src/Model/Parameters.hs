@@ -9,6 +9,7 @@ module Model.Parameters
     , AppParameters(..)
     , gridColumnsSlider
     , gridRowsSlider
+    , gridAnimationSlider
     , linkToNodeSlider
     , nodeToWidthSlider
     , gameControlWidth
@@ -33,6 +34,7 @@ import Model.Parameters.ConfigSlider
 data AppParameters = AppParameters
     { _apGridColumnsSlider :: ConfigSlider
     , _apGridRowsSlider :: ConfigSlider
+    , _apGridAnimationSlider :: ConfigSlider
     , _apLinkToNodeSlider :: ConfigSlider
     , _apNodeToWidthSlider :: ConfigSlider
     , _apGameControlWidth :: Double
@@ -46,9 +48,11 @@ instance Default AppParameters where
     def = AppParameters
         { _apGridColumnsSlider = ConfigSlider 5 2 32 "Columns:"
         , _apGridRowsSlider = ConfigSlider 5 2 32 "Rows:"
+        , _apGridAnimationSlider = ConfigSlider 500 0 1000
+            "Animation duration:"
         , _apLinkToNodeSlider = ConfigSlider 5 3 12
             "Link size to node size ratio:"
-        , _apNodeToWidthSlider = ConfigSlider 3 2 12
+        , _apNodeToWidthSlider = ConfigSlider 2 2 12
             "Node size to link width ratio:"
         , _apGameControlWidth = 400
         , _apGameControlHeight = 500
@@ -59,6 +63,7 @@ instance FromJSON AppParameters where
     parseJSON = withObject "AppParameters" $ \v -> AppParameters
         <$> v .: "grid_columns_slider"
         <*> v .: "grid_rows_slider"
+        <*> v .: "grid_animation_slider"
         <*> v .: "link_to_node_slider"
         <*> v .: "node_to_width_slider"
         <*> v .: "game_control_width"
@@ -69,6 +74,7 @@ instance ToJSON AppParameters where
     toJSON p = object
         [ "grid_columns_slider" .= (p ^. gridColumnsSlider)
         , "grid_rows_slider" .= (p ^. gridRowsSlider)
+        , "grid_animation_slider" .= (p ^. gridAnimationSlider)
         , "link_to_node_slider" .= (p ^. linkToNodeSlider)
         , "node_to_width_slider" .= (p ^. nodeToWidthSlider)
         , "game_control_width" .= (p ^. gameControlWidth)
