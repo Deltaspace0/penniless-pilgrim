@@ -113,7 +113,7 @@ makeGameControlLink isHz linkData state = widget where
             else LinkState
                 { _lsLink = newLink
                 , _lsOldLink = oldLink
-                , _lsRunning = True
+                , _lsRunning = animationDuration' > 0
                 , _lsStart = newStart
                 }
         reqs = if newLink == oldLink
