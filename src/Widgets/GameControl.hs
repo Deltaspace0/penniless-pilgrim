@@ -130,18 +130,20 @@ makeGameControl gcData state = widget where
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
 
-    handleDirection wenv node direction = Just result where
-        result = resultReqs newNode reqs
+    handleDirection wenv node direction = result where
+        result = if null nextGame
+            then Nothing
+            else Just $ resultReqs newNode reqs
         newNode = node & L.widget .~ w
         reqs = concat $
             [ [RenderOnce]
-            , widgetDataSet gameField game'
+            , widgetDataSet gameField nextGame'
             , widgetDataSet nextTaxField Nothing
             ]
         w = makeGameControl gcData state'
-        game' = movePilgrim direction game
+        nextGame@(Just nextGame') = movePilgrim direction game
         game = widgetDataGet (wenv ^. L.model) gameField
-        state' = GameControlState $ gridFromGame game' colors
+        state' = GameControlState $ gridFromGame nextGame' colors
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
