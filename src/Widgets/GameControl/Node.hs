@@ -55,7 +55,8 @@ data NodeData s = NodeData
     , _ndActiveColor :: Color
     , _ndHighlightColor :: Color
     , _ndGameControlId :: WidgetId
-    , _ndDirection :: Maybe G.Direction
+    , _ndPosition :: (Int, Int)
+    , _ndClickable :: Bool
     , _ndNextTax :: Maybe Double
     , _ndNextTaxField :: WidgetData s (Maybe Double)
     , _ndAnimationDuration :: Double
@@ -88,9 +89,8 @@ makeGameControlNode nodeData state = widget where
         , singleRender = render
         }
 
-    getBaseStyle _ _ = if null direction
-        then Just basicStyle
-        else Just $ basicStyle
+    getBaseStyle _ _ = if clickable
+        then Just $ basicStyle
             { _styleHover = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
                     then _ndHoverColor nodeData
@@ -104,6 +104,7 @@ makeGameControlNode nodeData state = widget where
                 , _sstCursorIcon = Just CursorHand
                 }
             }
+        else Just basicStyle
 
     getCurrentStyle wenv node = style where
         vp = node ^. L.info . L.viewport
@@ -161,14 +162,12 @@ makeGameControlNode nodeData state = widget where
             result = resultReqs node reqs
             reqs = widgetDataSet nextTaxField Nothing
         Click p _ _ | valid -> Just result where
-            valid = isPointInNodeVp node p && isDirection
+            valid = isPointInNodeVp node p && clickable
             result = resultReqs node reqs
             reqs =
-                [ SendMessage gcId direction'
+                [ SendMessage gcId position
                 , ResetCursorIcon id
                 ]
-            isDirection = not $ null direction
-            direction' = fromJust direction
         _ -> Nothing
         where
             gcId = _ndGameControlId nodeData
@@ -182,9 +181,8 @@ makeGameControlNode nodeData state = widget where
             running = _nsRunning state
             style = currentStyle wenv node
             vp@(Rect x y w h) = getContentArea node style
-            checkD = not $ null direction
-            isActive = checkD && isNodeActive wenv node
-            isHovered = checkD && isNodeHovered wenv node
+            isActive = clickable && isNodeActive wenv node
+            isHovered = clickable && isNodeHovered wenv node
             hc = Just $ _ndHighlightColor nodeData
         if running
             then forM_ animationQueue $ \(start, node') -> do
@@ -209,12 +207,13 @@ makeGameControlNode nodeData state = widget where
                         then hoverColor'
                         else color'
             else drawEllipse renderer vp $ _sstFgColor style
-        when (not $ null direction) $ do
+        when clickable $ do
             drawEllipseBorder renderer vp hc 2
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack
-    direction = _ndDirection nodeData
+    position = _ndPosition nodeData
+    clickable = _ndClickable nodeData
     animationDuration = _ndAnimationDuration nodeData
     basicStyle = def
         { _styleBasic = Just $ def

@@ -7,6 +7,7 @@ module Model.Game
     , makeGame
     , makeGame_
     , movePilgrim
+    , jumpPilgrim
     , directionFromGame
     , taxFromGame
     ) where
@@ -63,6 +64,12 @@ movePilgrim d game = result where
     link | goingBack = Nothing
          | p == min p p' = Just LinkForward
          | otherwise = Just LinkBack
+
+jumpPilgrim :: (Int, Int) -> Game -> Maybe Game
+jumpPilgrim p game
+    | null direction = Nothing
+    | otherwise = movePilgrim (fromJust direction) game
+    where direction = directionFromGame p game
 
 directionFromGame :: (Int, Int) -> Game -> Maybe Direction
 directionFromGame (x, y) game

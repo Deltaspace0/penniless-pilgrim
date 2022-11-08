@@ -81,11 +81,12 @@ makeGameControl gcData state = widget where
             , _ndActiveColor = _nodeActive colors
             , _ndHighlightColor = _nodeHighlight colors
             , _ndGameControlId = widgetId
-            , _ndDirection = directionFromGame p game
-            , _ndNextTax = taxFromGame p game
+            , _ndPosition = p
+            , _ndClickable = not $ null tax
+            , _ndNextTax = tax
             , _ndNextTaxField = nextTaxField
             , _ndAnimationDuration = animationDuration
-            }
+            } where tax = taxFromGame p game
         fh = gameControlHlink . linkData
         fl = gameControlVlink . linkData
         linkData link = LinkData
@@ -116,7 +117,7 @@ makeGameControl gcData state = widget where
             widgetId = node ^. L.info . L.widgetId
 
     handleMessage wenv node target message = result where
-        result = cast message >>= handleDirection wenv node
+        result = cast message >>= handlePosition wenv node
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
 
@@ -131,19 +132,27 @@ makeGameControl gcData state = widget where
         vlinkSequence = getVlinkSequence grid
 
     handleDirection wenv node direction = result where
+        result = handleGameChange wenv node f
+        f = movePilgrim direction
+
+    handlePosition wenv node p = result where
+        result = handleGameChange wenv node f
+        f = jumpPilgrim p
+
+    handleGameChange wenv node f = result where
         result = if null nextGame
             then Nothing
             else Just $ resultReqs newNode reqs
+        nextGame@(Just nextGame') = f game
+        game = widgetDataGet (wenv ^. L.model) gameField
         newNode = node & L.widget .~ w
+        w = makeGameControl gcData state'
+        state' = GameControlState $ gridFromGame nextGame' colors
         reqs = concat $
             [ [RenderOnce]
             , widgetDataSet gameField nextGame'
             , widgetDataSet nextTaxField Nothing
             ]
-        w = makeGameControl gcData state'
-        nextGame@(Just nextGame') = movePilgrim direction game
-        game = widgetDataGet (wenv ^. L.model) gameField
-        state' = GameControlState $ gridFromGame nextGame' colors
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
