@@ -17,6 +17,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Single
+import TextShow
 import qualified Monomer.Lens as L
 
 import Model.Parameters.Colors
@@ -75,7 +76,9 @@ instance Default NodeState where
 
 gameControlNode :: NodeData s -> WidgetNode s e
 gameControlNode nodeData = node where
-    node = defaultWidgetNode "gameControlNode" widget
+    node = defaultWidgetNode (WidgetType widgetType) widget
+    widgetType = "gameControlNode" <> showt position
+    position = _ndPosition nodeData
     widget = makeGameControlNode nodeData def
 
 makeGameControlNode :: NodeData s -> NodeState -> Widget s e
