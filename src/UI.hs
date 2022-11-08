@@ -41,16 +41,16 @@ buildUI _ model = widgetTree where
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
-        [ taxTotalLabel
+        [ totalTaxLabel
         , nextTaxLabel
         , boxCenter $ hstack'
             [ button "Reset" AppResetGame
             , button "Config" AppToggleConfig
             ]
         ]
-    taxTotalLabel = bigNumberLabel taxTotal "Tax total: "
+    totalTaxLabel = bigNumberLabel totalTax "Total tax: "
     nextTaxLabel = bigNumberLabel nextTax' "Next tax: "
-    taxTotal = Just $ _tax $ _pilgrim $ model ^. currentGame
+    totalTax = Just $ _tax $ _pilgrim $ model ^. currentGame
     nextTax' = model ^. nextTax
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
