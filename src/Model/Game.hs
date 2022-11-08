@@ -36,10 +36,12 @@ makeGame w h = makeGame_ w h def
 
 makeGame_ :: Int -> Int -> Pilgrim -> Game
 makeGame_ w h pilgrim = Game
-    { _grid = nodePush (_position pilgrim, NodePilgrim) grid
+    { _grid = foldr nodePush (makeGrid w h)
+        [ (_position pilgrim, NodePilgrim)
+        , ((w-1, h-1), NodeGoal)
+        ]
     , _pilgrim = pilgrim
-    } where
-        grid = makeGrid w h
+    }
 
 movePilgrim :: Direction -> Game -> Game
 movePilgrim d game = fst $ movePilgrim_ d game
