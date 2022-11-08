@@ -12,15 +12,17 @@ import Model.Direction
 
 data Pilgrim = Pilgrim
     { _position :: (Int, Int)
-    , _tax :: Double
+    , _previousPositions :: [(Int, Int)]
     , _path :: [Direction]
+    , _tax :: Double
     } deriving (Eq, Show)
 
 instance Default Pilgrim where
     def = Pilgrim
         { _position = (0, 0)
-        , _tax = 0
+        , _previousPositions = []
         , _path = []
+        , _tax = 0
         }
 
 updateTax :: Direction -> Double -> Double
@@ -37,7 +39,15 @@ isBack d pilgrim = not (null path) && d == opposite where
 updatePilgrim :: Direction -> Pilgrim -> Pilgrim
 updatePilgrim d pilgrim = Pilgrim
     { _position = nextPosition d $ _position pilgrim
+    , _previousPositions = if goingBack
+        then tail previousPositions
+        else (p:previousPositions)
+    , _path = if goingBack
+        then tail path
+        else (d:path)
     , _tax = updateTax d $ _tax pilgrim
-    , _path = if isBack d pilgrim then tail path else (d:path)
     } where
+        goingBack = isBack d pilgrim
+        p = _position pilgrim
+        previousPositions = _previousPositions pilgrim
         path = _path pilgrim

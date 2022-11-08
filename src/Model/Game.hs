@@ -67,9 +67,17 @@ movePilgrim d game = result where
 
 jumpPilgrim :: (Int, Int) -> Game -> Maybe Game
 jumpPilgrim p game
-    | null direction = Nothing
-    | otherwise = movePilgrim (fromJust direction) game
-    where direction = directionFromGame p game
+    | not (null direction) = movePilgrim (fromJust direction) game
+    | elem p previousPositions = Just $ foldr f game directions'
+    | otherwise = Nothing
+    where
+        direction = directionFromGame p game
+        previousPositions = _previousPositions $ _pilgrim game
+        path = _path $ _pilgrim game
+        f d = fromJust . (movePilgrim d)
+        directions = map (getOpposite . snd) $ ds ++ [head ds']
+        directions' = reverse directions
+        (ds, ds') = span ((/= p) . fst) $ zip previousPositions path
 
 directionFromGame :: (Int, Int) -> Game -> Maybe Direction
 directionFromGame (x, y) game
@@ -81,9 +89,8 @@ directionFromGame (x, y) game
         p = _position $ _pilgrim game
 
 taxFromGame :: (Int, Int) -> Game -> Maybe Double
-taxFromGame p game
-    | null direction = Nothing
-    | otherwise = Just $ _tax $ _pilgrim game'
-    where
-        direction = directionFromGame p game
-        game' = fromJust $ movePilgrim (fromJust direction) game
+taxFromGame p game = tax where
+    tax = if null game'
+        then Nothing
+        else Just $ _tax $ _pilgrim $ fromJust game'
+    game' = jumpPilgrim p game
