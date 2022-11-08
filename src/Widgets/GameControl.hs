@@ -143,7 +143,8 @@ makeGameControl gcData state = widget where
         result = if null nextGame
             then Nothing
             else Just $ resultReqs newNode reqs
-        nextGame@(Just nextGame') = f game
+        nextGame = f game
+        nextGame' = fromJust nextGame
         game = widgetDataGet (wenv ^. L.model) gameField
         newNode = node & L.widget .~ w
         w = makeGameControl gcData state'
