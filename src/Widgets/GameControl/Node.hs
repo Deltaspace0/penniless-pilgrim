@@ -184,7 +184,7 @@ makeGameControlNode nodeData state = widget where
             vp@(Rect x y w h) = getContentArea node style
             checkD = not $ null direction
             isActive = checkD && isNodeActive wenv node
-            isHovered = checkD && isNodeHoveredEllipse_ vp wenv node
+            isHovered = checkD && isNodeHovered wenv node
             hc = Just $ _ndHighlightColor nodeData
         if running
             then forM_ animationQueue $ \(start, node') -> do
