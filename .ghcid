@@ -1,0 +1,2 @@
+--command "stack ghci --main-is penniless-pilgrim:exe:penniless-pilgrim-exe"
+--test ":main"
