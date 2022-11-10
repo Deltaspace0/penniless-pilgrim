@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -21,7 +22,6 @@ buildUI _ model = widgetTree where
     vstack' = vstack_ [childSpacing_ 16]
     hstack' = hstack_ [childSpacing_ 32]
     boxCenter = box_ [alignCenter]
-    crCfg = [onChange (const AppResizeGrid :: Double -> AppEvent)]
     widgetTree = hstack'
         [ boxCenter $ gameControlM model `nodeKey` "mainGrid"
         , separatorLine
@@ -31,8 +31,8 @@ buildUI _ model = widgetTree where
         then vstack' $ concat
             [ sideWidgets
             , [separatorLine]
-            , configSlider_ model gridColumnsSlider crCfg
-            , configSlider_ model gridRowsSlider crCfg
+            , configSlider_ model gridColumnsSlider [AppResizeGrid]
+            , configSlider_ model gridRowsSlider [AppResizeGrid]
             , configSlider model gridAnimationSlider
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
@@ -89,12 +89,12 @@ configSlider model slider = configSlider_ model slider []
 configSlider_
     :: AppModel
     -> Lens' AppParameters ConfigSlider
-    -> [SliderCfg AppModel AppEvent Double]
+    -> [AppEvent]
     -> [WidgetNode AppModel AppEvent]
-configSlider_ model slider config =
+configSlider_ model slider events =
     [ label $ caption <> " " <> showt' current
     , hstack_ [childSpacing_ 32]
-        [ hslider_ field a b config'
+        [ hslider_ field a b config
         , button' "-" $ AppSetParameters decreasedParameters
         , button' "+" $ AppSetParameters increasedParameters
         ]
@@ -105,14 +105,16 @@ configSlider_ model slider config =
         changeRate = slider' ^. csChangeRate
         caption = slider' ^. csCaption
         field = parameters . slider . csCurrent
-        config' =
+        config =
             [ wheelRate $ toRational changeRate
             , dragRate $ toRational changeRate
-            , onChange (const eventSave :: Double -> AppEvent)
-            , onChange (const eventLoad :: Double -> AppEvent)
-            ] <> config
-        eventSave = AppSetSaveConfigCaption saveConfigCaption'
-        eventLoad = AppSetLoadConfigCaption loadConfigCaption'
+            ] <> map transformEvent events'
+        events' = saveLoadCaptionEvents <> events
+        saveLoadCaptionEvents =
+            [ AppSetSaveConfigCaption saveConfigCaption'
+            , AppSetLoadConfigCaption loadConfigCaption'
+            ]
+        transformEvent e = onChange (const e :: Double -> AppEvent)
         saveConfigCaption' = model ^. initialSaveConfigCaption
         loadConfigCaption' = model ^. initialLoadConfigCaption
         slider' = p ^. slider
@@ -123,7 +125,11 @@ configSlider_ model slider config =
         increasedSlider = slider' & csCurrent %~ increase
         decrease c = max a $ c-changeRate
         increase c = min b $ c+changeRate
-        button' c e = button c e `styleBasic` [width 32, height 24]
+        button' c e = button_ c e buttonConfig `styleBasic`
+            [ width 32
+            , height 24
+            ]
+        buttonConfig = map onClick events'
 
 showt' :: Double -> Text
 showt' number = pack result where
