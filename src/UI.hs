@@ -45,7 +45,7 @@ buildUI _ model = widgetTree where
         , nextTaxLabel
         , boxCenter $ hstack'
             [ button "Reset" AppResetGame
-            , button "Config" AppToggleConfig
+            , toggleButton "Config" showConfig
             ]
         ]
     totalTaxLabel = bigNumberLabel totalTax "Total tax: "

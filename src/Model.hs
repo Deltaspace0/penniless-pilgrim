@@ -37,7 +37,6 @@ import Model.Parameters
 data AppEvent
     = AppInit
     | AppResetGame
-    | AppToggleConfig
     | AppSaveConfig
     | AppLoadConfig
     | AppSetSaveConfigCaption Text
@@ -96,9 +95,6 @@ resetPilgrimHandle model = [Model model'] where
     cols' = fromIntegral $ cols+1
     rows' = fromIntegral $ rows+1
 
-toggleConfigHandle :: EventHandle
-toggleConfigHandle model = [Model $ model & showConfig %~ not]
-
 saveConfigHandle :: EventHandle
 saveConfigHandle model = [Task taskHandler] where
     taskHandler = do
@@ -148,7 +144,6 @@ handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
     AppResetGame -> resetPilgrimHandle model
-    AppToggleConfig -> toggleConfigHandle model
     AppSaveConfig -> saveConfigHandle model
     AppLoadConfig -> loadConfigHandle model
     AppSetSaveConfigCaption t -> setSaveConfigCaptionHandle t model
