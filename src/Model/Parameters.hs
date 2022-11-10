@@ -46,14 +46,36 @@ makeLensesWith abbreviatedFields 'AppParameters
 
 instance Default AppParameters where
     def = AppParameters
-        { _apGridColumnsSlider = ConfigSlider 5 2 32 "Columns:"
-        , _apGridRowsSlider = ConfigSlider 5 2 32 "Rows:"
-        , _apGridAnimationSlider = ConfigSlider 500 0 1000
-            "Animation duration (in milliseconds):"
-        , _apLinkToNodeSlider = ConfigSlider 5 3 12
-            "Link size to node size ratio:"
-        , _apNodeToWidthSlider = ConfigSlider 2 2 12
-            "Node size to link width ratio:"
+        { _apGridColumnsSlider = ConfigSlider
+            { _csCurrent = 5
+            , _csMin = 2
+            , _csMax = 32
+            , _csCaption = "Columns:"
+            }
+        , _apGridRowsSlider = ConfigSlider
+            { _csCurrent = 5
+            , _csMin = 2
+            , _csMax = 32
+            , _csCaption = "Rows:"
+            }
+        , _apGridAnimationSlider = ConfigSlider
+            { _csCurrent = 500
+            , _csMin = 0
+            , _csMax = 1000
+            , _csCaption = "Animation duration (in milliseconds):"
+            }
+        , _apLinkToNodeSlider = ConfigSlider
+            { _csCurrent = 5
+            , _csMin = 3
+            , _csMax = 12
+            , _csCaption = "Link size to node size ratio:"
+            }
+        , _apNodeToWidthSlider = ConfigSlider
+            { _csCurrent = 2
+            , _csMin = 2
+            , _csMax = 12
+            , _csCaption = "Node size to link width ratio:"
+            }
         , _apGameControlWidth = 400
         , _apGameControlHeight = 500
         , _apColors = def
