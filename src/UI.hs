@@ -107,7 +107,7 @@ configSlider_ model slider events =
         caption = slider' ^. csCaption
         field = parameters . slider . csCurrent
         config =
-            [ wheelRate $ toRational changeRate
+            [ wheelRate 0
             , dragRate $ toRational changeRate
             ] <> map transformEvent events'
         events' = saveLoadCaptionEvents <> events
