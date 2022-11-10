@@ -11,6 +11,7 @@ import Data.Maybe
 import Data.Text (Text, pack)
 import Monomer
 import TextShow (showt)
+import qualified Monomer.Lens as L
 
 import Widgets.GameControl
 import Model
@@ -92,17 +93,21 @@ configSlider_
     -> [WidgetNode AppModel AppEvent]
 configSlider_ model slider config =
     [ label $ caption <> " " <> showt' current
-    , hslider_ field a b config'
+    , hstack_ [childSpacing_ 32]
+        [ hslider_ field a b config'
+        , button "-" $ AppSetParameters decreasedParameters
+        , button "+" $ AppSetParameters increasedParameters
+        ]
     ] where
         current = slider' ^. csCurrent
         a = slider' ^. csMin
         b = slider' ^. csMax
-        changeRate = toRational $ slider' ^. csChangeRate
+        changeRate = slider' ^. csChangeRate
         caption = slider' ^. csCaption
         field = parameters . slider . csCurrent
         config' =
-            [ wheelRate changeRate
-            , dragRate changeRate
+            [ wheelRate $ toRational changeRate
+            , dragRate $ toRational changeRate
             , onChange (const eventSave :: Double -> AppEvent)
             , onChange (const eventLoad :: Double -> AppEvent)
             ] <> config
@@ -110,7 +115,14 @@ configSlider_ model slider config =
         eventLoad = AppSetLoadConfigCaption loadConfigCaption'
         saveConfigCaption' = model ^. initialSaveConfigCaption
         loadConfigCaption' = model ^. initialLoadConfigCaption
-        slider' = model ^. parameters . slider
+        slider' = p ^. slider
+        p = model ^. parameters
+        decreasedParameters = p & slider .~ decreasedSlider
+        increasedParameters = p & slider .~ increasedSlider
+        decreasedSlider = slider' & csCurrent %~ decrease
+        increasedSlider = slider' & csCurrent %~ increase
+        decrease c = max a $ c-changeRate
+        increase c = min b $ c+changeRate
 
 showt' :: Double -> Text
 showt' number = pack result where
