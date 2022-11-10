@@ -137,8 +137,14 @@ setParametersHandle parameters' model = [Model model'] where
 
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model model'] where
-    model' = model & currentGame .~ game & initialGame .~ game
+    model' = model & initialGame .~ game & currentGame .~ game'
     game = gameFromParameters $ model ^. parameters
+    game' = if currentGameBounds == bounds
+        then currentGame'
+        else game
+    currentGameBounds = getBounds $ _grid currentGame'
+    bounds = getBounds $ _grid game
+    currentGame' = model ^. currentGame
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
