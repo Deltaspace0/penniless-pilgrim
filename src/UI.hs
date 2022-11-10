@@ -95,8 +95,8 @@ configSlider_ model slider config =
     [ label $ caption <> " " <> showt' current
     , hstack_ [childSpacing_ 32]
         [ hslider_ field a b config'
-        , button "-" $ AppSetParameters decreasedParameters
-        , button "+" $ AppSetParameters increasedParameters
+        , button' "-" $ AppSetParameters decreasedParameters
+        , button' "+" $ AppSetParameters increasedParameters
         ]
     ] where
         current = slider' ^. csCurrent
@@ -123,6 +123,7 @@ configSlider_ model slider config =
         increasedSlider = slider' & csCurrent %~ increase
         decrease c = max a $ c-changeRate
         increase c = min b $ c+changeRate
+        button' c e = button c e `styleBasic` [width 32, height 24]
 
 showt' :: Double -> Text
 showt' number = pack result where
