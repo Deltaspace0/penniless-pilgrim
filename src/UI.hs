@@ -32,8 +32,7 @@ buildUI _ model = widgetTree where
             , [separatorLine]
             , configSlider_ model gridColumnsSlider crCfg
             , configSlider_ model gridRowsSlider crCfg
-            , configSlider_ model gridAnimationSlider
-                [wheelRate 10, dragRate 10]
+            , configSlider model gridAnimationSlider
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
             , [button (model ^. saveConfigCaption) AppSaveConfig]
@@ -78,10 +77,7 @@ bigNumberLabel number text = styledLabel where
         ]
     label' = if null number
         then label text
-        else label $ text <> pack t'
-    t = show $ fromJust number
-    t' = if m == ".0" then i else t
-    (i, m) = break (== '.') t
+        else label $ text <> showt' (fromJust number)
 
 configSlider
     :: AppModel
@@ -95,18 +91,18 @@ configSlider_
     -> [SliderCfg AppModel AppEvent Double]
     -> [WidgetNode AppModel AppEvent]
 configSlider_ model slider config =
-    [ label $ caption <> " " <> t
+    [ label $ caption <> " " <> showt' current
     , hslider_ field a b config'
     ] where
-        caption = model ^. parameters . slider . csCaption
-        t = showt (floor current :: Int)
+        current = slider' ^. csCurrent
+        a = slider' ^. csMin
+        b = slider' ^. csMax
+        changeRate = toRational $ slider' ^. csChangeRate
+        caption = slider' ^. csCaption
         field = parameters . slider . csCurrent
-        a = model ^. parameters . slider . csMin
-        b = model ^. parameters . slider . csMax
-        current = model ^. parameters . slider . csCurrent
         config' =
-            [ wheelRate 1
-            , dragRate 1
+            [ wheelRate changeRate
+            , dragRate changeRate
             , onChange (const eventSave :: Double -> AppEvent)
             , onChange (const eventLoad :: Double -> AppEvent)
             ] <> config
@@ -114,3 +110,10 @@ configSlider_ model slider config =
         eventLoad = AppSetLoadConfigCaption loadConfigCaption'
         saveConfigCaption' = model ^. initialSaveConfigCaption
         loadConfigCaption' = model ^. initialLoadConfigCaption
+        slider' = model ^. parameters . slider
+
+showt' :: Double -> Text
+showt' number = pack result where
+    result = if m == ".0" then i else t
+    (i, m) = break (== '.') t
+    t = show $ (fromIntegral $ round $ number*1000)/1000

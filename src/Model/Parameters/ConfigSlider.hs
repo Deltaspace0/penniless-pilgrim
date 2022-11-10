@@ -6,6 +6,7 @@ module Model.Parameters.ConfigSlider
     , csCurrent
     , csMin
     , csMax
+    , csChangeRate
     , csCaption
     ) where
 
@@ -17,6 +18,7 @@ data ConfigSlider = ConfigSlider
     { _csCurrent :: Double
     , _csMin :: Double
     , _csMax :: Double
+    , _csChangeRate :: Double
     , _csCaption :: Text
     } deriving (Eq, Show)
 
@@ -27,6 +29,7 @@ instance FromJSON ConfigSlider where
         <$> v .: "default"
         <*> v .: "min"
         <*> v .: "max"
+        <*> v .: "change_rate"
         <*> v .: "caption"
 
 instance ToJSON ConfigSlider where
@@ -34,5 +37,6 @@ instance ToJSON ConfigSlider where
         [ "default" .= (configSlider ^. csCurrent)
         , "min" .= (configSlider ^. csMin)
         , "max" .= (configSlider ^. csMax)
+        , "change_rate" .= (configSlider ^. csChangeRate)
         , "caption" .= (configSlider ^. csCaption)
         ]

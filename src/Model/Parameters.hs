@@ -50,30 +50,35 @@ instance Default AppParameters where
             { _csCurrent = 5
             , _csMin = 2
             , _csMax = 32
+            , _csChangeRate = 1
             , _csCaption = "Columns:"
             }
         , _apGridRowsSlider = ConfigSlider
             { _csCurrent = 5
             , _csMin = 2
             , _csMax = 32
+            , _csChangeRate = 1
             , _csCaption = "Rows:"
             }
         , _apGridAnimationSlider = ConfigSlider
             { _csCurrent = 500
             , _csMin = 0
             , _csMax = 1000
+            , _csChangeRate = 10
             , _csCaption = "Animation duration (in milliseconds):"
             }
         , _apLinkToNodeSlider = ConfigSlider
             { _csCurrent = 5
             , _csMin = 3
-            , _csMax = 12
+            , _csMax = 8
+            , _csChangeRate = 0.2
             , _csCaption = "Link size to node size ratio:"
             }
         , _apNodeToWidthSlider = ConfigSlider
             { _csCurrent = 2
-            , _csMin = 2
-            , _csMax = 12
+            , _csMin = 1
+            , _csMax = 8
+            , _csChangeRate = 0.2
             , _csCaption = "Node size to link width ratio:"
             }
         , _apGameControlWidth = 400
