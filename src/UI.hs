@@ -28,16 +28,17 @@ buildUI _ model = widgetTree where
         , side
         ] `styleBasic` [padding 32]
     side = if model ^. showConfig
-        then vstack' $ concat
-            [ sideWidgets
-            , [separatorLine]
-            , configSlider_ model gridColumnsSlider [AppResizeGrid]
-            , configSlider_ model gridRowsSlider [AppResizeGrid]
-            , configSlider model gridAnimationSlider
-            , configSlider model linkToNodeSlider
-            , configSlider model nodeToWidthSlider
-            , [button (model ^. saveConfigCaption) AppSaveConfig]
-            , [button (model ^. loadConfigCaption) AppLoadConfig]
+        then vstack' $ sideWidgets <>
+            [ separatorLine
+            , button (model ^. saveConfigCaption) AppSaveConfig
+            , button (model ^. loadConfigCaption) AppLoadConfig
+            , vscroll_ [wheelRate 20] $ vstack' (concat
+                [ configSlider_ model gridColumnsSlider [AppResizeGrid]
+                , configSlider_ model gridRowsSlider [AppResizeGrid]
+                , configSlider model gridAnimationSlider
+                , configSlider model linkToNodeSlider
+                , configSlider model nodeToWidthSlider
+                ]) `styleBasic` [paddingR 16]
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
