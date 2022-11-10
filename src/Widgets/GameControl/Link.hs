@@ -149,19 +149,20 @@ makeGameControlLink isHz linkData state = widget where
                 then (_ldColor linkData, Nothing)
                 else (oldLink' ^. color, oldLink' ^. form)
         if running && progress < 1
-            then if null newForm
-                then renderForm r oldData vp (1-progress)
-                else renderForm r newData vp progress
-            else renderForm r newData vp 1
+            then if progress < 0.5
+                then renderForm r oldData newData vp $ 1-progress*2
+                else renderForm r newData oldData vp $ progress*2-1
+            else renderForm r newData oldData vp 1
 
-    renderForm r (color', form') vp progress = do
+    renderForm r (color', form') (_, form'') vp progress = do
         let Rect x y linkSize nodeSize = vp
             c = Just color'
             totalSize = linkSize-nodeSize*2
             totalSize' = totalSize*progress
             rest = totalSize-totalSize'
             s' = nodeSize + if isHz then x else y
-            s = s' + if form' == Just LinkBack then rest else 0
+            f x = if x == Just LinkBack then rest else 0
+            s = s' + if null form' then f form'' else f form'
             b = s+totalSize'
             linkWidth = nodeSize/(_ldNodeToWidthRatio linkData)
             ars = if totalSize' > linkWidth*3
