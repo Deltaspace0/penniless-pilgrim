@@ -32,13 +32,7 @@ buildUI _ model = widgetTree where
             [ separatorLine
             , button (model ^. saveConfigCaption) AppSaveConfig
             , button (model ^. loadConfigCaption) AppLoadConfig
-            , vscroll_ [wheelRate 20] $ vstack' (concat
-                [ configSlider_ model gridColumnsSlider [AppResizeGrid]
-                , configSlider_ model gridRowsSlider [AppResizeGrid]
-                , configSlider model gridAnimationSlider
-                , configSlider model linkToNodeSlider
-                , configSlider model nodeToWidthSlider
-                ]) `styleBasic` [paddingR 16]
+            , vscroll_ [wheelRate 20] paddedConfigSliders
             ]
         else boxCenter $ vstack' sideWidgets
     sideWidgets =
@@ -49,6 +43,14 @@ buildUI _ model = widgetTree where
             , toggleButton "Config" showConfig
             ]
         ]
+    configSliders = vstack' $ concat
+        [ configSlider_ model gridColumnsSlider [AppResizeGrid]
+        , configSlider_ model gridRowsSlider [AppResizeGrid]
+        , configSlider model gridAnimationSlider
+        , configSlider model linkToNodeSlider
+        , configSlider model nodeToWidthSlider
+        ]
+    paddedConfigSliders = configSliders `styleBasic` [paddingR 16]
     totalTaxLabel = bigNumberLabel totalTax "Total tax: "
     nextTaxLabel = bigNumberLabel nextTax' "Next tax: "
     totalTax = Just $ _tax $ _pilgrim $ model ^. currentGame
