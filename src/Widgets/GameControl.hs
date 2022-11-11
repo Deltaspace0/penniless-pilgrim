@@ -20,8 +20,8 @@ import Widgets.GameControl.Node
 import Model hiding (Node, Link)
 
 data GameControlData s = GameControlData
-    { _gcdGame :: ALens' s Game
-    , _gcdNextTax :: ALens' s (Maybe Double)
+    { _gcdGameLens :: ALens' s Game
+    , _gcdNextTaxLens :: ALens' s (Maybe Double)
     , _gcdColors :: Colors
     , _gcdAnimationDuration :: Double
     , _gcdLinkToNodeRatio :: Double
@@ -66,32 +66,32 @@ makeGameControl gcData state = widget where
             & L.children .~
                    fmap fn nodeSequence
                 >< fmap (fh . snd) hlinkSequence
-                >< fmap (fl . snd) vlinkSequence
+                >< fmap (fv . snd) vlinkSequence
         reqs = [ResizeWidgets widgetId]
         w = makeGameControl gcData $ GameControlState grid
-        game = widgetDataGet (wenv ^. L.model) gameField
+        game = widgetDataGet (wenv ^. L.model) gameLens
         grid = gridFromGame game colors
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
         fn (p, nodeStack) = gameControlNode $ NodeData
             { _ndNodeStack = nodeStack
-            , _ndColor = _nodeDefault colors
-            , _ndHoverColor = _nodeHover colors
-            , _ndActiveColor = _nodeActive colors
+            , _ndNullColor = _nodeDefault colors
+            , _ndNullHoverColor = _nodeHover colors
+            , _ndNullActiveColor = _nodeActive colors
             , _ndHighlightColor = _nodeHighlight colors
             , _ndGameControlId = widgetId
             , _ndPosition = p
             , _ndClickable = not $ null tax
             , _ndNextTax = tax
-            , _ndNextTaxField = nextTaxField
+            , _ndNextTaxLens = nextTaxLens
             , _ndAnimationDuration = animationDuration
             } where tax = taxFromGame p game
         fh = gameControlHlink . linkData
-        fl = gameControlVlink . linkData
+        fv = gameControlVlink . linkData
         linkData link = LinkData
             { _ldLink = link
-            , _ldColor = _linkDefault colors
+            , _ldNullColor = _linkDefault colors
             , _ldAnimationDuration = animationDuration
             , _ldNodeToWidthRatio = nodeToWidthRatio
             }
@@ -145,14 +145,14 @@ makeGameControl gcData state = widget where
             else Just $ resultReqs newNode reqs
         nextGame = f game
         nextGame' = fromJust nextGame
-        game = widgetDataGet (wenv ^. L.model) gameField
+        game = widgetDataGet (wenv ^. L.model) gameLens
         newNode = node & L.widget .~ w
         w = makeGameControl gcData state'
         state' = GameControlState $ gridFromGame nextGame' colors
         reqs = concat $
             [ [RenderOnce]
-            , widgetDataSet gameField nextGame'
-            , widgetDataSet nextTaxField Nothing
+            , widgetDataSet gameLens nextGame'
+            , widgetDataSet nextTaxLens Nothing
             ]
 
     getNodeArea vp (i, j) = Rect x y d d where
@@ -164,8 +164,8 @@ makeGameControl gcData state = widget where
         x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
         y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
 
-    gameField = WidgetLens $ _gcdGame gcData
-    nextTaxField = WidgetLens $ _gcdNextTax gcData
+    gameLens = WidgetLens $ _gcdGameLens gcData
+    nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
     grid = _gcsGrid state
     colors = _gcdColors gcData
     animationDuration = _gcdAnimationDuration gcData

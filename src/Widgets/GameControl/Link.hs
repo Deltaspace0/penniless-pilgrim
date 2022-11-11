@@ -58,7 +58,7 @@ vlinkTransform colors (Just G.LinkForward) = Just Link
 
 data LinkData = LinkData
     { _ldLink :: Maybe Link
-    , _ldColor :: Color
+    , _ldNullColor :: Color
     , _ldAnimationDuration :: Double
     , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)
@@ -143,10 +143,10 @@ makeGameControlLink isHz linkData state = widget where
             Just newLink' = newLink
             Just oldLink' = oldLink
             newData@(newColor, newForm) = if null newLink
-                then (_ldColor linkData, Nothing)
+                then (_ldNullColor linkData, Nothing)
                 else (newLink' ^. color, newLink' ^. form)
             oldData@(oldColor, oldForm) = if null oldLink
-                then (_ldColor linkData, Nothing)
+                then (_ldNullColor linkData, Nothing)
                 else (oldLink' ^. color, oldLink' ^. form)
         if running && progress < 1
             then if progress < 0.5

@@ -51,15 +51,15 @@ nodeTransform colors = map $ \node -> case node of
 
 data NodeData s = NodeData
     { _ndNodeStack :: [Node]
-    , _ndColor :: Color
-    , _ndHoverColor :: Color
-    , _ndActiveColor :: Color
+    , _ndNullColor :: Color
+    , _ndNullHoverColor :: Color
+    , _ndNullActiveColor :: Color
     , _ndHighlightColor :: Color
     , _ndGameControlId :: WidgetId
     , _ndPosition :: (Int, Int)
     , _ndClickable :: Bool
     , _ndNextTax :: Maybe Double
-    , _ndNextTaxField :: WidgetData s (Maybe Double)
+    , _ndNextTaxLens :: WidgetData s (Maybe Double)
     , _ndAnimationDuration :: Double
     }
 
@@ -96,13 +96,13 @@ makeGameControlNode nodeData state = widget where
         then Just $ basicStyle
             { _styleHover = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ndHoverColor nodeData
+                    then _ndNullHoverColor nodeData
                     else nodeHead ^. hoverColor
                 , _sstCursorIcon = Just CursorHand
                 }
             , _styleActive = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ndActiveColor nodeData
+                    then _ndNullActiveColor nodeData
                     else nodeHead ^. activeColor
                 , _sstCursorIcon = Just CursorHand
                 }
@@ -175,7 +175,7 @@ makeGameControlNode nodeData state = widget where
         where
             gcId = _ndGameControlId nodeData
             id = node ^. L.info . L.widgetId
-            nextTaxField = _ndNextTaxField nodeData
+            nextTaxField = _ndNextTaxLens nodeData
             nextTax = _ndNextTax nodeData
 
     render wenv node renderer = do
@@ -196,13 +196,13 @@ makeGameControlNode nodeData state = widget where
                     dy = h*(1-progress)/2
                     vp' = Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
                     activeColor' = if null node'
-                        then _ndActiveColor nodeData
+                        then _ndNullActiveColor nodeData
                         else (fromJust node') ^. activeColor
                     hoverColor' = if null node'
-                        then _ndHoverColor nodeData
+                        then _ndNullHoverColor nodeData
                         else (fromJust node') ^. hoverColor
                     color' = if null node'
-                        then _ndColor nodeData
+                        then _ndNullColor nodeData
                         else (fromJust node') ^. color
                 drawEllipse renderer vp' $ Just $ if isActive
                     then activeColor'
@@ -221,7 +221,7 @@ makeGameControlNode nodeData state = widget where
     basicStyle = def
         { _styleBasic = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _ndColor nodeData
+                then _ndNullColor nodeData
                 else nodeHead ^. color
             }
         }

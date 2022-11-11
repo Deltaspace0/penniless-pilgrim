@@ -58,8 +58,8 @@ buildUI _ model = widgetTree where
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = gameControl $ GameControlData
-    { _gcdGame = currentGame
-    , _gcdNextTax = nextTax
+    { _gcdGameLens = currentGame
+    , _gcdNextTaxLens = nextTax
     , _gcdColors = get colors
     , _gcdAnimationDuration = get $ gridAnimationSlider . csCurrent
     , _gcdLinkToNodeRatio = get $ linkToNodeSlider  . csCurrent
