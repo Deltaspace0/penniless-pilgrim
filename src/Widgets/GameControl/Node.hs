@@ -7,6 +7,7 @@
 module Widgets.GameControl.Node
     ( Node(..)
     , NodeData(..)
+    , NodeMessage(..)
     , nodeTransform
     , gameControlNode
     ) where
@@ -15,6 +16,7 @@ import Control.Lens
 import Control.Monad
 import Data.Default
 import Data.Maybe
+import Data.Typeable
 import Monomer
 import Monomer.Widgets.Single
 import TextShow
@@ -63,15 +65,25 @@ data NodeData s = NodeData
     , _ndAnimationDuration :: Double
     }
 
+data NodeMessage
+    = NodeStartShake
+    | NodeStopShake
+    | NodeStopAnimation
+    deriving (Eq, Show)
+
 data NodeState = NodeState
     { _nsAnimationStack :: [(Millisecond, Maybe Node)]
     , _nsRunning :: Bool
+    , _nsShakeRunning :: Bool
+    , _nsShakeStart :: Millisecond
     } deriving (Eq, Show)
 
 instance Default NodeState where
     def = NodeState
         { _nsAnimationStack = []
         , _nsRunning = False
+        , _nsShakeRunning = False
+        , _nsShakeStart = 0
         }
 
 gameControlNode :: NodeData s -> WidgetNode s e
@@ -89,6 +101,7 @@ makeGameControlNode nodeData state = widget where
         , singleInit = init
         , singleMerge = merge
         , singleHandleEvent = handleEvent
+        , singleHandleMessage = handleMessage
         , singleRender = render
         }
 
@@ -130,13 +143,13 @@ makeGameControlNode nodeData state = widget where
         w = makeGameControlNode nodeData state'
         state' = if newNodeHead == oldNodeHead
             then oldState
-            else NodeState
+            else oldState
                 { _nsAnimationStack = newAnimationStack
                 , _nsRunning = animationDuration' > 0
                 }
         reqs = if newNodeHead == oldNodeHead
             then []
-            else [RenderEvery widgetId period (Just steps)]
+            else [makeRenderEveryRequest newNode]
         newNodeHead = if null nodeStack
             then Nothing
             else Just nodeHead
@@ -152,12 +165,9 @@ makeGameControlNode nodeData state = widget where
         filteredTail = filter f $ tail oldAnimationStack
         f (ts', _) = ts-ts' < animationDuration'
         ts = wenv ^. L.timestamp
-        widgetId = newNode ^. L.info . L.widgetId
-        period = 10
-        steps = fromIntegral $ animationDuration' `div` period
         animationDuration' = floor animationDuration
 
-    handleEvent wenv node target evt = case evt of
+    handleEvent wenv node _ event = case event of
         Enter _ -> Just result where
             result = resultReqs node reqs
             reqs = widgetDataSet nextTaxField nextTax
@@ -178,15 +188,47 @@ makeGameControlNode nodeData state = widget where
             nextTaxField = _ndNextTaxLens nodeData
             nextTax = _ndNextTax nodeData
 
+    handleMessage wenv node _ message = do
+        action <- cast message
+        let state' = case action of
+                NodeStartShake -> state
+                    { _nsShakeRunning = True
+                    , _nsShakeStart = wenv ^. L.timestamp
+                    }
+                NodeStopShake -> state
+                    { _nsShakeRunning = False
+                    }
+                NodeStopAnimation -> state
+                    { _nsRunning = False
+                    , _nsShakeRunning = False
+                    }
+            req = if action == NodeStartShake
+                then [makeRenderEveryRequest node]
+                else []
+            w = makeGameControlNode nodeData state'
+            newNode = node & L.widget .~ w
+        return $ resultReqs newNode req
+
     render wenv node renderer = do
         let ts = wenv ^. L.timestamp
             animationQueue = reverse $ _nsAnimationStack state
             running = _nsRunning state
+            shakeRunning = _nsShakeRunning state
+            shakeStart = _nsShakeStart state
             style = currentStyle wenv node
-            vp@(Rect x y w h) = getContentArea node style
             isActive = clickable && isNodeActive wenv node
             isHovered = clickable && isNodeHovered wenv node
             hc = Just $ _ndHighlightColor nodeData
+            vp'@(Rect x' y' w' h') = getContentArea node style
+            shakeDelta = fromIntegral $ ts-shakeStart
+            p = shakeDelta/animationDuration
+            shakeProgress = max 0 $ min 1 p
+            sf = (1+(sin $ shakeProgress*3.14159265358979*7/2))/5
+            dx = w'*sf/2
+            dy = h'*sf/2
+            vp@(Rect x y w h) = if shakeRunning
+                then Rect (x'+dx) (y'+dy) (w'-dx*2) (h'-dy*2)
+                else vp'
         if running
             then forM_ animationQueue $ \(start, node') -> do
                 let delta = fromIntegral $ ts-start
@@ -212,6 +254,13 @@ makeGameControlNode nodeData state = widget where
             else drawEllipse renderer vp $ _sstFgColor style
         when clickable $ do
             drawEllipseBorder renderer vp hc 2
+
+    makeRenderEveryRequest node = req where
+        req = RenderEvery widgetId period $ Just steps
+        widgetId = node ^. L.info . L.widgetId
+        period = 10
+        steps = fromIntegral $ animationDuration' `div` period
+        animationDuration' = floor animationDuration
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack

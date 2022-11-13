@@ -83,7 +83,7 @@ resizeGridHandle model = [Model model'] where
     currentGame' = model ^. currentGame
 
 handleEvent :: AppEventHandler AppModel AppEvent
-handleEvent wenv node model evt = case evt of
+handleEvent wenv node model event = case event of
     AppInit -> [SetFocusOnKey "mainGrid"]
     AppResetGame -> resetGameHandle model
     AppResizeGrid -> resizeGridHandle model

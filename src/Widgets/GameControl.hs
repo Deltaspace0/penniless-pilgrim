@@ -13,6 +13,7 @@ import Data.Sequence ((><))
 import Data.Typeable
 import Monomer
 import Monomer.Widgets.Container
+import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Widgets.GameControl.Link
@@ -100,7 +101,7 @@ makeGameControl gcData state = widget where
 
     merge wenv newNode _ _ = init wenv newNode
 
-    handleEvent wenv node target evt = case evt of
+    handleEvent wenv node _ event = case event of
         KeyAction _ code KeyPressed
             | isKeyNorth code -> handleDirection wenv node North
             | isKeySouth code -> handleDirection wenv node South
@@ -117,7 +118,7 @@ makeGameControl gcData state = widget where
         where
             widgetId = node ^. L.info . L.widgetId
 
-    handleMessage wenv node target message = result where
+    handleMessage wenv node _ message = result where
         result = cast message >>= handlePosition wenv node
 
     getSizeReq wenv node _ = (fixedSize width, fixedSize height)
@@ -141,16 +142,19 @@ makeGameControl gcData state = widget where
         f = jumpPilgrim p
 
     handleGameChange wenv node f = result where
-        result = if null nextGame
-            then Nothing
-            else Just $ resultReqs node reqs
+        result = Just $ resultReqs node reqs
         nextGame = f game
         nextGame' = fromJust nextGame
         game = widgetDataGet (wenv ^. L.model) gameLens
-        reqs = concat $
-            [ widgetDataSet gameLens nextGame'
-            , widgetDataSet nextTaxLens Nothing
-            ]
+        reqs = if null nextGame
+            then [SendMessage shakeNodeId NodeStartShake]
+            else concat
+                [ widgetDataSet gameLens nextGame'
+                , widgetDataSet nextTaxLens Nothing
+                ]
+        shakeNodeId = shakeNode ^. L.info ^. L.widgetId
+        shakeNode = Seq.index (node ^. L.children) $ x*(rows+1)+y
+        (x, y) = _position $ _pilgrim game
 
     getNodeArea vp (i, j) = Rect x y d d where
         x = (vx vp) + linkSize*(fromIntegral i)
