@@ -3,7 +3,7 @@ module Util
     ) where
 
 import Data.Text (Text, pack)
-import TextShow (showt)
+import TextShow
 
 showt' :: Double -> Text
 showt' number = pack result where

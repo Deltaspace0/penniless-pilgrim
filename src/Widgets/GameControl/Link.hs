@@ -20,6 +20,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 import Monomer.Widgets.Single
+import TextShow
 import qualified Monomer.Lens as L
 
 import Model.Parameters.Colors
@@ -59,6 +60,7 @@ vlinkTransform colors (Just G.LinkForward) = Just Link
 data LinkData = LinkData
     { _ldLink :: Maybe Link
     , _ldNullColor :: Color
+    , _ldPosition :: (Int, Int)
     , _ldAnimationDuration :: Double
     , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)
@@ -80,12 +82,16 @@ instance Default LinkState where
 
 gameControlHlink :: LinkData -> WidgetNode s e
 gameControlHlink linkData = node where
-    node = defaultWidgetNode "gameControlLink" widget
+    node = defaultWidgetNode (WidgetType widgetType) widget
+    widgetType = "gameControlHLink" <> showt position
+    position = _ldPosition linkData
     widget = makeGameControlLink True linkData def
 
 gameControlVlink :: LinkData -> WidgetNode s e
 gameControlVlink linkData = node where
-    node = defaultWidgetNode "gameControlLink" widget
+    node = defaultWidgetNode (WidgetType widgetType) widget
+    widgetType = "gameControlVLink" <> showt position
+    position = _ldPosition linkData
     widget = makeGameControlLink False linkData def
 
 makeGameControlLink :: Bool -> LinkData -> LinkState -> Widget s e

@@ -19,6 +19,7 @@ module Model
     ) where
 
 import Control.Lens
+import Data.Maybe
 import Monomer
 
 import Config.Model hiding (handleEvent)
@@ -74,11 +75,11 @@ resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model model'] where
     model' = model & initialGame .~ game & currentGame .~ game'
     game = gameFromParameters $ model ^. configModel . parameters
-    game' = if currentGameBounds == bounds
-        then currentGame'
-        else game
-    currentGameBounds = getBounds $ _grid currentGame'
-    bounds = getBounds $ _grid game
+    game' = if null gameWithAppliedPath
+        then game
+        else fromJust gameWithAppliedPath
+    gameWithAppliedPath = applyPath directions game
+    directions = _path $ _pilgrim currentGame'
     currentGame' = model ^. currentGame
 
 handleEvent :: AppEventHandler AppModel AppEvent

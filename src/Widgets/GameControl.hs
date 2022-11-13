@@ -65,8 +65,8 @@ makeGameControl gcData state = widget where
             & L.widget .~ w
             & L.children .~
                    fmap fn nodeSequence
-                >< fmap (fh . snd) hlinkSequence
-                >< fmap (fv . snd) vlinkSequence
+                >< fmap fh hlinkSequence
+                >< fmap fv vlinkSequence
         reqs = [ResizeWidgets widgetId]
         w = makeGameControl gcData $ GameControlState grid
         game = widgetDataGet (wenv ^. L.model) gameLens
@@ -89,9 +89,10 @@ makeGameControl gcData state = widget where
             } where tax = taxFromGame p game
         fh = gameControlHlink . linkData
         fv = gameControlVlink . linkData
-        linkData link = LinkData
+        linkData (p, link) = LinkData
             { _ldLink = link
             , _ldNullColor = _linkDefault colors
+            , _ldPosition = p
             , _ldAnimationDuration = animationDuration
             , _ldNodeToWidthRatio = nodeToWidthRatio
             }
