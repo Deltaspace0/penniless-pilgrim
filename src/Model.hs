@@ -83,8 +83,8 @@ initModel path = do
         , _appLoadConfigCaption = loadConfigCaption'
         }
 
-resetPilgrimHandle :: EventHandle
-resetPilgrimHandle model = [Model model'] where
+resetGameHandle :: EventHandle
+resetGameHandle model = [Model model'] where
     model' = model & updateGame & updateSliders
     updateSliders = updateColumns . updateRows
     updateColumns = currentValue gridColumnsSlider .~ cols'
@@ -149,7 +149,7 @@ resizeGridHandle model = [Model model'] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model evt = case evt of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    AppResetGame -> resetPilgrimHandle model
+    AppResetGame -> resetGameHandle model
     AppSaveConfig -> saveConfigHandle model
     AppLoadConfig -> loadConfigHandle model
     AppSetSaveConfigCaption t -> setSaveConfigCaptionHandle t model
