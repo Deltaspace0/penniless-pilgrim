@@ -143,16 +143,12 @@ makeGameControl gcData state = widget where
     handleGameChange wenv node f = result where
         result = if null nextGame
             then Nothing
-            else Just $ resultReqs newNode reqs
+            else Just $ resultReqs node reqs
         nextGame = f game
         nextGame' = fromJust nextGame
         game = widgetDataGet (wenv ^. L.model) gameLens
-        newNode = node & L.widget .~ w
-        w = makeGameControl gcData state'
-        state' = GameControlState $ gridFromGame nextGame' colors
         reqs = concat $
-            [ [RenderOnce]
-            , widgetDataSet gameLens nextGame'
+            [ widgetDataSet gameLens nextGame'
             , widgetDataSet nextTaxLens Nothing
             ]
 
