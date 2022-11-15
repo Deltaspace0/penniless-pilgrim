@@ -10,8 +10,7 @@ import Data.Text (Text)
 import Monomer
 import qualified Monomer.Lens as L
 
-import Config.Model
-import Config.UI
+import Composites
 import Model
 import Util
 import Widgets.GameControl

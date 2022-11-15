@@ -22,7 +22,7 @@ import Control.Lens
 import Data.Maybe
 import Monomer
 
-import Config.Model hiding (handleEvent)
+import Composites
 import Model.Game
 import Model.Grid
 import Model.Parameters

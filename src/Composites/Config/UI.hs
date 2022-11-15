@@ -1,14 +1,14 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Config.UI
+module Composites.Config.UI
     ( configComposite
     ) where
 
 import Control.Lens
 import Monomer
 
-import Config.Model
+import Composites.Config.Model
 import Model.Parameters
 import Util
 
@@ -17,7 +17,7 @@ configComposite
     => ALens' sp (ConfigModel ep)
     -> WidgetNode sp ep
 configComposite modelLens = composite' where
-    composite' = composite wt modelLens buildUI handleEvent
+    composite' = composite wt modelLens buildUI handleConfigEvent
     wt = "configComposite"
 
 buildUI :: UIBuilder (ConfigModel ep) ConfigEvent

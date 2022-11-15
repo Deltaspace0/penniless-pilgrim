@@ -24,8 +24,10 @@ source-repository head
 
 library
   exposed-modules:
-      Config.Model
-      Config.UI
+      Composites
+      Composites.Config
+      Composites.Config.Model
+      Composites.Config.UI
       Model
       Model.Direction
       Model.Game

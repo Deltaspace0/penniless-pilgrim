@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Config.Model
+module Composites.Config.Model
     ( ConfigEvent(..)
     , ConfigModel(..)
     , filePath
@@ -14,7 +14,7 @@ module Config.Model
     , parameters
     , onGridDimensionsChange
     , initConfigModel
-    , handleEvent
+    , handleConfigEvent
     ) where
 
 import Control.Lens
@@ -67,8 +67,8 @@ initConfigModel onGridDimensionsChange path = do
         , _cfgOnGridDimensionsChange = onGridDimensionsChange
         }
 
-handleEvent :: EventHandler (ConfigModel ep) ConfigEvent sp ep
-handleEvent _ _ model event = case event of
+handleConfigEvent :: EventHandler (ConfigModel ep) ConfigEvent sp ep
+handleConfigEvent _ _ model event = case event of
     ConfigSave -> saveHandle model
     ConfigLoad -> loadHandle model
     ConfigSetSaveCaption text -> setSaveCaptionHandle text model
