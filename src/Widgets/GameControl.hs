@@ -7,6 +7,7 @@ module Widgets.GameControl
     ) where
 
 import Control.Lens
+import Control.Monad
 import Data.Default
 import Data.Maybe
 import Data.Sequence ((><))
@@ -31,9 +32,20 @@ data GameControlData s = GameControlData
     , _gcdHeight :: Double
     }
 
-newtype GameControlState = GameControlState
+data GameControlState = GameControlState
     { _gcsGrid :: Grid Node Link
-    }
+    , _gcsPreviousBounds :: (Double, Double)
+    , _gcsRunning :: Bool
+    , _gcsStart :: Millisecond
+    } deriving (Eq, Show)
+
+instance Default GameControlState where
+    def = GameControlState
+        { _gcsGrid = makeGrid 2 2
+        , _gcsPreviousBounds = (0, 0)
+        , _gcsRunning = False
+        , _gcsStart = 0
+        }
 
 gridFromGame :: Game -> Colors -> Grid Node Link
 gridFromGame game colors = gridMap nt hlt vlt $ _grid game where
@@ -44,8 +56,7 @@ gridFromGame game colors = gridMap nt hlt vlt $ _grid game where
 gameControl :: GameControlData s -> WidgetNode s e
 gameControl gcData = gameControlNode where
     gameControlNode = defaultWidgetNode "gameControl" widget
-    widget = makeGameControl gcData state
-    state = GameControlState $ makeGrid 2 2
+    widget = makeGameControl gcData def
 
 makeGameControl
     :: GameControlData s
@@ -59,47 +70,54 @@ makeGameControl gcData state = widget where
         , containerHandleMessage = handleMessage
         , containerGetSizeReq = getSizeReq
         , containerResize = resize
+        , containerRender = render
+        , containerRenderAfter = renderAfter
         }
 
-    init wenv node = resultReqs resNode reqs where
-        resNode = node
-            & L.widget .~ w
-            & L.children .~
-                   fmap fn nodeSequence
-                >< fmap fh hlinkSequence
-                >< fmap fv vlinkSequence
-        reqs = [ResizeWidgets widgetId]
-        w = makeGameControl gcData $ GameControlState grid
+    init wenv node = resultNode resNode where
+        resNode = (makeChildren wenv node) & L.widget .~ w
+        w = makeGameControl gcData $ state
+            { _gcsGrid = grid
+            }
         game = widgetDataGet (wenv ^. L.model) gameLens
         grid = gridFromGame game colors
-        nodeSequence = getNodeSequence grid
-        hlinkSequence = getHlinkSequence grid
-        vlinkSequence = getVlinkSequence grid
-        fn (p, nodeStack) = gameControlNode $ NodeData
-            { _ndNodeStack = nodeStack
-            , _ndNullColor = _nodeDefault colors
-            , _ndNullHoverColor = _nodeHover colors
-            , _ndNullActiveColor = _nodeActive colors
-            , _ndHighlightColor = _nodeHighlight colors
-            , _ndGameControlId = widgetId
-            , _ndPosition = p
-            , _ndClickable = not $ null tax
-            , _ndNextTax = tax
-            , _ndNextTaxLens = nextTaxLens
-            , _ndAnimationDuration = animationDuration
-            } where tax = taxFromGame p game
-        fh = gameControlHlink . linkData
-        fv = gameControlVlink . linkData
-        linkData (p, link) = LinkData
-            { _ldLink = link
-            , _ldNullColor = _linkDefault colors
-            , _ldPosition = p
-            , _ldAnimationDuration = animationDuration
-            , _ldNodeToWidthRatio = nodeToWidthRatio
-            }
-        widgetId = node ^. L.info . L.widgetId
 
-    merge wenv newNode _ _ = init wenv newNode
+    merge wenv newNode _ oldState = resultReqs resNode reqs where
+        resNode = (makeChildren wenv newNode) & L.widget .~ w
+        w = makeGameControl gcData state'
+        state' = if newBounds == oldBounds
+            then oldState
+            else GameControlState
+                { _gcsGrid = grid'
+                , _gcsPreviousBounds = previousBounds
+                , _gcsRunning = animationDuration' > 0
+                , _gcsStart = ts
+                }
+        reqs = if newBounds == oldBounds
+            then [ResizeWidgets widgetId]
+            else [RenderEvery widgetId period (Just steps)]
+        grid' = gridFromGame game colors
+        grid = _gcsGrid oldState
+        game = widgetDataGet (wenv ^. L.model) gameLens
+        newBounds = getBounds grid'
+        oldBounds = getBounds grid
+        cols = fst $ _gcsPreviousBounds oldState
+        rows = snd $ _gcsPreviousBounds oldState
+        cols' = fromIntegral $ fst oldBounds
+        rows' = fromIntegral $ snd oldBounds
+        cols'' = cols+(cols'-cols)*progress
+        rows'' = rows+(rows'-rows)*progress
+        oldStart = _gcsStart oldState
+        delta = fromIntegral (ts-oldStart) :: Double
+        progress = delta/animationDuration
+        previousBounds = if delta < animationDuration
+            then (cols'', rows'')
+            else (cols', rows')
+        ts = wenv ^. L.timestamp
+        widgetId = newNode ^. L.info . L.widgetId
+        period = 10
+        steps = fromIntegral $ animationDuration' `div` period
+        animationDuration' = floor animationDuration
 
     handleEvent wenv node _ event = case event of
         KeyAction _ code KeyPressed
@@ -132,6 +150,68 @@ makeGameControl gcData state = widget where
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
+
+    render wenv node renderer = do
+        let style = currentStyle wenv node
+            vp = getContentArea node style
+            ts = wenv ^. L.timestamp
+            (cols', rows') = _gcsPreviousBounds state
+            running = _gcsRunning state
+            start = _gcsStart state
+            delta = fromIntegral $ ts-start
+            progress = max 0 $ min 1 $ delta/animationDuration
+        saveContext renderer
+        when (running && progress < 1) $ do
+            let factorW' = cols'+2/linkToNodeRatio
+                factorH' = rows'+2/linkToNodeRatio
+                linkSize' = min (width/factorW') (height/factorH')
+                x = linkSize'*factorW/width
+                y = linkSize'*factorH/height
+                s = (max x y)+progress*(1-(max x y))
+                vx = (width-linkSize*factorW)/2
+                vy = (height-linkSize*factorH)/2
+                vx' = (width-linkSize'*factorW')/2
+                vy' = (height-linkSize'*factorH')/2
+                tx = (vx'-vx)*(1-progress)+(1-s)*(vx+(vp ^. L.x))
+                ty = (vy'-vy)*(1-progress)+(1-s)*(vy+(vp ^. L.y))
+            intersectScissor renderer vp
+            setTranslation renderer $ Point tx ty
+            setScale renderer $ Point s s
+
+    renderAfter _ _ = restoreContext
+
+    makeChildren wenv node = resNode where
+        resNode = node & L.children .~ fmap fn nodeSequence
+            >< fmap fh hlinkSequence
+            >< fmap fv vlinkSequence
+        game = widgetDataGet (wenv ^. L.model) gameLens
+        grid = gridFromGame game colors
+        nodeSequence = getNodeSequence grid
+        hlinkSequence = getHlinkSequence grid
+        vlinkSequence = getVlinkSequence grid
+        fn (p, nodeStack) = gameControlNode $ NodeData
+            { _ndNodeStack = nodeStack
+            , _ndNullColor = _nodeDefault colors
+            , _ndNullHoverColor = _nodeHover colors
+            , _ndNullActiveColor = _nodeActive colors
+            , _ndHighlightColor = _nodeHighlight colors
+            , _ndGameControlId = widgetId
+            , _ndPosition = p
+            , _ndClickable = not $ null tax
+            , _ndNextTax = tax
+            , _ndNextTaxLens = nextTaxLens
+            , _ndAnimationDuration = animationDuration
+            } where tax = taxFromGame p game
+        fh = gameControlHlink . linkData
+        fv = gameControlVlink . linkData
+        linkData (p, link) = LinkData
+            { _ldLink = link
+            , _ldNullColor = _linkDefault colors
+            , _ldPosition = p
+            , _ldAnimationDuration = animationDuration
+            , _ldNodeToWidthRatio = nodeToWidthRatio
+            }
+        widgetId = node ^. L.info . L.widgetId
 
     handleDirection wenv node direction = result where
         result = handleGameChange wenv node f
