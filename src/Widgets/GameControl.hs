@@ -85,7 +85,7 @@ makeGameControl gcData state = widget where
     merge wenv newNode _ oldState = resultReqs resNode reqs where
         resNode = (makeChildren wenv newNode) & L.widget .~ w
         w = makeGameControl gcData state'
-        state' = if newCornerRect == oldCornerRect
+        state' = if sameCornerRect
             then oldState
             else GameControlState
                 { _gcsCornerRect = newCornerRect
@@ -93,9 +93,9 @@ makeGameControl gcData state = widget where
                 , _gcsRunning = animationDuration' > 0
                 , _gcsStart = ts
                 }
-        reqs = if newCornerRect == oldCornerRect
-            then [ResizeWidgets widgetId]
-            else [requestRenderEvery newNode animationDuration]
+        reqs = (ResizeWidgets widgetId):[reReq | not sameCornerRect]
+        reReq = requestRenderEvery newNode animationDuration
+        sameCornerRect = newCornerRect == oldCornerRect
         newCornerRect = getCornerRect wenv
         oldCornerRect = _gcsCornerRect oldState
         olderCornerRect = _gcsOldCornerRect oldState
