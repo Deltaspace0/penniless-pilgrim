@@ -61,7 +61,7 @@ instance Default AppParameters where
             , _csCaption = "Rows:"
             }
         , _apGridAnimationSlider = ConfigSlider
-            { _csCurrent = 500
+            { _csCurrent = 300
             , _csMin = 0
             , _csMax = 1000
             , _csChangeRate = 10

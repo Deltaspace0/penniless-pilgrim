@@ -30,7 +30,7 @@
     "grid_animation_slider": {
         "min": 0,
         "max": 1000,
-        "default": 500,
+        "default": 300,
         "change_rate": 10,
         "caption": "Animation duration (in milliseconds):"
     },
