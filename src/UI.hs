@@ -35,7 +35,7 @@ buildUI _ model = widgetTree where
         [ totalTaxLabel
         , nextTaxLabel
         , boxCenter $ hstack'
-            [ button "Reset" AppResetGame
+            [ button "Reset" $ AppSetGame $ model ^. initialGame
             , toggleButton "Config" showConfig
             ]
         ]

@@ -29,8 +29,8 @@ import Model.Parameters
 
 data AppEvent
     = AppInit
-    | AppResetGame
     | AppResizeGrid
+    | AppSetGame Game
     deriving (Eq, Show)
 
 data AppModel = AppModel
@@ -58,19 +58,6 @@ initModel path = do
         , _appNextTax = Nothing
         }
 
-resetGameHandle :: EventHandle
-resetGameHandle model = [Model model'] where
-    model' = model & updateGame & updateSliders
-    updateSliders = updateColumns . updateRows
-    updateColumns = currentValue gridColumnsSlider .~ cols'
-    updateRows = currentValue gridRowsSlider .~ rows'
-    updateGame = currentGame .~ model ^. initialGame
-    currentValue slider = parameters' . slider . csCurrent
-    parameters' = configModel . parameters
-    (cols, rows) = getBounds $ _grid $ model ^. initialGame
-    cols' = fromIntegral $ cols+1
-    rows' = fromIntegral $ rows+1
-
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model model'] where
     model' = model & initialGame .~ game & currentGame .~ game'
@@ -82,11 +69,24 @@ resizeGridHandle model = [Model model'] where
     directions = _path $ _pilgrim currentGame'
     currentGame' = model ^. currentGame
 
+setGameHandle :: Game -> EventHandle
+setGameHandle game model = [Model model'] where
+    model' = model & updateGame & updateSliders
+    updateSliders = updateColumns . updateRows
+    updateColumns = currentValue gridColumnsSlider .~ cols'
+    updateRows = currentValue gridRowsSlider .~ rows'
+    updateGame = currentGame .~ game
+    currentValue slider = parameters' . slider . csCurrent
+    parameters' = configModel . parameters
+    (cols, rows) = getBounds $ _grid game
+    cols' = fromIntegral $ cols+1
+    rows' = fromIntegral $ rows+1
+
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent wenv node model event = case event of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    AppResetGame -> resetGameHandle model
     AppResizeGrid -> resizeGridHandle model
+    AppSetGame game -> setGameHandle game model
 
 gameFromParameters :: AppParameters -> Game
 gameFromParameters parameters' = game where
