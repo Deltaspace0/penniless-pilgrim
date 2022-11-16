@@ -34,16 +34,16 @@ data GameControlData s = GameControlData
     }
 
 data GameControlState = GameControlState
-    { _gcsGrid :: Grid Node Link
-    , _gcsPreviousBounds :: (Double, Double)
+    { _gcsCornerRect :: Rect
+    , _gcsOldCornerRect :: Rect
     , _gcsRunning :: Bool
     , _gcsStart :: Millisecond
     } deriving (Eq, Show)
 
 instance Default GameControlState where
     def = GameControlState
-        { _gcsGrid = makeGrid 2 2
-        , _gcsPreviousBounds = (0, 0)
+        { _gcsCornerRect = Rect 0 0 0 0
+        , _gcsOldCornerRect = Rect 0 0 0 0
         , _gcsRunning = False
         , _gcsStart = 0
         }
@@ -78,42 +78,33 @@ makeGameControl gcData state = widget where
     init wenv node = resultNode resNode where
         resNode = (makeChildren wenv node) & L.widget .~ w
         w = makeGameControl gcData $ state
-            { _gcsGrid = grid
+            { _gcsCornerRect = getCornerRect wenv
+            , _gcsOldCornerRect = getCornerRect wenv
             }
-        game = widgetDataGet (wenv ^. L.model) gameLens
-        grid = gridFromGame game colors
 
     merge wenv newNode _ oldState = resultReqs resNode reqs where
         resNode = (makeChildren wenv newNode) & L.widget .~ w
         w = makeGameControl gcData state'
-        state' = if newBounds == oldBounds
+        state' = if newCornerRect == oldCornerRect
             then oldState
             else GameControlState
-                { _gcsGrid = grid'
-                , _gcsPreviousBounds = previousBounds
+                { _gcsCornerRect = newCornerRect
+                , _gcsOldCornerRect = oldCornerRect'
                 , _gcsRunning = animationDuration' > 0
                 , _gcsStart = ts
                 }
-        reqs = if newBounds == oldBounds
+        reqs = if newCornerRect == oldCornerRect
             then [ResizeWidgets widgetId]
             else [requestRenderEvery newNode animationDuration]
-        grid' = gridFromGame game colors
-        grid = _gcsGrid oldState
-        game = widgetDataGet (wenv ^. L.model) gameLens
-        newBounds = getBounds grid'
-        oldBounds = getBounds grid
-        cols = fst $ _gcsPreviousBounds oldState
-        rows = snd $ _gcsPreviousBounds oldState
-        cols' = fromIntegral $ fst oldBounds
-        rows' = fromIntegral $ snd oldBounds
-        cols'' = cols+(cols'-cols)*progress
-        rows'' = rows+(rows'-rows)*progress
+        newCornerRect = getCornerRect wenv
+        oldCornerRect = _gcsCornerRect oldState
+        olderCornerRect = _gcsOldCornerRect oldState
+        oldCornerRect' = if delta < animationDuration
+            then getMiddleRect olderCornerRect oldCornerRect progress
+            else oldCornerRect
         oldStart = _gcsStart oldState
-        delta = fromIntegral (ts-oldStart) :: Double
+        delta = fromIntegral $ ts-oldStart
         progress = delta/animationDuration
-        previousBounds = if delta < animationDuration
-            then (cols'', rows'')
-            else (cols', rows')
         ts = wenv ^. L.timestamp
         widgetId = newNode ^. L.info . L.widgetId
         animationDuration' = floor animationDuration
@@ -143,36 +134,36 @@ makeGameControl gcData state = widget where
     resize wenv node vp children = resized where
         resized = (resultNode node, assignedAreas)
         assignedAreas =
-               fmap (getNodeArea vp . fst) nodeSequence
-            >< fmap (getLinkArea vp . fst) hlinkSequence
-            >< fmap (getLinkArea vp . fst) vlinkSequence
-        nodeSequence = getNodeSequence grid
-        hlinkSequence = getHlinkSequence grid
-        vlinkSequence = getVlinkSequence grid
+               fmap (getNodeArea . fst) (getNodeSequence grid)
+            >< fmap (getLinkArea . fst) (getHlinkSequence grid)
+            >< fmap (getLinkArea . fst) (getVlinkSequence grid)
+        grid = getGrid wenv
+        getNodeArea (i, j) = Rect x y d d where
+            x = vx+linkSize*(fromIntegral i)
+            y = vy+linkSize*(fromIntegral j)
+            d = nodeSize*2
+        getLinkArea (i, j) = Rect x y linkSize nodeSize where
+            x = vx+linkSize*(fromIntegral i)+nodeSize
+            y = vy+linkSize*(fromIntegral j)+nodeSize
+        vx = x+(vp ^. L.x)
+        vy = y+(vp ^. L.y)
+        Rect x y linkSize nodeSize = getCornerRect wenv
 
     render wenv node renderer = do
         let style = currentStyle wenv node
             vp = getContentArea node style
             ts = wenv ^. L.timestamp
-            (cols', rows') = _gcsPreviousBounds state
+            Rect x y linkSize _ = _gcsCornerRect state
+            Rect x' y' linkSize' _ = _gcsOldCornerRect state
             running = _gcsRunning state
             start = _gcsStart state
             delta = fromIntegral $ ts-start
             progress = max 0 $ min 1 $ delta/animationDuration
         saveContext renderer
         when (running && progress < 1) $ do
-            let factorW' = cols'+2/linkToNodeRatio
-                factorH' = rows'+2/linkToNodeRatio
-                linkSize' = min (width/factorW') (height/factorH')
-                x = linkSize'*factorW/width
-                y = linkSize'*factorH/height
-                s = (max x y)+progress*(1-(max x y))
-                vx = (width-linkSize*factorW)/2
-                vy = (height-linkSize*factorH)/2
-                vx' = (width-linkSize'*factorW')/2
-                vy' = (height-linkSize'*factorH')/2
-                tx = (vx'-vx)*(1-progress)+(1-s)*(vx+(vp ^. L.x))
-                ty = (vy'-vy)*(1-progress)+(1-s)*(vy+(vp ^. L.y))
+            let s = (linkSize'/linkSize)*(1-progress)+progress
+                tx = (x'-x)*(1-progress)+(1-s)*(x+(vp ^. L.x))
+                ty = (y'-y)*(1-progress)+(1-s)*(y+(vp ^. L.y))
             intersectScissor renderer vp
             setTranslation renderer $ Point tx ty
             setScale renderer $ Point s s
@@ -234,29 +225,34 @@ makeGameControl gcData state = widget where
         shakeNodeId = shakeNode ^. L.info ^. L.widgetId
         shakeNode = Seq.index (node ^. L.children) $ x*(rows+1)+y
         (x, y) = _position $ _pilgrim game
+        rows = snd $ getBounds $ getGrid wenv
 
-    getNodeArea vp (i, j) = Rect x y d d where
-        x = (vx vp) + linkSize*(fromIntegral i)
-        y = (vy vp) + linkSize*(fromIntegral j)
-        d = nodeSize*2
+    getCornerRect wenv = Rect x y linkSize nodeSize where
+        x = (width-linkSize*factorW)/2
+        y = (height-linkSize*factorH)/2
+        linkSize = min (width/factorW) (height/factorH)
+        nodeSize = linkSize/linkToNodeRatio
+        factorW = (fromIntegral cols)+2/linkToNodeRatio
+        factorH = (fromIntegral rows)+2/linkToNodeRatio
+        (cols, rows) = getBounds $ getGrid wenv
 
-    getLinkArea vp (i, j) = Rect x y linkSize nodeSize where
-        x = (vx vp) + linkSize*(fromIntegral i) + nodeSize
-        y = (vy vp) + linkSize*(fromIntegral j) + nodeSize
+    getMiddleRect rectA rectB progress = rect where
+        rect = Rect x y linkSize nodeSize
+        x = xA+(xB-xA)*progress
+        y = yA+(yB-yA)*progress
+        linkSize = linkSizeA+(linkSizeB-linkSizeA)*progress
+        nodeSize = nodeSizeA+(nodeSizeB-nodeSizeA)*progress
+        Rect xA yA linkSizeA nodeSizeA = rectA
+        Rect xB yB linkSizeB nodeSizeB = rectB
+
+    getGrid wenv = gridFromGame game colors where
+        game = widgetDataGet (wenv ^. L.model) gameLens
 
     gameLens = WidgetLens $ _gcdGameLens gcData
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
-    grid = _gcsGrid state
     colors = _gcdColors gcData
     animationDuration = _gcdAnimationDuration gcData
     linkToNodeRatio = _gcdLinkToNodeRatio gcData
     nodeToWidthRatio = _gcdNodeToWidthRatio gcData
     width = _gcdWidth gcData
     height = _gcdHeight gcData
-    (cols, rows) = getBounds grid
-    factorW = (fromIntegral cols)+2/linkToNodeRatio
-    factorH = (fromIntegral rows)+2/linkToNodeRatio
-    linkSize = min (width/factorW) (height/factorH)
-    nodeSize = linkSize/linkToNodeRatio
-    vx vp = (width-linkSize*factorW)/2 + vp ^. L.x
-    vy vp = (height-linkSize*factorH)/2 + vp ^. L.y
