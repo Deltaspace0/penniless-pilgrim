@@ -23,6 +23,7 @@ import TextShow
 import qualified Monomer.Lens as L
 
 import Model.Parameters.Colors
+import Util
 import qualified Model.Game as G
 
 data Node = Node
@@ -149,7 +150,7 @@ makeGameControlNode nodeData state = widget where
                 }
         reqs = if newNodeHead == oldNodeHead
             then []
-            else [makeRenderEveryRequest newNode]
+            else [requestRenderEvery newNode animationDuration]
         newNodeHead = if null nodeStack
             then Nothing
             else Just nodeHead
@@ -203,7 +204,7 @@ makeGameControlNode nodeData state = widget where
                     , _nsShakeRunning = False
                     }
             req = if action == NodeStartShake
-                then [makeRenderEveryRequest node]
+                then [requestRenderEvery node animationDuration]
                 else []
             w = makeGameControlNode nodeData state'
             newNode = node & L.widget .~ w
@@ -254,13 +255,6 @@ makeGameControlNode nodeData state = widget where
             else drawEllipse renderer vp $ _sstFgColor style
         when clickable $ do
             drawEllipseBorder renderer vp hc 2
-
-    makeRenderEveryRequest node = req where
-        req = RenderEvery widgetId period $ Just steps
-        widgetId = node ^. L.info . L.widgetId
-        period = 10
-        steps = fromIntegral $ animationDuration' `div` period
-        animationDuration' = floor animationDuration
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack

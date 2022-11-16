@@ -17,6 +17,7 @@ import Monomer.Widgets.Container
 import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
+import Util
 import Widgets.GameControl.Link
 import Widgets.GameControl.Node
 import Model hiding (Node, Link)
@@ -95,7 +96,7 @@ makeGameControl gcData state = widget where
                 }
         reqs = if newBounds == oldBounds
             then [ResizeWidgets widgetId]
-            else [RenderEvery widgetId period (Just steps)]
+            else [requestRenderEvery newNode animationDuration]
         grid' = gridFromGame game colors
         grid = _gcsGrid oldState
         game = widgetDataGet (wenv ^. L.model) gameLens
@@ -115,8 +116,6 @@ makeGameControl gcData state = widget where
             else (cols', rows')
         ts = wenv ^. L.timestamp
         widgetId = newNode ^. L.info . L.widgetId
-        period = 10
-        steps = fromIntegral $ animationDuration' `div` period
         animationDuration' = floor animationDuration
 
     handleEvent wenv node _ event = case event of

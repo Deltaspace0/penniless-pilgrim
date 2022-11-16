@@ -24,6 +24,7 @@ import TextShow
 import qualified Monomer.Lens as L
 
 import Model.Parameters.Colors
+import Util
 import qualified Model.Game as G
 
 data LinkForm = LinkBack | LinkForward deriving (Eq, Show)
@@ -124,16 +125,13 @@ makeGameControlLink isHz linkData state = widget where
                 }
         reqs = if newLink == oldLink
             then []
-            else [RenderEvery widgetId period (Just steps)]
+            else [requestRenderEvery newNode animationDuration]
         newLink = _ldLink linkData
         oldLink = _lsLink oldState
         oldStart = _lsStart oldState
         delta = min animationDuration' (ts-oldStart)
         newStart = ts - animationDuration' + delta
         ts = wenv ^. L.timestamp
-        widgetId = newNode ^. L.info . L.widgetId
-        period = 10
-        steps = fromIntegral $ animationDuration' `div` period
         animationDuration' = floor animationDuration
 
     render wenv node r = do
