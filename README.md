@@ -1,6 +1,9 @@
 # Penniless Pilgrim
 
-![Screenshot](readme/screenshot.png)
+## Screenshots
+![Screenshot](readme/screenshot1.png)
+![Screenshot](readme/screenshot2.png)
+![Screenshot](readme/screenshot3.png)
 
 ## Goals
 - To learn Haskell and [Monomer](https://github.com/fjvallarino/monomer) library.
@@ -13,6 +16,7 @@
 - Grid can be resized to have different dimensions other than 5x5.
 - Interface can be customized via [config.json](config.json).
 - Config can be saved and loaded from file.
+- Games can also be saved and loaded from file ([games.json](games.json)).
 
 ## License
 - This project is licensed under the [MIT license](LICENSE.md).
