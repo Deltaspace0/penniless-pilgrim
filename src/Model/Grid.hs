@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.Grid
@@ -28,7 +29,8 @@ module Model.Grid
     , gridMap
     ) where
 
-import Control.Lens hiding (indices)
+import Control.Lens hiding (indices, (.=))
+import Data.Aeson hiding (Array)
 import Data.Array.IArray
 import Data.Maybe
 import Data.Sequence (Seq(..))
@@ -43,6 +45,35 @@ data Grid a b = Grid
     , _gridHlinks :: Array Point (Maybe b)
     , _gridVlinks :: Array Point (Maybe b)
     } deriving (Eq, Show)
+
+instance (FromJSON a) => FromJSON (Array Point a) where
+    parseJSON = withObject "Array" $ \v -> do
+        startBounds <- v .: "start_bounds"
+        endBounds <- v .: "end_bounds"
+        array <- v .: "array"
+        let bounds = (startBounds, endBounds)
+        return $ listArray bounds array
+
+instance (ToJSON a) => ToJSON (Array Point a) where
+    toJSON array = object
+        [ "start_bounds" .= startBounds
+        , "end_bounds" .= endBounds
+        , "array" .= elems array
+        ] where
+            (startBounds, endBounds) = bounds array
+
+instance (FromJSON a, FromJSON b) => FromJSON (Grid a b) where
+    parseJSON = withObject "Grid" $ \v -> Grid
+        <$> v .: "nodes"
+        <*> v .: "hlinks"
+        <*> v .: "vlinks"
+
+instance (ToJSON a, ToJSON b) => ToJSON (Grid a b) where
+    toJSON grid = object
+        [ "nodes" .= _gridNodes grid
+        , "hlinks" .= _gridHlinks grid
+        , "vlinks" .= _gridVlinks grid
+        ]
 
 makeLensesWith abbreviatedFields 'Grid
 

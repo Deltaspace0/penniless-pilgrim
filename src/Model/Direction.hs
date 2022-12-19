@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Model.Direction
     ( Direction(..)
     , getOpposite
@@ -5,8 +7,10 @@ module Model.Direction
     , relativeDirection
     ) where
 
+import Data.Aeson
 import Data.List
 import Data.Maybe
+import Data.Text (pack)
 
 data Direction
     = North
@@ -14,6 +18,16 @@ data Direction
     | West
     | East
     deriving (Eq, Show)
+
+instance FromJSON Direction where
+    parseJSON = withText "Direction" $ \v -> return $ case v of
+        "North" -> North
+        "South" -> South
+        "West" -> West
+        "East" -> East
+
+instance ToJSON Direction where
+    toJSON = String . pack . show
 
 getOpposite :: Direction -> Direction
 getOpposite North = South

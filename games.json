@@ -1,0 +1,288 @@
+[
+    {
+        "caption": "5x5\t\tTax: 0.0\t\tX: 0\tY: 0\t\t2022-12-19 21:48:44.010121276 MSK",
+        "game": {
+            "grid": {
+                "hlinks": {
+                    "array": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "end_bounds": [
+                        3,
+                        4
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                },
+                "nodes": {
+                    "array": [
+                        [
+                            "NodePilgrim"
+                        ],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [
+                            "NodeGoal"
+                        ]
+                    ],
+                    "end_bounds": [
+                        4,
+                        4
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                },
+                "vlinks": {
+                    "array": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "end_bounds": [
+                        4,
+                        3
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "pilgrim": {
+                "path": [],
+                "position": [
+                    0,
+                    0
+                ],
+                "previous_positions": [],
+                "tax": 0
+            }
+        }
+    },
+    {
+        "caption": "5x5\t\tTax: 18.0\t\tX: 2\tY: 2\t\t2022-12-19 21:48:39.338567585 MSK",
+        "game": {
+            "grid": {
+                "hlinks": {
+                    "array": [
+                        "LinkForward",
+                        null,
+                        null,
+                        null,
+                        null,
+                        "LinkForward",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "LinkForward",
+                        "LinkBack",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "end_bounds": [
+                        3,
+                        4
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                },
+                "nodes": {
+                    "array": [
+                        [
+                            "NodePath"
+                        ],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [
+                            "NodePath"
+                        ],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [
+                            "NodePath"
+                        ],
+                        [
+                            "NodePath"
+                        ],
+                        [
+                            "NodePilgrim"
+                        ],
+                        [],
+                        [],
+                        [],
+                        [
+                            "NodePath"
+                        ],
+                        [
+                            "NodePath"
+                        ],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [],
+                        [
+                            "NodeGoal"
+                        ]
+                    ],
+                    "end_bounds": [
+                        4,
+                        4
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                },
+                "vlinks": {
+                    "array": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "LinkForward",
+                        null,
+                        null,
+                        null,
+                        null,
+                        "LinkForward",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "end_bounds": [
+                        4,
+                        3
+                    ],
+                    "start_bounds": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "pilgrim": {
+                "path": [
+                    "West",
+                    "South",
+                    "East",
+                    "South",
+                    "East",
+                    "East"
+                ],
+                "position": [
+                    2,
+                    2
+                ],
+                "previous_positions": [
+                    [
+                        3,
+                        2
+                    ],
+                    [
+                        3,
+                        1
+                    ],
+                    [
+                        2,
+                        1
+                    ],
+                    [
+                        2,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ],
+                    [
+                        0,
+                        0
+                    ]
+                ],
+                "tax": 18
+            }
+        }
+    }
+]

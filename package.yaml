@@ -30,6 +30,7 @@ dependencies:
 - monomer
 - text
 - text-show
+- time
 - utf8-string
 
 library:

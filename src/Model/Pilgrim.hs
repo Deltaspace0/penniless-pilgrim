@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Model.Pilgrim
     ( module Model.Direction
     , Pilgrim(..)
@@ -6,6 +8,7 @@ module Model.Pilgrim
     , updatePilgrim
     ) where
 
+import Data.Aeson
 import Data.Default
 
 import Model.Direction
@@ -24,6 +27,21 @@ instance Default Pilgrim where
         , _path = []
         , _tax = 0
         }
+
+instance FromJSON Pilgrim where
+    parseJSON = withObject "Pilgrim" $ \v -> Pilgrim
+        <$> v .: "position"
+        <*> v .: "previous_positions"
+        <*> v .: "path"
+        <*> v .: "tax"
+
+instance ToJSON Pilgrim where
+    toJSON pilgrim = object
+        [ "position" .= _position pilgrim
+        , "previous_positions" .= _previousPositions pilgrim
+        , "path" .= _path pilgrim
+        , "tax" .= _tax pilgrim
+        ]
 
 updateTax :: Direction -> Double -> Double
 updateTax North t = t/2

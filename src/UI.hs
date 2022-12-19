@@ -25,28 +25,38 @@ buildUI _ model = widgetTree where
         , separatorLine
         , side
         ] `styleBasic` [padding 32]
-    side = if model ^. showConfig
-        then vstack' $ sideWidgets <>
+    side = case model ^. activeMenu of
+        Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine
             , configComposite configModel
             ]
-        else boxCenter $ vstack' sideWidgets
+        Just GameSLMenu -> vstack' $ sideWidgets <>
+            [ separatorLine
+            , gameSLComposite gameSLModel
+            ]
+        _ -> boxCenter $ vstack' sideWidgets
     sideWidgets =
         [ totalTaxLabel
         , nextTaxLabel
-        , boxCenter $ hstack'
-            [ button "Reset" $ AppSetGame $ model ^. initialGame
-            , toggleButton "Config" showConfig
-            ]
+        , boxCenter $ hstack' $
+            [ button "Reset" $ AppSetGame $ initialGame'
+            , optionButton "Save/load game" gameSLMenu' activeMenu
+            , optionButton "Config" configMenu' activeMenu
+            ] <> [hideButton | not $ null $ model ^. activeMenu]
         ]
     totalTaxLabel = bigNumberLabel totalTax "Total tax: "
     nextTaxLabel = bigNumberLabel nextTax' "Next tax: "
-    totalTax = Just $ _tax $ _pilgrim $ model ^. currentGame
+    totalTax = Just $ _tax $ _pilgrim currentGame'
+    initialGame' = model ^. gameSLModel . initialGame
+    currentGame' = model ^. gameSLModel . currentGame
     nextTax' = model ^. nextTax
+    gameSLMenu' = Just GameSLMenu
+    configMenu' = Just ConfigMenu
+    hideButton = optionButton "Hide" Nothing activeMenu
 
 gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = gameControl $ GameControlData
-    { _gcdGameLens = currentGame
+    { _gcdGameLens = gameSLModel . currentGame
     , _gcdNextTaxLens = nextTax
     , _gcdColors = get colors
     , _gcdAnimationDuration = get $ gridAnimationSlider . csCurrent

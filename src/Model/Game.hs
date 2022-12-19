@@ -1,8 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Model.Game
-    ( module Model.Grid
+    ( module Model.Game.Link
+    , module Model.Game.Node
+    , module Model.Grid
     , module Model.Pilgrim
-    , Node(..)
-    , Link(..)
     , Game(..)
     , makeGame
     , makeGame_
@@ -13,24 +15,30 @@ module Model.Game
     , taxFromGame
     ) where
 
+import Data.Aeson
 import Data.Default
 import Data.Maybe
 
+import Model.Game.Link
+import Model.Game.Node
 import Model.Grid
 import Model.Pilgrim
-
-data Node
-    = NodePilgrim
-    | NodePath
-    | NodeGoal
-    deriving (Eq, Show)
-
-data Link = LinkBack | LinkForward deriving (Eq, Show)
 
 data Game = Game
     { _grid :: Grid Node Link
     , _pilgrim :: Pilgrim
     } deriving (Eq, Show)
+
+instance FromJSON Game where
+    parseJSON = withObject "Game" $ \v -> Game
+        <$> v .: "grid"
+        <*> v .: "pilgrim"
+
+instance ToJSON Game where
+    toJSON game = object
+        [ "grid" .= _grid game
+        , "pilgrim" .= _pilgrim game
+        ]
 
 makeGame :: Int -> Int -> Game
 makeGame w h = makeGame_ w h def

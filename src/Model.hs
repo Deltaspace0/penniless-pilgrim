@@ -6,12 +6,12 @@
 module Model
     ( module Model.Game
     , module Model.Parameters
+    , AppMenu(..)
     , AppEvent(..)
     , AppModel(..)
-    , initialGame
-    , currentGame
-    , showConfig
+    , activeMenu
     , configModel
+    , gameSLModel
     , nextTax
     , initModel
     , handleEvent
@@ -27,6 +27,11 @@ import Model.Game
 import Model.Grid
 import Model.Parameters
 
+data AppMenu
+    = ConfigMenu
+    | GameSLMenu
+    deriving (Eq, Show)
+
 data AppEvent
     = AppInit
     | AppResizeGrid
@@ -34,10 +39,9 @@ data AppEvent
     deriving (Eq, Show)
 
 data AppModel = AppModel
-    { _appInitialGame :: Game
-    , _appCurrentGame :: Game
-    , _appShowConfig :: Bool
+    { _appActiveMenu :: Maybe AppMenu
     , _appConfigModel :: ConfigModel AppEvent
+    , _appGameSLModel :: GameSLModel
     , _appNextTax :: Maybe Double
     } deriving (Eq, Show)
 
@@ -45,29 +49,31 @@ type EventHandle = AppModel -> [AppEventResponse AppModel AppEvent]
 
 makeLensesWith abbreviatedFields 'AppModel
 
-initModel :: Maybe String -> IO AppModel
-initModel path = do
-    configModel' <- initConfigModel AppResizeGrid path
+initModel :: Maybe String -> Maybe String -> IO AppModel
+initModel configPath gamesPath = do
+    configModel' <- initConfigModel AppResizeGrid configPath
     let parameters' = configModel' ^. parameters
         game = gameFromParameters parameters'
+    gameSLModel' <- initGameSLModel game gamesPath
     return $ AppModel
-        { _appInitialGame = game
-        , _appCurrentGame = game
-        , _appShowConfig = False
+        { _appActiveMenu = Nothing
         , _appConfigModel = configModel'
+        , _appGameSLModel = gameSLModel'
         , _appNextTax = Nothing
         }
 
 resizeGridHandle :: EventHandle
 resizeGridHandle model = [Model model'] where
-    model' = model & initialGame .~ game & currentGame .~ game'
+    model' = model
+        & gameSLModel . initialGame .~ game
+        & gameSLModel . currentGame .~ game'
     game = gameFromParameters $ model ^. configModel . parameters
     game' = if null gameWithAppliedPath
         then game
         else fromJust gameWithAppliedPath
     gameWithAppliedPath = applyPath directions game
     directions = _path $ _pilgrim currentGame'
-    currentGame' = model ^. currentGame
+    currentGame' = model ^. gameSLModel . currentGame
 
 setGameHandle :: Game -> EventHandle
 setGameHandle game model = [Model model'] where
@@ -75,7 +81,7 @@ setGameHandle game model = [Model model'] where
     updateSliders = updateColumns . updateRows
     updateColumns = currentValue gridColumnsSlider .~ cols'
     updateRows = currentValue gridRowsSlider .~ rows'
-    updateGame = currentGame .~ game
+    updateGame = gameSLModel . currentGame .~ game
     currentValue slider = parameters' . slider . csCurrent
     parameters' = configModel . parameters
     (cols, rows) = getBounds $ _grid game
@@ -83,7 +89,7 @@ setGameHandle game model = [Model model'] where
     rows' = fromIntegral $ rows+1
 
 handleEvent :: AppEventHandler AppModel AppEvent
-handleEvent wenv node model event = case event of
+handleEvent _ _ model event = case event of
     AppInit -> [SetFocusOnKey "mainGrid"]
     AppResizeGrid -> resizeGridHandle model
     AppSetGame game -> setGameHandle game model
