@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Model.Parameters.ConfigSlider
+module Composites.Config.Parameters.ConfigSlider
     ( ConfigSlider(..)
     , csCurrent
     , csMin

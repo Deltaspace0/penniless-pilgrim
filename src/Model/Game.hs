@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Game
-    ( module Model.Game.Link
-    , module Model.Game.Node
+    ( module Model.Game.GameLink
+    , module Model.Game.GameNode
     , module Model.Game.Pilgrim
     , module Model.Grid
     , Game(..)
@@ -19,13 +19,13 @@ import Data.Aeson
 import Data.Default
 import Data.Maybe
 
-import Model.Game.Link
-import Model.Game.Node
+import Model.Game.GameLink
+import Model.Game.GameNode
 import Model.Game.Pilgrim
 import Model.Grid
 
 data Game = Game
-    { _grid :: Grid Node Link
+    { _grid :: Grid GameNode GameLink
     , _pilgrim :: Pilgrim
     } deriving (Eq, Show)
 

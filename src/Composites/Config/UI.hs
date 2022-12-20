@@ -9,7 +9,7 @@ import Control.Lens
 import Monomer
 
 import Composites.Config.Model
-import Model.Parameters
+import Composites.Config.Parameters
 import Util
 
 configComposite
@@ -39,13 +39,13 @@ buildUI _ model = widgetTree where
 
 configSlider
     :: ConfigModel ep
-    -> Lens' AppParameters ConfigSlider
+    -> Lens' Parameters ConfigSlider
     -> [WidgetNode (ConfigModel ep) ConfigEvent]
 configSlider model slider = configSlider_ model slider []
 
 configSlider_
     :: ConfigModel ep
-    -> Lens' AppParameters ConfigSlider
+    -> Lens' Parameters ConfigSlider
     -> [ConfigEvent]
     -> [WidgetNode (ConfigModel ep) ConfigEvent]
 configSlider_ model slider events =

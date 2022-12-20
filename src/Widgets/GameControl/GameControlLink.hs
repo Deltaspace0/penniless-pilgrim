@@ -1,15 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
-module Widgets.GameControl.Link
-    ( LinkForm(..)
-    , Link(..)
+module Widgets.GameControl.GameControlLink
+    ( module Widgets.GameControl.GameControlLink.LinkVisual
     , LinkData(..)
-    , hlinkTransform
-    , vlinkTransform
     , gameControlHlink
     , gameControlVlink
     ) where
@@ -23,52 +17,20 @@ import Monomer.Widgets.Single
 import TextShow
 import qualified Monomer.Lens as L
 
-import Model.Parameters.Colors
+import Model.Game
 import Util
-import qualified Model.Game as G
-
-data LinkForm = LinkBack | LinkForward deriving (Eq, Show)
-
-data Link = Link
-    { _linkColor :: Color
-    , _linkForm :: Maybe LinkForm
-    } deriving (Eq, Show)
-
-makeFields 'Link
-
-hlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
-hlinkTransform _ Nothing = Nothing
-hlinkTransform colors (Just G.LinkBack) = Just Link
-    { _linkColor = _linkWest colors
-    , _linkForm = Just LinkBack
-    }
-hlinkTransform colors (Just G.LinkForward) = Just Link
-    { _linkColor = _linkEast colors
-    , _linkForm = Just LinkForward
-    }
-
-vlinkTransform :: Colors -> Maybe G.Link -> Maybe Link
-vlinkTransform _ Nothing = Nothing
-vlinkTransform colors (Just G.LinkBack) = Just Link
-    { _linkColor = _linkNorth colors
-    , _linkForm = Just LinkBack
-    }
-vlinkTransform colors (Just G.LinkForward) = Just Link
-    { _linkColor = _linkSouth colors
-    , _linkForm = Just LinkForward
-    }
+import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlLink.LinkVisual
 
 data LinkData = LinkData
-    { _ldLink :: Maybe Link
-    , _ldNullColor :: Color
+    { _ldLink :: Maybe LinkVisual
     , _ldPosition :: (Int, Int)
-    , _ldAnimationDuration :: Double
-    , _ldNodeToWidthRatio :: Double
+    , _ldConfig :: GameControlConfig
     } deriving (Eq, Show)
 
 data LinkState = LinkState
-    { _lsLink :: Maybe Link
-    , _lsOldLink :: Maybe Link
+    { _lsLink :: Maybe LinkVisual
+    , _lsOldLink :: Maybe LinkVisual
     , _lsRunning :: Bool
     , _lsStart :: Millisecond
     } deriving (Eq, Show)
@@ -147,11 +109,11 @@ makeGameControlLink isHz linkData state = widget where
             Just newLink' = newLink
             Just oldLink' = oldLink
             newData@(newColor, newForm) = if null newLink
-                then (_ldNullColor linkData, Nothing)
-                else (newLink' ^. color, newLink' ^. form)
+                then (_lccDefault colorConfig, Nothing)
+                else (_linkColor newLink', _linkForm newLink')
             oldData@(oldColor, oldForm) = if null oldLink
-                then (_ldNullColor linkData, Nothing)
-                else (oldLink' ^. color, oldLink' ^. form)
+                then (_lccDefault colorConfig, Nothing)
+                else (_linkColor oldLink', _linkForm oldLink')
         if running && progress < 1
             then if progress < 0.5
                 then renderForm r oldData newData vp $ 1-progress*2
@@ -168,7 +130,7 @@ makeGameControlLink isHz linkData state = widget where
             f x = if x == Just LinkBack then rest else 0
             s = s' + if null form' then f form'' else f form'
             b = s+totalSize'
-            linkWidth = nodeSize/(_ldNodeToWidthRatio linkData)
+            linkWidth = nodeSize/(_gccNodeToWidthRatio config)
             ars = if totalSize' > linkWidth*3
                 then linkWidth*1.5
                 else totalSize'/2
@@ -194,4 +156,6 @@ makeGameControlLink isHz linkData state = widget where
                 drawTriangle' b b'
             _ -> drawLine' s b
 
-    animationDuration = _ldAnimationDuration linkData
+    animationDuration = _gccAnimationDuration config
+    colorConfig = _gcccLink $ _gccColorConfig config
+    config = _ldConfig linkData

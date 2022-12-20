@@ -5,7 +5,6 @@
 
 module Model
     ( module Model.Game
-    , module Model.Parameters
     , AppMenu(..)
     , AppEvent(..)
     , AppModel(..)
@@ -15,7 +14,6 @@ module Model
     , nextTax
     , initModel
     , handleEvent
-    , gameFromParameters
     ) where
 
 import Control.Lens
@@ -25,7 +23,6 @@ import Monomer
 import Composites
 import Model.Game
 import Model.Grid
-import Model.Parameters
 
 data AppMenu
     = ConfigMenu
@@ -52,8 +49,7 @@ makeLensesWith abbreviatedFields 'AppModel
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
     configModel' <- initConfigModel AppResizeGrid configPath
-    let parameters' = configModel' ^. parameters
-        game = gameFromParameters parameters'
+    let game = gameFromConfig configModel'
     gameSLModel' <- initGameSLModel game gamesPath
     return $ AppModel
         { _appActiveMenu = Nothing
@@ -67,7 +63,7 @@ resizeGridHandle model = [Model model'] where
     model' = model
         & gameSLModel . initialGame .~ game
         & gameSLModel . currentGame .~ game'
-    game = gameFromParameters $ model ^. configModel . parameters
+    game = gameFromConfig $ model ^. configModel
     game' = if null gameWithAppliedPath
         then game
         else fromJust gameWithAppliedPath
@@ -77,25 +73,12 @@ resizeGridHandle model = [Model model'] where
 
 setGameHandle :: Game -> EventHandle
 setGameHandle game model = [Model model'] where
-    model' = model & updateGame & updateSliders
-    updateSliders = updateColumns . updateRows
-    updateColumns = currentValue gridColumnsSlider .~ cols'
-    updateRows = currentValue gridRowsSlider .~ rows'
+    model' = model & updateGame & updateConfig
     updateGame = gameSLModel . currentGame .~ game
-    currentValue slider = parameters' . slider . csCurrent
-    parameters' = configModel . parameters
-    (cols, rows) = getBounds $ _grid game
-    cols' = fromIntegral $ cols+1
-    rows' = fromIntegral $ rows+1
+    updateConfig = configModel %~ configFromGame game
 
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent _ _ model event = case event of
     AppInit -> [SetFocusOnKey "mainGrid"]
     AppResizeGrid -> resizeGridHandle model
     AppSetGame game -> setGameHandle game model
-
-gameFromParameters :: AppParameters -> Game
-gameFromParameters parameters' = game where
-    game = makeGame (floor gridColumns) (floor gridRows)
-    gridColumns = parameters' ^. gridColumnsSlider . csCurrent
-    gridRows = parameters' ^. gridRowsSlider . csCurrent

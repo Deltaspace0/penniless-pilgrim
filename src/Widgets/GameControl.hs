@@ -2,7 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl
-    ( GameControlData(..)
+    ( module Widgets.GameControl.GameControlConfig
+    , GameControlData(..)
     , gameControl
     ) where
 
@@ -17,20 +18,16 @@ import Monomer.Widgets.Container
 import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
+import Model
 import Util
-import Widgets.GameControl.Link
-import Widgets.GameControl.Node
-import Model hiding (Node, Link)
+import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlLink
+import Widgets.GameControl.GameControlNode
 
 data GameControlData s = GameControlData
     { _gcdGameLens :: ALens' s Game
     , _gcdNextTaxLens :: ALens' s (Maybe Double)
-    , _gcdColors :: Colors
-    , _gcdAnimationDuration :: Double
-    , _gcdLinkToNodeRatio :: Double
-    , _gcdNodeToWidthRatio :: Double
-    , _gcdWidth :: Double
-    , _gcdHeight :: Double
+    , _gcdConfig :: GameControlConfig
     }
 
 data GameControlState = GameControlState
@@ -48,15 +45,21 @@ instance Default GameControlState where
         , _gcsStart = 0
         }
 
-gridFromGame :: Game -> Colors -> Grid Node Link
-gridFromGame game colors = gridMap nt hlt vlt $ _grid game where
-    nt  = nodeTransform colors
-    hlt = hlinkTransform colors
-    vlt = vlinkTransform colors
+gridFromGame
+    :: Game
+    -> GameControlConfig
+    -> Grid NodeVisual LinkVisual
+gridFromGame game config = gridMap nt hlt vlt $ _grid game where
+    nt  = nodeTransform nodeColorConfig
+    hlt = hlinkTransform linkColorConfig
+    vlt = vlinkTransform linkColorConfig
+    nodeColorConfig = _gcccNode colorConfig
+    linkColorConfig = _gcccLink colorConfig
+    colorConfig = _gccColorConfig config
 
 gameControl :: GameControlData s -> WidgetNode s e
-gameControl gcData = gameControlNode where
-    gameControlNode = defaultWidgetNode "gameControl" widget
+gameControl gcData = node where
+    node = defaultWidgetNode "gameControl" widget
     widget = makeGameControl gcData def
 
 makeGameControl
@@ -175,31 +178,25 @@ makeGameControl gcData state = widget where
             >< fmap fh hlinkSequence
             >< fmap fv vlinkSequence
         game = widgetDataGet (wenv ^. L.model) gameLens
-        grid = gridFromGame game colors
+        grid = gridFromGame game config
         nodeSequence = getNodeSequence grid
         hlinkSequence = getHlinkSequence grid
         vlinkSequence = getVlinkSequence grid
         fn (p, nodeStack) = gameControlNode $ NodeData
             { _ndNodeStack = nodeStack
-            , _ndNullColor = _nodeDefault colors
-            , _ndNullHoverColor = _nodeHover colors
-            , _ndNullActiveColor = _nodeActive colors
-            , _ndHighlightColor = _nodeHighlight colors
             , _ndGameControlId = widgetId
             , _ndPosition = p
             , _ndClickable = not $ null tax
             , _ndNextTax = tax
             , _ndNextTaxLens = nextTaxLens
-            , _ndAnimationDuration = animationDuration
+            , _ndConfig = config
             } where tax = taxFromGame p game
         fh = gameControlHlink . linkData
         fv = gameControlVlink . linkData
         linkData (p, link) = LinkData
             { _ldLink = link
-            , _ldNullColor = _linkDefault colors
             , _ldPosition = p
-            , _ldAnimationDuration = animationDuration
-            , _ldNodeToWidthRatio = nodeToWidthRatio
+            , _ldConfig = config
             }
         widgetId = node ^. L.info . L.widgetId
 
@@ -245,14 +242,14 @@ makeGameControl gcData state = widget where
         Rect xA yA linkSizeA nodeSizeA = rectA
         Rect xB yB linkSizeB nodeSizeB = rectB
 
-    getGrid wenv = gridFromGame game colors where
+    getGrid wenv = gridFromGame game config where
         game = widgetDataGet (wenv ^. L.model) gameLens
 
     gameLens = WidgetLens $ _gcdGameLens gcData
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
-    colors = _gcdColors gcData
-    animationDuration = _gcdAnimationDuration gcData
-    linkToNodeRatio = _gcdLinkToNodeRatio gcData
-    nodeToWidthRatio = _gcdNodeToWidthRatio gcData
-    width = _gcdWidth gcData
-    height = _gcdHeight gcData
+    animationDuration = _gccAnimationDuration config
+    linkToNodeRatio = _gccLinkToNodeRatio config
+    nodeToWidthRatio = _gccNodeToWidthRatio config
+    width = _gccWidth config
+    height = _gccHeight config
+    config = _gcdConfig gcData

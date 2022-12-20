@@ -51,7 +51,7 @@ initGameSLModel :: Game -> Maybe String -> IO GameSLModel
 initGameSLModel game path = do
     savedGames' <- if null path
         then return Seq.empty
-        else snd <$> fromFile (fromJust path)
+        else snd <$> gameInfoFromFile (fromJust path)
     return $ GameSLModel
         { _gslFilePath = path
         , _gslSavedGames = savedGames'
@@ -129,5 +129,5 @@ syncToFileHandle model = [Producer producerHandler] where
             savedGames' = model ^. savedGames
         success <- if null path
             then return False
-            else toFile savedGames' $ fromJust path
+            else gameInfoToFile savedGames' $ fromJust path
         return ()

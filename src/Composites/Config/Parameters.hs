@@ -3,10 +3,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Model.Parameters
-    ( module Model.Parameters.Colors
-    , module Model.Parameters.ConfigSlider
-    , AppParameters(..)
+module Composites.Config.Parameters
+    ( module Composites.Config.Parameters.ColorConfig
+    , module Composites.Config.Parameters.ConfigSlider
+    , Parameters(..)
     , gridColumnsSlider
     , gridRowsSlider
     , gridAnimationSlider
@@ -14,9 +14,10 @@ module Model.Parameters
     , nodeToWidthSlider
     , gameControlWidth
     , gameControlHeight
-    , colors
-    , fromFile
-    , toFile
+    , colorConfig
+    , gameFromParameters
+    , parametersFromFile
+    , parametersToFile
     ) where
 
 import Control.Exception
@@ -28,10 +29,11 @@ import Data.Maybe
 import System.IO
 import qualified Data.ByteString.Lazy.UTF8 as BLU
 
-import Model.Parameters.Colors
-import Model.Parameters.ConfigSlider
+import Composites.Config.Parameters.ColorConfig
+import Composites.Config.Parameters.ConfigSlider
+import Model.Game
 
-data AppParameters = AppParameters
+data Parameters = Parameters
     { _apGridColumnsSlider :: ConfigSlider
     , _apGridRowsSlider :: ConfigSlider
     , _apGridAnimationSlider :: ConfigSlider
@@ -39,13 +41,13 @@ data AppParameters = AppParameters
     , _apNodeToWidthSlider :: ConfigSlider
     , _apGameControlWidth :: Double
     , _apGameControlHeight :: Double
-    , _apColors :: Colors
+    , _apColorConfig :: ColorConfig
     } deriving (Eq, Show)
 
-makeLensesWith abbreviatedFields 'AppParameters
+makeLensesWith abbreviatedFields 'Parameters
 
-instance Default AppParameters where
-    def = AppParameters
+instance Default Parameters where
+    def = Parameters
         { _apGridColumnsSlider = ConfigSlider
             { _csCurrent = 5
             , _csMin = 2
@@ -83,11 +85,11 @@ instance Default AppParameters where
             }
         , _apGameControlWidth = 400
         , _apGameControlHeight = 500
-        , _apColors = def
+        , _apColorConfig = def
         }
 
-instance FromJSON AppParameters where
-    parseJSON = withObject "AppParameters" $ \v -> AppParameters
+instance FromJSON Parameters where
+    parseJSON = withObject "Parameters" $ \v -> Parameters
         <$> v .: "grid_columns_slider"
         <*> v .: "grid_rows_slider"
         <*> v .: "grid_animation_slider"
@@ -95,9 +97,9 @@ instance FromJSON AppParameters where
         <*> v .: "node_to_width_slider"
         <*> v .: "game_control_width"
         <*> v .: "game_control_height"
-        <*> v .: "colors"
+        <*> v .: "color_config"
 
-instance ToJSON AppParameters where
+instance ToJSON Parameters where
     toJSON p = object
         [ "grid_columns_slider" .= (p ^. gridColumnsSlider)
         , "grid_rows_slider" .= (p ^. gridRowsSlider)
@@ -106,21 +108,27 @@ instance ToJSON AppParameters where
         , "node_to_width_slider" .= (p ^. nodeToWidthSlider)
         , "game_control_width" .= (p ^. gameControlWidth)
         , "game_control_height" .= (p ^. gameControlHeight)
-        , "colors" .= (p ^. colors)
+        , "color_config" .= (p ^. colorConfig)
         ]
 
-fromFile :: String -> IO (Bool, AppParameters)
-fromFile path = do
+gameFromParameters :: Parameters -> Game
+gameFromParameters parameters' = game where
+    game = makeGame (floor gridColumns) (floor gridRows)
+    gridColumns = parameters' ^. gridColumnsSlider . csCurrent
+    gridRows = parameters' ^. gridRowsSlider . csCurrent
+
+parametersFromFile :: String -> IO (Bool, Parameters)
+parametersFromFile path = do
     let handler = const $ return "" :: SomeException -> IO String
     file <- catch (readFile path) handler
     let contents = BLU.fromString file
-        parameters = decode contents :: Maybe AppParameters
+        parameters = decode contents :: Maybe Parameters
     return $ if null parameters
         then (False, def)
         else (True, fromJust parameters)
 
-toFile :: AppParameters -> String -> IO Bool
-toFile parameters path = do
+parametersToFile :: Parameters -> String -> IO Bool
+parametersToFile parameters path = do
     let config = defConfig {confCompare = flip compare}
         converted = encodePretty' config parameters
         contents = BLU.toString converted

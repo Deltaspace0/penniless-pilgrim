@@ -1,14 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
-module Widgets.GameControl.Node
-    ( Node(..)
+module Widgets.GameControl.GameControlNode
+    ( module Widgets.GameControl.GameControlNode.NodeVisual
     , NodeData(..)
     , NodeMessage(..)
-    , nodeTransform
     , gameControlNode
     ) where
 
@@ -22,48 +18,18 @@ import Monomer.Widgets.Single
 import TextShow
 import qualified Monomer.Lens as L
 
-import Model.Parameters.Colors
 import Util
-import qualified Model.Game as G
-
-data Node = Node
-    { _nodeColor :: Color
-    , _nodeHoverColor :: Color
-    , _nodeActiveColor :: Color
-    } deriving (Eq, Show)
-
-makeFields 'Node
-
-nodeTransform :: Colors -> [G.Node] -> [Node]
-nodeTransform colors = map $ \node -> case node of
-    G.NodePilgrim -> Node
-        { _nodeColor = _nodePilgrimDefault colors
-        , _nodeHoverColor = _nodePilgrimHover colors
-        , _nodeActiveColor = _nodePilgrimActive colors
-        }
-    G.NodePath -> Node
-        { _nodeColor = _nodePathDefault colors
-        , _nodeHoverColor = _nodePathHover colors
-        , _nodeActiveColor = _nodePathActive colors
-        }
-    G.NodeGoal -> Node
-        { _nodeColor = _nodeGoalDefault colors
-        , _nodeHoverColor = _nodeGoalHover colors
-        , _nodeActiveColor = _nodeGoalActive colors
-        }
+import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlNode.NodeVisual
 
 data NodeData s = NodeData
-    { _ndNodeStack :: [Node]
-    , _ndNullColor :: Color
-    , _ndNullHoverColor :: Color
-    , _ndNullActiveColor :: Color
-    , _ndHighlightColor :: Color
+    { _ndNodeStack :: [NodeVisual]
     , _ndGameControlId :: WidgetId
     , _ndPosition :: (Int, Int)
     , _ndClickable :: Bool
     , _ndNextTax :: Maybe Double
     , _ndNextTaxLens :: WidgetData s (Maybe Double)
-    , _ndAnimationDuration :: Double
+    , _ndConfig :: GameControlConfig
     }
 
 data NodeMessage
@@ -73,7 +39,7 @@ data NodeMessage
     deriving (Eq, Show)
 
 data NodeState = NodeState
-    { _nsAnimationStack :: [(Millisecond, Maybe Node)]
+    { _nsAnimationStack :: [(Millisecond, Maybe NodeVisual)]
     , _nsRunning :: Bool
     , _nsShakeRunning :: Bool
     , _nsShakeStart :: Millisecond
@@ -110,14 +76,14 @@ makeGameControlNode nodeData state = widget where
         then Just $ basicStyle
             { _styleHover = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ndNullHoverColor nodeData
-                    else nodeHead ^. hoverColor
+                    then _nodeHover colorConfig
+                    else _nodeColorHover nodeHead
                 , _sstCursorIcon = Just CursorHand
                 }
             , _styleActive = Just $ def
                 { _sstFgColor = Just $ if null nodeStack
-                    then _ndNullActiveColor nodeData
-                    else nodeHead ^. activeColor
+                    then _nodeActive colorConfig
+                    else _nodeColorActive nodeHead
                 , _sstCursorIcon = Just CursorHand
                 }
             }
@@ -219,7 +185,6 @@ makeGameControlNode nodeData state = widget where
             style = currentStyle wenv node
             isActive = clickable && isNodeActive wenv node
             isHovered = clickable && isNodeHovered wenv node
-            hc = Just $ _ndHighlightColor nodeData
             vp'@(Rect x' y' w' h') = getContentArea node style
             shakeDelta = fromIntegral $ ts-shakeStart
             p = shakeDelta/animationDuration
@@ -239,32 +204,37 @@ makeGameControlNode nodeData state = widget where
                     dy = h*(1-progress)/2
                     vp' = Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
                     activeColor' = if null node'
-                        then _ndNullActiveColor nodeData
-                        else (fromJust node') ^. activeColor
+                        then _nodeActive colorConfig
+                        else _nodeColorActive $ fromJust node'
                     hoverColor' = if null node'
-                        then _ndNullHoverColor nodeData
-                        else (fromJust node') ^. hoverColor
+                        then _nodeHover colorConfig
+                        else _nodeColorHover $ fromJust node'
                     color' = if null node'
-                        then _ndNullColor nodeData
-                        else (fromJust node') ^. color
+                        then _nodeDefault colorConfig
+                        else _nodeColorDefault $ fromJust node'
                 drawEllipse renderer vp' $ Just $ if isActive
                     then activeColor'
                     else if isHovered
                         then hoverColor'
                         else color'
             else drawEllipse renderer vp $ _sstFgColor style
+        let highlightColor = Just $ if null nodeStack
+                then _nodeHighlight colorConfig
+                else _nodeColorHighlight nodeHead
         when clickable $ do
-            drawEllipseBorder renderer vp hc 2
+            drawEllipseBorder renderer vp highlightColor 2
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack
     position = _ndPosition nodeData
     clickable = _ndClickable nodeData
-    animationDuration = _ndAnimationDuration nodeData
+    animationDuration = _gccAnimationDuration config
+    colorConfig = _nccDefault $ _gcccNode $ _gccColorConfig config
+    config = _ndConfig nodeData
     basicStyle = def
         { _styleBasic = Just $ def
             { _sstFgColor = Just $ if null nodeStack
-                then _ndNullColor nodeData
-                else nodeHead ^. color
+                then _nodeDefault colorConfig
+                else _nodeColorDefault nodeHead
             }
         }

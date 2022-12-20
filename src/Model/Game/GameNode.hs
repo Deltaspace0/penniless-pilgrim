@@ -1,23 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Model.Game.Node
-    ( Node(..)
+module Model.Game.GameNode
+    ( GameNode(..)
     ) where
 
 import Data.Aeson
 import Data.Text
 
-data Node
+data GameNode
     = NodePilgrim
     | NodePath
     | NodeGoal
     deriving (Eq, Show)
 
-instance FromJSON Node where
-    parseJSON = withText "Node" $ \v -> return $ case v of
+instance FromJSON GameNode where
+    parseJSON = withText "GameNode" $ \v -> return $ case v of
         "NodePilgrim" -> NodePilgrim
         "NodePath" -> NodePath
         "NodeGoal" -> NodeGoal
 
-instance ToJSON Node where
+instance ToJSON GameNode where
     toJSON = String . pack . show

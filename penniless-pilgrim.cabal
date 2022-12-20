@@ -27,6 +27,10 @@ library
       Composites
       Composites.Config
       Composites.Config.Model
+      Composites.Config.Parameters
+      Composites.Config.Parameters.ColorConfig
+      Composites.Config.Parameters.ConfigSlider
+      Composites.Config.Parameters.RGB
       Composites.Config.UI
       Composites.GameSL
       Composites.GameSL.GameInfo
@@ -35,18 +39,22 @@ library
       Model
       Model.Direction
       Model.Game
-      Model.Game.Link
-      Model.Game.Node
+      Model.Game.GameLink
+      Model.Game.GameNode
       Model.Game.Pilgrim
       Model.Grid
-      Model.Parameters
-      Model.Parameters.Colors
-      Model.Parameters.ConfigSlider
       UI
       Util
       Widgets.GameControl
-      Widgets.GameControl.Link
-      Widgets.GameControl.Node
+      Widgets.GameControl.GameControlColorConfig
+      Widgets.GameControl.GameControlConfig
+      Widgets.GameControl.GameControlLink
+      Widgets.GameControl.GameControlLink.LinkColorConfig
+      Widgets.GameControl.GameControlLink.LinkVisual
+      Widgets.GameControl.GameControlNode
+      Widgets.GameControl.GameControlNode.NodeColorConfig
+      Widgets.GameControl.GameControlNode.NodeColors
+      Widgets.GameControl.GameControlNode.NodeVisual
   other-modules:
       Paths_penniless_pilgrim
   hs-source-dirs:

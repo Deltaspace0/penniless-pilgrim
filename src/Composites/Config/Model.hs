@@ -4,7 +4,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Composites.Config.Model
-    ( ConfigEvent(..)
+    ( module Composites.Config.Parameters
+    , ConfigEvent(..)
     , ConfigModel(..)
     , filePath
     , initialSaveCaption
@@ -13,6 +14,8 @@ module Composites.Config.Model
     , loadCaption
     , parameters
     , onGridDimensionsChange
+    , configFromGame
+    , gameFromConfig
     , initConfigModel
     , handleConfigEvent
     ) where
@@ -24,14 +27,15 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
-import Model.Parameters
+import Composites.Config.Parameters
+import Model.Game
 
 data ConfigEvent
     = ConfigSave
     | ConfigLoad
     | ConfigSetSaveCaption Text
     | ConfigSetLoadCaption Text
-    | ConfigSetParameters AppParameters
+    | ConfigSetParameters Parameters
     | ConfigReportGDC
     deriving (Eq, Show)
 
@@ -41,7 +45,7 @@ data ConfigModel ep = ConfigModel
     , _cfgInitialLoadCaption :: Text
     , _cfgSaveCaption :: Text
     , _cfgLoadCaption :: Text
-    , _cfgParameters :: AppParameters
+    , _cfgParameters :: Parameters
     , _cfgOnGridDimensionsChange :: ep
     } deriving (Eq, Show)
 
@@ -50,11 +54,22 @@ type EventHandle sp ep = ConfigModel ep ->
 
 makeLensesWith abbreviatedFields 'ConfigModel
 
+configFromGame :: Game -> ConfigModel ep -> ConfigModel ep
+configFromGame game model = model
+    & parameters . gridColumnsSlider . csCurrent .~ cols'
+    & parameters . gridRowsSlider . csCurrent .~ rows' where
+        (cols, rows) = getBounds $ _grid game
+        cols' = fromIntegral $ cols+1
+        rows' = fromIntegral $ rows+1
+
+gameFromConfig :: ConfigModel ep -> Game
+gameFromConfig model = gameFromParameters $ model ^. parameters
+
 initConfigModel :: ep -> Maybe String -> IO (ConfigModel ep)
 initConfigModel onGridDimensionsChange path = do
     parameters' <- if null path
         then return def
-        else snd <$> fromFile (fromJust path)
+        else snd <$> parametersFromFile (fromJust path)
     let saveCaption' = "Save config to file"
         loadCaption' = "Load config from file"
     return $ ConfigModel
@@ -83,7 +98,7 @@ saveHandle model = [Task taskHandler] where
             parameters' = model ^. parameters
         success <- if null path
             then return False
-            else toFile parameters' $ fromJust path
+            else parametersToFile parameters' $ fromJust path
         return $ ConfigSetSaveCaption $ if success
             then "Successfully saved config to file"
             else "Couldn't save config to file"
@@ -94,7 +109,7 @@ loadHandle model = [Producer producerHandler] where
         let path = model ^. filePath
         (success, parameters') <- if null path
             then return (False, def)
-            else fromFile $ fromJust path
+            else parametersFromFile $ fromJust path
         let model' = model & parameters .~ parameters'
             caption = if success
                 then "Successfully loaded config from file"
@@ -112,7 +127,7 @@ setLoadCaptionHandle :: Text -> EventHandle sp ep
 setLoadCaptionHandle text model = [Model model'] where
     model' = model & loadCaption .~ text
 
-setParametersHandle :: AppParameters -> EventHandle sp ep
+setParametersHandle :: Parameters -> EventHandle sp ep
 setParametersHandle parameters' model = [Model model'] where
     model' = model & parameters .~ parameters'
 

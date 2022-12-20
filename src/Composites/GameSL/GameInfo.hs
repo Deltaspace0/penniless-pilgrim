@@ -3,8 +3,8 @@
 module Composites.GameSL.GameInfo
     ( GameInfo(..)
     , fromGame
-    , fromFile
-    , toFile
+    , gameInfoFromFile
+    , gameInfoToFile
     ) where
 
 import Control.Exception
@@ -47,8 +47,8 @@ fromGame game = do
             <> "\t\t" <> (pack $ show utcTime)
     return $ GameInfo game caption
 
-fromFile :: String -> IO (Bool, Seq GameInfo)
-fromFile path = do
+gameInfoFromFile :: String -> IO (Bool, Seq GameInfo)
+gameInfoFromFile path = do
     let handler = const $ return "" :: SomeException -> IO String
     file <- catch (readFile path) handler
     let contents = BLU.fromString file
@@ -57,8 +57,8 @@ fromFile path = do
         then (False, Seq.empty)
         else (True, Seq.fromList $ fromJust savedGames)
 
-toFile :: Seq GameInfo -> String -> IO Bool
-toFile savedGames path = do
+gameInfoToFile :: Seq GameInfo -> String -> IO Bool
+gameInfoToFile savedGames path = do
     let converted = encodePretty $ toList savedGames
         contents = BLU.toString converted
         operation = writeFile path contents

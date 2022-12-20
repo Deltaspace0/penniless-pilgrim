@@ -58,14 +58,17 @@ gameControlM :: AppModel -> WidgetNode AppModel AppEvent
 gameControlM model = gameControl $ GameControlData
     { _gcdGameLens = gameSLModel . currentGame
     , _gcdNextTaxLens = nextTax
-    , _gcdColors = get colors
-    , _gcdAnimationDuration = get $ gridAnimationSlider . csCurrent
-    , _gcdLinkToNodeRatio = get $ linkToNodeSlider  . csCurrent
-    , _gcdNodeToWidthRatio = get $ nodeToWidthSlider . csCurrent
-    , _gcdWidth = get gameControlWidth
-    , _gcdHeight = get gameControlHeight
+    , _gcdConfig = GameControlConfig
+        { _gccColorConfig = _ccGameControl $ get colorConfig
+        , _gccAnimationDuration = getS gridAnimationSlider
+        , _gccLinkToNodeRatio = getS linkToNodeSlider
+        , _gccNodeToWidthRatio = getS nodeToWidthSlider
+        , _gccWidth = get gameControlWidth
+        , _gccHeight = get gameControlHeight
+        }
     } where
         get f = model ^. configModel . parameters . f
+        getS slider = get $ slider . csCurrent
 
 bigNumberLabel
     :: Maybe Double
