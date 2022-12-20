@@ -3,8 +3,8 @@
 module Model.Game
     ( module Model.Game.Link
     , module Model.Game.Node
+    , module Model.Game.Pilgrim
     , module Model.Grid
-    , module Model.Pilgrim
     , Game(..)
     , makeGame
     , makeGame_
@@ -21,8 +21,8 @@ import Data.Maybe
 
 import Model.Game.Link
 import Model.Game.Node
+import Model.Game.Pilgrim
 import Model.Grid
-import Model.Pilgrim
 
 data Game = Game
     { _grid :: Grid Node Link

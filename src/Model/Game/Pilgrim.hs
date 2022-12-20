@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Model.Pilgrim
+module Model.Game.Pilgrim
     ( module Model.Direction
     , Pilgrim(..)
     , updateTax

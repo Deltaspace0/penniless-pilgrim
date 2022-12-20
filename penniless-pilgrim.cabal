@@ -37,11 +37,11 @@ library
       Model.Game
       Model.Game.Link
       Model.Game.Node
+      Model.Game.Pilgrim
       Model.Grid
       Model.Parameters
       Model.Parameters.Colors
       Model.Parameters.ConfigSlider
-      Model.Pilgrim
       UI
       Util
       Widgets.GameControl
