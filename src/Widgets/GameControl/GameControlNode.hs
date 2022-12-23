@@ -180,31 +180,11 @@ makeGameControlNode nodeData state = widget where
         let ts = wenv ^. L.timestamp
             animationQueue = reverse $ _nsAnimationStack state
             style = currentStyle wenv node
-            isActive = clickable && isNodeActive wenv node
-            isHovered = clickable && isNodeHovered wenv node
             vp@(Rect x y w h) = getShakeArea node style ts
         if _nsRunning state
-            then forM_ animationQueue $ \(start, node') -> do
+            then forM_ animationQueue $ \(start, visual) -> do
                 let delta = fromIntegral $ ts-start
-                    p = delta/animationDuration
-                    progress = max 0 $ min 1 p
-                    dx = w*(1-progress)/2
-                    dy = h*(1-progress)/2
-                    vp' = Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
-                    activeColor' = if null node'
-                        then _nodeActive colorConfig
-                        else _nodeColorActive $ fromJust node'
-                    hoverColor' = if null node'
-                        then _nodeHover colorConfig
-                        else _nodeColorHover $ fromJust node'
-                    color' = if null node'
-                        then _nodeDefault colorConfig
-                        else _nodeColorDefault $ fromJust node'
-                drawEllipse renderer vp' $ Just $ if isActive
-                    then activeColor'
-                    else if isHovered
-                        then hoverColor'
-                        else color'
+                renderAnimation wenv node renderer vp delta visual
             else drawEllipse renderer vp $ _sstFgColor style
         let highlightColor = Just $ if null nodeStack
                 then _nodeHighlight colorConfig
@@ -219,11 +199,35 @@ makeGameControlNode nodeData state = widget where
         vp@(Rect x y w h) = getContentArea node style
         dx = w*sf/2
         dy = h*sf/2
-        sf = (1+(sin $ shakeProgress*pi*7/2))/5
-        shakeProgress = max 0 $ min 1 p
-        p = shakeDelta/animationDuration
-        shakeDelta = fromIntegral $ ts-shakeStart
-        shakeStart = _nsShakeStart state
+        sf = (1+(sin $ progress*pi*7/2))/5
+        progress = max 0 $ min 1 $ delta/animationDuration
+        delta = fromIntegral $ ts-(_nsShakeStart state)
+
+    renderAnimation wenv node renderer vp delta visual = do
+        let Rect x y w h = vp
+            progress = max 0 $ min 1 $ delta/animationDuration
+            dx = w*(1-progress)/2
+            dy = h*(1-progress)/2
+            vp' = Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
+            isActive = clickable && isNodeActive wenv node
+            isHovered = clickable && isNodeHovered wenv node
+            color = Just $ getColor isActive isHovered visual
+        drawEllipse renderer vp' color
+
+    getColor isActive isHovered visual
+        | isActive = activeColor
+        | isHovered = hoverColor
+        | otherwise = defaultColor
+        where
+            activeColor = if null visual
+                then _nodeActive colorConfig
+                else _nodeColorActive $ fromJust visual
+            hoverColor = if null visual
+                then _nodeHover colorConfig
+                else _nodeColorHover $ fromJust visual
+            defaultColor = if null visual
+                then _nodeDefault colorConfig
+                else _nodeColorDefault $ fromJust visual
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack
