@@ -179,23 +179,11 @@ makeGameControlNode nodeData state = widget where
     render wenv node renderer = do
         let ts = wenv ^. L.timestamp
             animationQueue = reverse $ _nsAnimationStack state
-            running = _nsRunning state
-            shakeRunning = _nsShakeRunning state
-            shakeStart = _nsShakeStart state
             style = currentStyle wenv node
             isActive = clickable && isNodeActive wenv node
             isHovered = clickable && isNodeHovered wenv node
-            vp'@(Rect x' y' w' h') = getContentArea node style
-            shakeDelta = fromIntegral $ ts-shakeStart
-            p = shakeDelta/animationDuration
-            shakeProgress = max 0 $ min 1 p
-            sf = (1+(sin $ shakeProgress*pi*7/2))/5
-            dx = w'*sf/2
-            dy = h'*sf/2
-            vp@(Rect x y w h) = if shakeRunning
-                then Rect (x'+dx) (y'+dy) (w'-dx*2) (h'-dy*2)
-                else vp'
-        if running
+            vp@(Rect x y w h) = getShakeArea node style ts
+        if _nsRunning state
             then forM_ animationQueue $ \(start, node') -> do
                 let delta = fromIntegral $ ts-start
                     p = delta/animationDuration
@@ -223,6 +211,19 @@ makeGameControlNode nodeData state = widget where
                 else _nodeColorHighlight nodeHead
         when clickable $ do
             drawEllipseBorder renderer vp highlightColor 2
+
+    getShakeArea node style ts = shakeArea where
+        shakeArea = if _nsShakeRunning state
+            then Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
+            else vp
+        vp@(Rect x y w h) = getContentArea node style
+        dx = w*sf/2
+        dy = h*sf/2
+        sf = (1+(sin $ shakeProgress*pi*7/2))/5
+        shakeProgress = max 0 $ min 1 p
+        p = shakeDelta/animationDuration
+        shakeDelta = fromIntegral $ ts-shakeStart
+        shakeStart = _nsShakeStart state
 
     nodeStack = _ndNodeStack nodeData
     nodeHead = head nodeStack
