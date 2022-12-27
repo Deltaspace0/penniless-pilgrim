@@ -48,13 +48,25 @@ library
       Widgets.GameControl
       Widgets.GameControl.GameControlColorConfig
       Widgets.GameControl.GameControlConfig
-      Widgets.GameControl.GameControlLink
-      Widgets.GameControl.GameControlLink.LinkColorConfig
-      Widgets.GameControl.GameControlLink.LinkVisual
-      Widgets.GameControl.GameControlNode
-      Widgets.GameControl.GameControlNode.NodeColorConfig
-      Widgets.GameControl.GameControlNode.NodeColors
-      Widgets.GameControl.GameControlNode.NodeVisual
+      Widgets.GameControl.GameControlData
+      Widgets.GameControl.GameControlRenderer
+      Widgets.GameControl.GameControlState
+      Widgets.GameControlLink
+      Widgets.GameControlLink.LinkColorConfig
+      Widgets.GameControlLink.LinkData
+      Widgets.GameControlLink.LinkRenderer
+      Widgets.GameControlLink.LinkState
+      Widgets.GameControlLink.LinkVisual
+      Widgets.GameControlNode
+      Widgets.GameControlNode.NodeColorConfig
+      Widgets.GameControlNode.NodeColors
+      Widgets.GameControlNode.NodeData
+      Widgets.GameControlNode.NodeMessage
+      Widgets.GameControlNode.NodeRenderer
+      Widgets.GameControlNode.NodeState
+      Widgets.GameControlNode.NodeVisual
+      Widgets.GameControlNode.ShakeState
+      Widgets.GameControlNode.VisualState
   other-modules:
       Paths_penniless_pilgrim
   hs-source-dirs:

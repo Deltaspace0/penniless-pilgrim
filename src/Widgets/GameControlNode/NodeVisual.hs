@@ -1,4 +1,4 @@
-module Widgets.GameControl.GameControlNode.NodeVisual
+module Widgets.GameControlNode.NodeVisual
     ( NodeVisual(..)
     , nodeTransform
     ) where
@@ -6,7 +6,7 @@ module Widgets.GameControl.GameControlNode.NodeVisual
 import Monomer
 
 import Model.Game
-import Widgets.GameControl.GameControlNode.NodeColorConfig
+import Widgets.GameControlNode.NodeColorConfig
 
 data NodeVisual = NodeVisual
     { _nodeColorHighlight :: Color

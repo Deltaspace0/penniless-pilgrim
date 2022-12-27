@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Widgets.GameControl.GameControlNode.NodeColorConfig
-    ( module Widgets.GameControl.GameControlNode.NodeColors
+module Widgets.GameControlNode.NodeColorConfig
+    ( module Widgets.GameControlNode.NodeColors
     , NodeColorConfig(..)
     ) where
 
@@ -9,7 +9,7 @@ import Data.Aeson
 import Data.Default
 import Monomer
 
-import Widgets.GameControl.GameControlNode.NodeColors
+import Widgets.GameControlNode.NodeColors
 
 data NodeColorConfig = NodeColorConfig
     { _nccDefault :: NodeColors

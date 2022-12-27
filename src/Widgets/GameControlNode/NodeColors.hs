@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Widgets.GameControl.GameControlNode.NodeColors
+module Widgets.GameControlNode.NodeColors
     ( NodeColors(..)
     ) where
 

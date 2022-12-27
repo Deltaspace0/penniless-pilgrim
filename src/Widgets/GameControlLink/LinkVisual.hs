@@ -1,4 +1,4 @@
-module Widgets.GameControl.GameControlLink.LinkVisual
+module Widgets.GameControlLink.LinkVisual
     ( LinkVisual(..)
     , hlinkTransform
     , vlinkTransform
@@ -7,7 +7,7 @@ module Widgets.GameControl.GameControlLink.LinkVisual
 import Monomer
 
 import Model.Game
-import Widgets.GameControl.GameControlLink.LinkColorConfig
+import Widgets.GameControlLink.LinkColorConfig
 
 data LinkVisual = LinkVisual
     { _linkColor :: Color

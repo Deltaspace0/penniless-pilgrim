@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl.GameControlColorConfig
-    ( module Widgets.GameControl.GameControlLink.LinkColorConfig
-    , module Widgets.GameControl.GameControlNode.NodeColorConfig
+    ( module Widgets.GameControlLink.LinkColorConfig
+    , module Widgets.GameControlNode.NodeColorConfig
     , GameControlColorConfig(..)
     ) where
 
 import Data.Aeson
 import Data.Default
 
-import Widgets.GameControl.GameControlLink.LinkColorConfig
-import Widgets.GameControl.GameControlNode.NodeColorConfig
+import Widgets.GameControlLink.LinkColorConfig
+import Widgets.GameControlNode.NodeColorConfig
 
 data GameControlColorConfig = GameControlColorConfig
     { _gcccLink :: LinkColorConfig

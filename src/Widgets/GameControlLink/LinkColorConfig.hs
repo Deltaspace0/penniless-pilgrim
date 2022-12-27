@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Widgets.GameControl.GameControlLink.LinkColorConfig
+module Widgets.GameControlLink.LinkColorConfig
     ( LinkColorConfig(..)
     ) where
 

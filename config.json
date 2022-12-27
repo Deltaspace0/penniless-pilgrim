@@ -36,96 +36,125 @@
     },
     "game_control_width": 400,
     "game_control_height": 500,
-    "colors": {
-        "node_pilgrim_hover": {
-            "r": 116,
-            "g": 248,
-            "b": 111
-        },
-        "node_pilgrim_default": {
-            "r": 60,
-            "g": 247,
-            "b": 53
-        },
-        "node_pilgrim_active": {
-            "r": 36,
-            "g": 181,
-            "b": 31
-        },
-        "node_path_hover": {
-            "r": 245,
-            "g": 132,
-            "b": 105
-        },
-        "node_path_default": {
-            "r": 247,
-            "g": 105,
-            "b": 70
-        },
-        "node_path_active": {
-            "r": 185,
-            "g": 75,
-            "b": 48
-        },
-        "node_hover": {
-            "r": 157,
-            "g": 157,
-            "b": 149
-        },
-        "node_highlight": {
-            "r": 234,
-            "g": 232,
-            "b": 233
-        },
-        "node_goal_hover": {
-            "r": 230,
-            "g": 238,
-            "b": 98
-        },
-        "node_goal_default": {
-            "r": 221,
-            "g": 230,
-            "b": 58
-        },
-        "node_goal_active": {
-            "r": 162,
-            "g": 169,
-            "b": 42
-        },
-        "node_default": {
-            "r": 120,
-            "g": 120,
-            "b": 117
-        },
-        "node_active": {
-            "r": 105,
-            "g": 104,
-            "b": 103
-        },
-        "link_west": {
-            "r": 247,
-            "g": 105,
-            "b": 70
-        },
-        "link_south": {
-            "r": 247,
-            "g": 105,
-            "b": 70
-        },
-        "link_north": {
-            "r": 247,
-            "g": 105,
-            "b": 70
-        },
-        "link_east": {
-            "r": 247,
-            "g": 105,
-            "b": 70
-        },
-        "link_default": {
-            "r": 120,
-            "g": 120,
-            "b": 117
+    "color_config": {
+        "game_control": {
+            "node": {
+                "pilgrim": {
+                    "hover": {
+                        "r": 116,
+                        "g": 248,
+                        "b": 111
+                    },
+                    "highlight": {
+                        "r": 234,
+                        "g": 232,
+                        "b": 233
+                    },
+                    "default": {
+                        "r": 60,
+                        "g": 247,
+                        "b": 53
+                    },
+                    "active": {
+                        "r": 36,
+                        "g": 181,
+                        "b": 31
+                    }
+                },
+                "path": {
+                    "hover": {
+                        "r": 245,
+                        "g": 132,
+                        "b": 105
+                    },
+                    "highlight": {
+                        "r": 234,
+                        "g": 232,
+                        "b": 233
+                    },
+                    "default": {
+                        "r": 247,
+                        "g": 105,
+                        "b": 70
+                    },
+                    "active": {
+                        "r": 185,
+                        "g": 75,
+                        "b": 48
+                    }
+                },
+                "goal": {
+                    "hover": {
+                        "r": 230,
+                        "g": 238,
+                        "b": 98
+                    },
+                    "highlight": {
+                        "r": 234,
+                        "g": 232,
+                        "b": 233
+                    },
+                    "default": {
+                        "r": 221,
+                        "g": 230,
+                        "b": 58
+                    },
+                    "active": {
+                        "r": 162,
+                        "g": 169,
+                        "b": 42
+                    }
+                },
+                "default": {
+                    "hover": {
+                        "r": 157,
+                        "g": 157,
+                        "b": 149
+                    },
+                    "highlight": {
+                        "r": 234,
+                        "g": 232,
+                        "b": 233
+                    },
+                    "default": {
+                        "r": 120,
+                        "g": 120,
+                        "b": 117
+                    },
+                    "active": {
+                        "r": 105,
+                        "g": 104,
+                        "b": 103
+                    }
+                }
+            },
+            "link": {
+                "west": {
+                    "r": 247,
+                    "g": 105,
+                    "b": 70
+                },
+                "south": {
+                    "r": 247,
+                    "g": 105,
+                    "b": 70
+                },
+                "north": {
+                    "r": 247,
+                    "g": 105,
+                    "b": 70
+                },
+                "east": {
+                    "r": 247,
+                    "g": 105,
+                    "b": 70
+                },
+                "default": {
+                    "r": 120,
+                    "g": 120,
+                    "b": 117
+                }
+            }
         }
     }
 }
