@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.35.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -32,10 +32,6 @@ library
       Composites.Config.Parameters.ConfigSlider
       Composites.Config.Parameters.RGB
       Composites.Config.UI
-      Composites.GameSL
-      Composites.GameSL.GameInfo
-      Composites.GameSL.Model
-      Composites.GameSL.UI
       Model
       Model.Direction
       Model.Game
@@ -43,6 +39,11 @@ library
       Model.Game.GameNode
       Model.Game.Pilgrim
       Model.Grid
+      Monomer.SaveManager
+      Monomer.SaveManager.SaveManagerCfg
+      Monomer.SaveManager.SaveManagerEvent
+      Monomer.SaveManager.SaveManagerModel
+      Monomer.SaveManager.UI
       UI
       Util
       Widgets.GameControl
