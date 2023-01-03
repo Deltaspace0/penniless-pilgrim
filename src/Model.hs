@@ -45,7 +45,7 @@ data AppMenu
 
 data AppEvent
     = AppInit
-    | AppResizeGrid
+    | AppUpdateGameWithConfig
     | AppSetGame Game
     | AppSaveGamesToFile (Saves Game)
     deriving (Eq, Show)
@@ -64,7 +64,8 @@ makeLensesWith abbreviatedFields 'AppModel
 
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
-    configModel' <- initConfigModel AppResizeGrid configPath
+    let event = AppUpdateGameWithConfig
+    configModel' <- initConfigModel event configPath
     let game = gameFromConfig configModel'
         gameSaves' = initSaveManagerModel game
         handler = const $ return "" :: SomeException -> IO String
@@ -94,8 +95,8 @@ gameSavesCaptionMethod game time = caption where
     rows' = showt $ rows+1
     (cols, rows) = getBounds $ _grid game
 
-resizeGridHandle :: EventHandle
-resizeGridHandle model = [Model model'] where
+updateGameWithConfigHandle :: EventHandle
+updateGameWithConfigHandle model = [Model model'] where
     model' = model
         & gameSaves . initData .~ game
         & gameSaves . currentData .~ game'
@@ -126,6 +127,6 @@ saveGamesToFileHandle games model = [Producer handler] where
 handleEvent :: AppEventHandler AppModel AppEvent
 handleEvent _ _ model event = case event of
     AppInit -> [SetFocusOnKey "mainGrid"]
-    AppResizeGrid -> resizeGridHandle model
+    AppUpdateGameWithConfig -> updateGameWithConfigHandle model
     AppSetGame game -> setGameHandle game model
     AppSaveGamesToFile games -> saveGamesToFileHandle games model
