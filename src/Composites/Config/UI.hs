@@ -14,13 +14,13 @@ import Util
 
 configComposite
     :: (Eq ep, CompositeEvent sp, CompositeEvent ep)
-    => ALens' sp (ConfigModel ep)
+    => ALens' sp ConfigModel
     -> WidgetNode sp ep
 configComposite modelLens = composite' where
     composite' = composite wt modelLens buildUI handleConfigEvent
     wt = "configComposite"
 
-buildUI :: UIBuilder (ConfigModel ep) ConfigEvent
+buildUI :: UIBuilder ConfigModel ConfigEvent
 buildUI _ model = widgetTree where
     widgetTree = vstack'
         [ button (model ^. saveCaption) ConfigSave
@@ -39,16 +39,16 @@ buildUI _ model = widgetTree where
     reportEvent = ConfigReportGameChange
 
 configSlider
-    :: ConfigModel ep
+    :: ConfigModel
     -> Lens' Parameters ConfigSlider
-    -> [WidgetNode (ConfigModel ep) ConfigEvent]
+    -> [WidgetNode ConfigModel ConfigEvent]
 configSlider model slider = configSlider_ model slider []
 
 configSlider_
-    :: ConfigModel ep
+    :: ConfigModel
     -> Lens' Parameters ConfigSlider
     -> [ConfigEvent]
-    -> [WidgetNode (ConfigModel ep) ConfigEvent]
+    -> [WidgetNode ConfigModel ConfigEvent]
 configSlider_ model slider events =
     [ label $ caption <> " " <> showt' current
     , hstack_ [childSpacing_ 32]

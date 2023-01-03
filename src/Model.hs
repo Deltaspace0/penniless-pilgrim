@@ -52,7 +52,7 @@ data AppEvent
 
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu
-    , _appConfigModel :: ConfigModel AppEvent
+    , _appConfigModel :: ConfigModel
     , _appGameSaves :: SaveManagerModel Game
     , _appGameSavesPath :: Maybe String
     , _appNextTax :: Maybe Double
@@ -64,8 +64,7 @@ makeLensesWith abbreviatedFields 'AppModel
 
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
-    let event = AppUpdateGameWithConfig
-    configModel' <- initConfigModel event configPath
+    configModel' <- initConfigModel configPath
     let game = gameFromConfig configModel'
         gameSaves' = initSaveManagerModel game
         handler = const $ return "" :: SomeException -> IO String

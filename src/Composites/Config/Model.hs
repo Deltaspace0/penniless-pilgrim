@@ -13,7 +13,6 @@ module Composites.Config.Model
     , saveCaption
     , loadCaption
     , parameters
-    , onGridDimensionsChange
     , configFromGame
     , gameFromConfig
     , initConfigModel
@@ -39,22 +38,21 @@ data ConfigEvent
     | ConfigReportGameChange
     deriving (Eq, Show)
 
-data ConfigModel ep = ConfigModel
+data ConfigModel = ConfigModel
     { _cfgFilePath :: Maybe String
     , _cfgInitialSaveCaption :: Text
     , _cfgInitialLoadCaption :: Text
     , _cfgSaveCaption :: Text
     , _cfgLoadCaption :: Text
     , _cfgParameters :: Parameters
-    , _cfgOnGridDimensionsChange :: ep
     } deriving (Eq, Show)
 
-type EventHandle sp ep = ConfigModel ep ->
-    [EventResponse (ConfigModel ep) ConfigEvent sp ep]
+type EventHandle sp ep = ConfigModel ->
+    [EventResponse ConfigModel ConfigEvent sp ep]
 
 makeLensesWith abbreviatedFields 'ConfigModel
 
-configFromGame :: Game -> ConfigModel ep -> ConfigModel ep
+configFromGame :: Game -> ConfigModel -> ConfigModel
 configFromGame game model = model
     & parameters . gridColumnsSlider . csCurrent .~ cols'
     & parameters . gridRowsSlider . csCurrent .~ rows' where
@@ -62,11 +60,11 @@ configFromGame game model = model
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
 
-gameFromConfig :: ConfigModel ep -> Game
+gameFromConfig :: ConfigModel -> Game
 gameFromConfig model = gameFromParameters $ model ^. parameters
 
-initConfigModel :: ep -> Maybe String -> IO (ConfigModel ep)
-initConfigModel onGridDimensionsChange path = do
+initConfigModel :: Maybe String -> IO ConfigModel
+initConfigModel path = do
     parameters' <- if null path
         then return def
         else snd <$> parametersFromFile (fromJust path)
@@ -79,10 +77,9 @@ initConfigModel onGridDimensionsChange path = do
         , _cfgSaveCaption = saveCaption'
         , _cfgLoadCaption = loadCaption'
         , _cfgParameters = parameters'
-        , _cfgOnGridDimensionsChange = onGridDimensionsChange
         }
 
-handleConfigEvent :: EventHandler (ConfigModel ep) ConfigEvent sp ep
+handleConfigEvent :: EventHandler ConfigModel ConfigEvent sp ep
 handleConfigEvent _ _ model event = case event of
     ConfigSave -> saveHandle model
     ConfigLoad -> loadHandle model
@@ -132,5 +129,4 @@ setParametersHandle parameters' model = [Model model'] where
     model' = model & parameters .~ parameters'
 
 reportGameChangeHandle :: EventHandle sp ep
-reportGameChangeHandle model = [Report event] where
-    event = model ^. onGridDimensionsChange
+reportGameChangeHandle model = []
