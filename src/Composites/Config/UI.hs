@@ -29,13 +29,14 @@ buildUI _ model = widgetTree where
         ]
     paddedConfigSliders = configSliders `styleBasic` [paddingR 16]
     configSliders = vstack' $ concat
-        [ configSlider_ model gridColumnsSlider [ConfigReportGDC]
-        , configSlider_ model gridRowsSlider [ConfigReportGDC]
+        [ configSlider_ model gridColumnsSlider [reportEvent]
+        , configSlider_ model gridRowsSlider [reportEvent]
         , configSlider model gridAnimationSlider
         , configSlider model linkToNodeSlider
         , configSlider model nodeToWidthSlider
         ]
     vstack' = vstack_ [childSpacing_ 16]
+    reportEvent = ConfigReportGameChange
 
 configSlider
     :: ConfigModel ep

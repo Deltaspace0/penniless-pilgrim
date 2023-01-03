@@ -36,7 +36,7 @@ data ConfigEvent
     | ConfigSetSaveCaption Text
     | ConfigSetLoadCaption Text
     | ConfigSetParameters Parameters
-    | ConfigReportGDC
+    | ConfigReportGameChange
     deriving (Eq, Show)
 
 data ConfigModel ep = ConfigModel
@@ -89,7 +89,7 @@ handleConfigEvent _ _ model event = case event of
     ConfigSetSaveCaption text -> setSaveCaptionHandle text model
     ConfigSetLoadCaption text -> setLoadCaptionHandle text model
     ConfigSetParameters p -> setParametersHandle p model
-    ConfigReportGDC -> reportGDCHandle model
+    ConfigReportGameChange -> reportGameChangeHandle model
 
 saveHandle :: EventHandle sp ep
 saveHandle model = [Task taskHandler] where
@@ -116,7 +116,7 @@ loadHandle model = [Producer producerHandler] where
                 else "Couldn't load config from file"
         when success $ do
             raiseEvent $ ConfigSetParameters parameters'
-            raiseEvent ConfigReportGDC
+            raiseEvent ConfigReportGameChange
         raiseEvent $ ConfigSetLoadCaption caption
 
 setSaveCaptionHandle :: Text -> EventHandle sp ep
@@ -131,6 +131,6 @@ setParametersHandle :: Parameters -> EventHandle sp ep
 setParametersHandle parameters' model = [Model model'] where
     model' = model & parameters .~ parameters'
 
-reportGDCHandle :: EventHandle sp ep
-reportGDCHandle model = [Report onGridDimensionsChange'] where
-    onGridDimensionsChange' = model ^. onGridDimensionsChange
+reportGameChangeHandle :: EventHandle sp ep
+reportGameChangeHandle model = [Report event] where
+    event = model ^. onGridDimensionsChange
