@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Composites.Config
-    ( module Composites.Config.Model
+    ( module Composites.Config.ConfigModel
     , configComposite
     , configComposite_
     ) where
@@ -9,7 +9,8 @@ module Composites.Config
 import Control.Lens
 import Monomer
 
-import Composites.Config.Model
+import Composites.Config.ConfigEvent
+import Composites.Config.ConfigModel
 import Composites.Config.UI
 
 configComposite
@@ -26,4 +27,4 @@ configComposite_
 configComposite_ modelLens onGameChange = composite' where
     composite' = composite wt modelLens buildUI eventHandler
     wt = "configComposite"
-    eventHandler = handleConfigEvent onGameChange
+    eventHandler = handleEvent onGameChange

@@ -26,7 +26,8 @@ library
   exposed-modules:
       Composites
       Composites.Config
-      Composites.Config.Model
+      Composites.Config.ConfigEvent
+      Composites.Config.ConfigModel
       Composites.Config.Parameters
       Composites.Config.Parameters.ColorConfig
       Composites.Config.Parameters.ConfigSlider

@@ -8,7 +8,8 @@ module Composites.Config.UI
 import Control.Lens
 import Monomer
 
-import Composites.Config.Model
+import Composites.Config.ConfigEvent
+import Composites.Config.ConfigModel
 import Composites.Config.Parameters
 import Util
 
