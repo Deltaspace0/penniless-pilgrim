@@ -34,6 +34,9 @@ library
       Composites.Config.Parameters.RGB
       Composites.Config.UI
       Model
+      Model.AppEvent
+      Model.AppMenu
+      Model.AppModel
       Model.Direction
       Model.Game
       Model.Game.GameLink
