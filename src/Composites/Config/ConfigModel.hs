@@ -49,9 +49,8 @@ gameFromConfig model = gameFromParameters $ model ^. parameters
 
 initConfigModel :: Maybe String -> IO ConfigModel
 initConfigModel path = do
-    parameters' <- if null path
-        then return def
-        else snd <$> parametersFromFile (fromJust path)
+    let f = fmap snd . parametersFromFile
+    parameters' <- fromMaybe (pure def) $ f <$> path
     let saveCaption' = "Save config to file"
         loadCaption' = "Load config from file"
     return $ ConfigModel

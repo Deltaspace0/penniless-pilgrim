@@ -123,9 +123,7 @@ parametersFromFile path = do
     file <- catch (readFile path) handler
     let contents = BLU.fromString file
         parameters = decode contents :: Maybe Parameters
-    return $ if null parameters
-        then (False, def)
-        else (True, fromJust parameters)
+    return $ fromMaybe (False, def) $ (,) True <$> parameters
 
 parametersToFile :: Parameters -> String -> IO Bool
 parametersToFile parameters path = do

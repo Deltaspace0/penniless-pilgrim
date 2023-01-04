@@ -42,9 +42,7 @@ nextPosition West (x, y) = (x-1, y)
 nextPosition East (x, y) = (x+1, y)
 
 relativeDirection :: (Int, Int) -> (Int, Int) -> Maybe Direction
-relativeDirection (x, y) (x1, y1) = if null ix
-    then Nothing
-    else Just $ directions!!(fromJust ix) where
-        ix = elemIndex (x1, y1) positions
-        directions = [North, South, West, East]
-        positions = [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]
+relativeDirection (x, y) (x1, y1) = (directions!!) <$> ix where
+    ix = elemIndex (x1, y1) positions
+    directions = [North, South, West, East]
+    positions = [(x, y-1), (x, y+1), (x-1, y), (x+1, y)]

@@ -91,17 +91,11 @@ renderVisual nodeRenderer vp ts visualState = do
 
 getColor :: NodeData s -> Bool -> Bool -> Maybe NodeVisual -> Color
 getColor nodeData isActive isHovered visual
-    | isActive = activeColor
-    | isHovered = hoverColor
-    | otherwise = defaultColor
+    | isActive = fromMaybe (_nodeActive colorConfig) visualActive
+    | isHovered = fromMaybe (_nodeHover colorConfig) visualHover
+    | otherwise = fromMaybe (_nodeDefault colorConfig) visualDefault
     where
-        activeColor = if null visual
-            then _nodeActive colorConfig
-            else _nodeColorActive $ fromJust visual
-        hoverColor = if null visual
-            then _nodeHover colorConfig
-            else _nodeColorHover $ fromJust visual
-        defaultColor = if null visual
-            then _nodeDefault colorConfig
-            else _nodeColorDefault $ fromJust visual
         colorConfig = getDefaultNodeColors nodeData
+        visualActive = _nodeColorActive <$> visual
+        visualHover = _nodeColorHover <$> visual
+        visualDefault = _nodeColorDefault <$> visual

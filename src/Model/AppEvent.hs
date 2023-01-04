@@ -51,10 +51,7 @@ setGameHandle game model = [Model model'] where
 
 saveGamesToFileHandle :: Saves Game -> EventHandle
 saveGamesToFileHandle games model = [Producer handler] where
-    handler _ = if null path
-        then return ()
-        else tryOperation >> return ()
-    tryOperation = try operation :: IO (Either SomeException ())
-    operation = writeFile (fromJust path) contents
-    path = model ^. gameSavesPath
+    handler _ = fromMaybe (pure ()) $ (>> pure ()) <$> res
+    res = try <$> operation :: Maybe (IO (Either SomeException ()))
+    operation = (flip writeFile) contents <$> model ^. gameSavesPath
     contents = BLU.toString $ encodePretty $ toList games
