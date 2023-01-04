@@ -132,4 +132,6 @@ setParametersHandle parameters' model = [Model model'] where
     model' = model & parameters .~ parameters'
 
 reportGameChangeHandle :: Maybe ep -> EventHandle sp ep
-reportGameChangeHandle onGameChange model = []
+reportGameChangeHandle onGameChange _ = if null onGameChange
+    then []
+    else [Report $ fromJust onGameChange]
