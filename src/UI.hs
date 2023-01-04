@@ -29,8 +29,8 @@ buildUI _ model = widgetTree where
     side = case model ^. activeMenu of
         Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine
-            , configComposite configModel
-            ]
+            , configComposite_ configModel onGameChange
+            ] where onGameChange = Just AppUpdateGameWithConfig
         Just GameSavesMenu -> vstack' $ sideWidgets <>
             [ separatorLine
             , saveManager_ gameSaves
