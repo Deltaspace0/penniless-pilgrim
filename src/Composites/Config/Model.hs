@@ -79,14 +79,17 @@ initConfigModel path = do
         , _cfgParameters = parameters'
         }
 
-handleConfigEvent :: EventHandler ConfigModel ConfigEvent sp ep
-handleConfigEvent _ _ model event = case event of
+handleConfigEvent
+    :: Maybe ep
+    -> EventHandler ConfigModel ConfigEvent sp ep
+handleConfigEvent onGameChange _ _ model event = case event of
     ConfigSave -> saveHandle model
     ConfigLoad -> loadHandle model
     ConfigSetSaveCaption text -> setSaveCaptionHandle text model
     ConfigSetLoadCaption text -> setLoadCaptionHandle text model
     ConfigSetParameters p -> setParametersHandle p model
-    ConfigReportGameChange -> reportGameChangeHandle model
+    ConfigReportGameChange ->
+        reportGameChangeHandle onGameChange model
 
 saveHandle :: EventHandle sp ep
 saveHandle model = [Task taskHandler] where
@@ -128,5 +131,5 @@ setParametersHandle :: Parameters -> EventHandle sp ep
 setParametersHandle parameters' model = [Model model'] where
     model' = model & parameters .~ parameters'
 
-reportGameChangeHandle :: EventHandle sp ep
-reportGameChangeHandle model = []
+reportGameChangeHandle :: Maybe ep -> EventHandle sp ep
+reportGameChangeHandle onGameChange model = []
