@@ -86,8 +86,8 @@ removeHandle _ model = responses where
 setSavedDataHandle :: Saves a -> EventHandle a sp ep
 setSavedDataHandle newSavedData config model = responses where
     responses = (Model $ model & savedData .~ newSavedData):req
-    req = RequestParent <$> (($ newSavedData) <$> onChangeReq)
-    onChangeReq = _smcOnChangeReq config
+    req = RequestParent <$> (($ newSavedData) <$> onSavesChangeReq)
+    onSavesChangeReq = _smcOnSavesChangeReq config
 
 setSelectedDataHandle :: Maybe Int -> EventHandle a sp ep
 setSelectedDataHandle newSelectedData _ model = [Model model'] where

@@ -34,7 +34,7 @@ buildUI _ model = widgetTree where
         Just GameSavesMenu -> vstack' $ sideWidgets <>
             [ separatorLine
             , saveManager_ gameSaves
-                [ onChange AppSaveGamesToFile
+                [ onSavesChange AppSaveGamesToFile
                 , captionMethod gameSavesCaptionMethod
                 ]
             ]
