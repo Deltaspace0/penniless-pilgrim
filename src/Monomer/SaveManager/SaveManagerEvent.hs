@@ -48,7 +48,7 @@ handleEvent config _ node model event = case event of
 newSlotHandle :: EventHandle a sp ep
 newSlotHandle config model = [Producer handler] where
     handler raiseEvent = do
-        x <- makeCaption config $ model ^. initData
+        x <- makeCaption config $ model ^. currentData
         raiseEvent $ EventSetSavedData $ x <| (model ^. savedData)
         raiseEvent $ EventSetSelectedData $ Just 0
 

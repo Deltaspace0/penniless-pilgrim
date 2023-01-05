@@ -8,6 +8,7 @@ module Model.AppModel
     , AppModel(..)
     , activeMenu
     , configModel
+    , initGame
     , gameSaves
     , gameSavesPath
     , nextTax
@@ -34,6 +35,7 @@ import Model.Game
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu
     , _appConfigModel :: ConfigModel
+    , _appInitGame :: Game
     , _appGameSaves :: SaveManagerModel Game
     , _appGameSavesPath :: Maybe String
     , _appNextTax :: Maybe Double
@@ -56,6 +58,7 @@ initModel configPath gamesPath = do
     return $ AppModel
         { _appActiveMenu = Nothing
         , _appConfigModel = configModel'
+        , _appInitGame = game
         , _appGameSaves = gameSaves' & savedData .~ savedGames
         , _appGameSavesPath = gamesPath
         , _appNextTax = Nothing

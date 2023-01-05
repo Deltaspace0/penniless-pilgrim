@@ -40,18 +40,15 @@ buildUI _ model = widgetTree where
             ]
         _ -> boxCenter $ vstack' sideWidgets
     sideWidgets =
-        [ totalTaxLabel
-        , nextTaxLabel
+        [ bigNumberLabel totalTax "Total tax: "
+        , bigNumberLabel nextTax' "Next tax: "
         , boxCenter $ hstack' $
-            [ button "Reset" $ AppSetGame initialGame
+            [ button "Reset" $ AppSetGame $ model ^. initGame
             , optionButton "Save/load game" gameSavesMenu activeMenu
             , optionButton "Config" configMenu activeMenu
             ] <> [hideButton | not $ null $ model ^. activeMenu]
         ]
-    totalTaxLabel = bigNumberLabel totalTax "Total tax: "
-    nextTaxLabel = bigNumberLabel nextTax' "Next tax: "
     totalTax = Just $ _tax $ _pilgrim currentGame
-    initialGame = model ^. gameSaves . initData
     currentGame = model ^. gameSaves . currentData
     nextTax' = model ^. nextTax
     gameSavesMenu = Just GameSavesMenu

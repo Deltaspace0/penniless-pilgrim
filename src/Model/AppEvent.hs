@@ -37,7 +37,7 @@ handleEvent _ _ model event = case event of
 updateGameWithConfigHandle :: EventHandle
 updateGameWithConfigHandle model = [Model model'] where
     model' = model
-        & gameSaves . initData .~ game
+        & initGame .~ game
         & gameSaves . currentData .~ game'
     game = gameFromConfig $ model ^. configModel
     game' = fromMaybe game $ applyPath directions game

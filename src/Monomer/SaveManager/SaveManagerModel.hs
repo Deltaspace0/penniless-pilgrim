@@ -5,7 +5,6 @@
 module Monomer.SaveManager.SaveManagerModel
     ( SaveManagerModel(..)
     , savedData
-    , initData
     , currentData
     , selectedData
     , initSaveManagerModel
@@ -18,7 +17,6 @@ import qualified Data.Sequence as Seq
 
 data SaveManagerModel a = SaveManagerModel
     { _smmSavedData :: Seq (a, Text)
-    , _smmInitData :: a
     , _smmCurrentData :: a
     , _smmSelectedData :: Maybe Int
     } deriving Eq
@@ -26,9 +24,8 @@ data SaveManagerModel a = SaveManagerModel
 makeLensesWith abbreviatedFields 'SaveManagerModel
 
 initSaveManagerModel :: a -> (SaveManagerModel a)
-initSaveManagerModel initData' = SaveManagerModel
+initSaveManagerModel initData = SaveManagerModel
     { _smmSavedData = Seq.empty
-    , _smmInitData = initData'
-    , _smmCurrentData = initData'
+    , _smmCurrentData = initData
     , _smmSelectedData = Nothing
     }
