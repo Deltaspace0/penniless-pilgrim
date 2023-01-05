@@ -46,7 +46,7 @@ mergeState oldState wenv ts gcData newNode = (newState, reqs) where
         then oldState
         else GameControlState
             { _gcsFixedRect = newFixedRect
-            , _gcsOldFixedRect = oldFixedRect
+            , _gcsOldFixedRect = oldFixedRect'
             , _gcsRunning = animationDuration' > 0
             , _gcsStart = ts
             }
