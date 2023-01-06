@@ -2,6 +2,10 @@
     [
         {
             "grid": {
+                "bounds": [
+                    7,
+                    7
+                ],
                 "hlinks": {
                     "array": [
                         null,
@@ -234,6 +238,10 @@
     [
         {
             "grid": {
+                "bounds": [
+                    4,
+                    4
+                ],
                 "hlinks": {
                     "array": [
                         "LinkForward",

@@ -33,7 +33,7 @@ getFixedRect gcData wenv = Rect x y linkSize nodeSize where
     nodeSize = linkSize/linkToNodeRatio
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
-    (cols, rows) = getBounds $ getGrid gcData wenv
+    (cols, rows) = _gridBounds $ getGrid gcData wenv
     width = _gccWidth config
     height = _gccHeight config
     linkToNodeRatio = _gccLinkToNodeRatio config
@@ -127,7 +127,7 @@ handleGameChange wenv node gcData f = result where
     shakeNodeId = shakeNode ^. L.info ^. L.widgetId
     shakeNode = Seq.index (node ^. L.children) $ x*(rows+1)+y
     (x, y) = _position $ _pilgrim game
-    rows = snd $ getBounds $ getGrid gcData wenv
+    rows = snd $ _gridBounds $ getGrid gcData wenv
     gameLens = WidgetLens $ _gcdGameLens gcData
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 

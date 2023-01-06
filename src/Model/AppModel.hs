@@ -74,4 +74,4 @@ gameSavesCaptionMethod game time = caption where
     pilgrim = _pilgrim game
     cols' = showt $ cols+1
     rows' = showt $ rows+1
-    (cols, rows) = getBounds $ _grid game
+    (cols, rows) = _gridBounds $ _grid game

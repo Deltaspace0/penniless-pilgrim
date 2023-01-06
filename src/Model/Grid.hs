@@ -25,7 +25,6 @@ module Model.Grid
     , getNodeSequence
     , getHlinkSequence
     , getVlinkSequence
-    , getBounds
     , gridMap
     ) where
 
@@ -44,6 +43,7 @@ data Grid a b = Grid
     { _gridNodes :: Array Point [a]
     , _gridHlinks :: Array Point (Maybe b)
     , _gridVlinks :: Array Point (Maybe b)
+    , _gridBounds :: (Int, Int)
     } deriving (Eq, Show)
 
 instance (FromJSON a) => FromJSON (Array Point a) where
@@ -67,12 +67,14 @@ instance (FromJSON a, FromJSON b) => FromJSON (Grid a b) where
         <$> v .: "nodes"
         <*> v .: "hlinks"
         <*> v .: "vlinks"
+        <*> v .: "bounds"
 
 instance (ToJSON a, ToJSON b) => ToJSON (Grid a b) where
     toJSON grid = object
         [ "nodes" .= _gridNodes grid
         , "hlinks" .= _gridHlinks grid
         , "vlinks" .= _gridVlinks grid
+        , "bounds" .= _gridBounds grid
         ]
 
 makeLensesWith abbreviatedFields 'Grid
@@ -86,13 +88,14 @@ makeGrid w h = grid where
         { _gridNodes = listArray ibounds $ repeat []
         , _gridHlinks = listArray hbounds $ repeat Nothing
         , _gridVlinks = listArray vbounds $ repeat Nothing
+        , _gridBounds = (w-1, h-1)
         }
 
 isInside :: Point -> Grid a b -> Bool
 isInside (x, y) grid = checkX && checkY where
     checkX = x >= 0 && x <= cols
     checkY = y >= 0 && y <= rows
-    (cols, rows) = snd $ bounds $ grid ^. nodes
+    (cols, rows) = _gridBounds grid
 
 getNode :: Point -> Grid a b -> [a]
 getNode p grid = grid ^. nodes . ix p
@@ -161,16 +164,13 @@ getVlinkSequence grid = Seq.fromList $ f <$> xs where
     xs = getVlinkIndices grid
     f p = (p, (grid ^. vlinks)!p)
 
-getBounds :: Grid a b -> Point
-getBounds grid = snd $ bounds $ grid ^. nodes
-
 gridMap
     :: ([a] -> [a'])
     -> (Maybe b -> Maybe b')
     -> (Maybe b -> Maybe b')
     -> Grid a b
     -> Grid a' b'
-gridMap nodeTransform hlinkTransform vlinkTransform grid = Grid
+gridMap nodeTransform hlinkTransform vlinkTransform grid = grid
     { _gridNodes = amap nodeTransform $ grid ^. nodes
     , _gridHlinks = amap hlinkTransform $ grid ^. hlinks
     , _gridVlinks = amap vlinkTransform $ grid ^. vlinks

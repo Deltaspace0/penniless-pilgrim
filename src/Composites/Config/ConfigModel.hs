@@ -40,7 +40,7 @@ configFromGame :: Game -> ConfigModel -> ConfigModel
 configFromGame game model = model
     & parameters . gridColumnsSlider . csCurrent .~ cols'
     & parameters . gridRowsSlider . csCurrent .~ rows' where
-        (cols, rows) = getBounds $ _grid game
+        (cols, rows) = _gridBounds $ _grid game
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
 
