@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Game.GameLink
@@ -6,16 +7,12 @@ module Model.Game.GameLink
 
 import Data.Aeson
 import Data.Text
+import GHC.Generics
 
 data GameLink
     = LinkBack
     | LinkForward
-    deriving (Eq, Show)
+    deriving (Eq, Show, Generic)
 
-instance FromJSON GameLink where
-    parseJSON = withText "GameLink" $ \v -> return $ case v of
-        "LinkBack" -> LinkBack
-        "LinkForward" -> LinkForward
-
-instance ToJSON GameLink where
-    toJSON = String . pack . show
+instance FromJSON GameLink
+instance ToJSON GameLink

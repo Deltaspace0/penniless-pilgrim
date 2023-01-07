@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Direction
@@ -11,23 +12,17 @@ import Data.Aeson
 import Data.List
 import Data.Maybe
 import Data.Text (pack)
+import GHC.Generics
 
 data Direction
     = North
     | South
     | West
     | East
-    deriving (Eq, Show)
+    deriving (Eq, Show, Generic)
 
-instance FromJSON Direction where
-    parseJSON = withText "Direction" $ \v -> return $ case v of
-        "North" -> North
-        "South" -> South
-        "West" -> West
-        "East" -> East
-
-instance ToJSON Direction where
-    toJSON = String . pack . show
+instance FromJSON Direction
+instance ToJSON Direction
 
 getOpposite :: Direction -> Direction
 getOpposite North = South

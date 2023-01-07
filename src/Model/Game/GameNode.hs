@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Game.GameNode
@@ -6,18 +7,13 @@ module Model.Game.GameNode
 
 import Data.Aeson
 import Data.Text
+import GHC.Generics
 
 data GameNode
     = NodePilgrim
     | NodePath
     | NodeGoal
-    deriving (Eq, Show)
+    deriving (Eq, Show, Generic)
 
-instance FromJSON GameNode where
-    parseJSON = withText "GameNode" $ \v -> return $ case v of
-        "NodePilgrim" -> NodePilgrim
-        "NodePath" -> NodePath
-        "NodeGoal" -> NodeGoal
-
-instance ToJSON GameNode where
-    toJSON = String . pack . show
+instance FromJSON GameNode
+instance ToJSON GameNode
