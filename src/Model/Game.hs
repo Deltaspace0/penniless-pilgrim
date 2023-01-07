@@ -15,6 +15,7 @@ module Model.Game
     , taxFromGame
     ) where
 
+import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Default
 import Data.Maybe
@@ -101,4 +102,10 @@ directionFromGame (x, y) game
         p = _position $ _pilgrim game
 
 taxFromGame :: (Int, Int) -> Game -> Maybe Double
-taxFromGame p game = _tax . _pilgrim <$> jumpPilgrim p game
+taxFromGame p game = moveResult <|> nodeResult where
+    moveResult = _tax . _pilgrim <$> nextGame
+    nextGame = directionFromGame p game >>= (flip movePilgrim) game
+    nodeResult = getTax $ getNode p $ _grid game
+    getTax [] = Nothing
+    getTax (NodePath tax:xs) = Just tax
+    getTax (_:xs) = getTax xs
