@@ -51,11 +51,10 @@ getMiddleRect rectA rectB progress = rect where
 
 assignAreas
     :: WidgetEnv s e
-    -> WidgetNode s e
     -> Rect
     -> GameControlData s
     -> Seq Rect
-assignAreas wenv node vp gcData = assignedAreas where
+assignAreas wenv vp gcData = assignedAreas where
     assignedAreas =
            fmap (getNodeArea . fst) (getNodeSequence grid)
         >< fmap (getLinkArea . fst) (getHlinkSequence grid)

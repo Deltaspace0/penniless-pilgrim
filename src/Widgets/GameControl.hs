@@ -79,7 +79,7 @@ makeGameControl gcData state = widget where
         height = _gccHeight $ _gcdConfig gcData
 
     resize wenv node vp _ = (resultNode node, assignedAreas) where
-        assignedAreas = assignAreas wenv node vp gcData        
+        assignedAreas = assignAreas wenv vp gcData        
 
     render wenv node renderer = runRenderer $ GameControlRenderer
         { _gcrEnv = wenv
