@@ -69,7 +69,8 @@ movePilgrim d game = result where
     linkEmpty = null $ getLink p d grid
     nodeUpdate = if goingBack
         then nodeTransfer p p' . nodePop p'
-        else nodePush (p, NodePath) . nodeTransfer p p'
+        else nodePush (p, NodePath tax) . nodeTransfer p p'
+    tax = _tax pilgrim
     link | goingBack = Nothing
          | p == min p p' = Just LinkForward
          | otherwise = Just LinkBack

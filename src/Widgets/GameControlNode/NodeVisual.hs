@@ -19,7 +19,7 @@ nodeTransform :: NodeColorConfig -> [GameNode] -> [NodeVisual]
 nodeTransform config = map getVisual where
     getVisual node = f $ case node of
         NodePilgrim -> _nccPilgrim config
-        NodePath -> _nccPath config
+        NodePath _ -> _nccPath config
         NodeGoal -> _nccGoal config
     f colors = NodeVisual
         { _nodeColorHighlight = _nodeHighlight colors

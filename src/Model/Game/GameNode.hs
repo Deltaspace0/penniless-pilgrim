@@ -11,7 +11,7 @@ import GHC.Generics
 
 data GameNode
     = NodePilgrim
-    | NodePath
+    | NodePath Double
     | NodeGoal
     deriving (Eq, Show, Generic)
 
