@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -28,11 +29,11 @@ module Model.Grid
     , gridMap
     ) where
 
-import Control.Lens hiding (indices, (.=))
-import Data.Aeson hiding (Array)
-import Data.Array.IArray
+import Control.Lens hiding ((.=))
+import Data.Aeson
+import Data.Ix
 import Data.Maybe
-import Data.Sequence (Seq(..))
+import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 
 import Model.Direction
@@ -40,56 +41,43 @@ import Model.Direction
 type Point = (Int, Int)
 
 data Grid a b = Grid
-    { _gridNodes :: Array Point [a]
-    , _gridHlinks :: Array Point (Maybe b)
-    , _gridVlinks :: Array Point (Maybe b)
+    { _gridStructure :: Seq (Seq ([a], Maybe b, Maybe b))
     , _gridBounds :: (Int, Int)
     } deriving (Eq, Show)
 
-instance (FromJSON a) => FromJSON (Array Point a) where
-    parseJSON = withObject "Array" $ \v -> do
-        startBounds <- v .: "start_bounds"
-        endBounds <- v .: "end_bounds"
-        array <- v .: "array"
-        let bounds = (startBounds, endBounds)
-        return $ listArray bounds array
-
-instance (ToJSON a) => ToJSON (Array Point a) where
-    toJSON array = object
-        [ "start_bounds" .= startBounds
-        , "end_bounds" .= endBounds
-        , "array" .= elems array
-        ] where
-            (startBounds, endBounds) = bounds array
-
 instance (FromJSON a, FromJSON b) => FromJSON (Grid a b) where
     parseJSON = withObject "Grid" $ \v -> Grid
-        <$> v .: "nodes"
-        <*> v .: "hlinks"
-        <*> v .: "vlinks"
+        <$> v .: "structure"
         <*> v .: "bounds"
 
 instance (ToJSON a, ToJSON b) => ToJSON (Grid a b) where
     toJSON grid = object
-        [ "nodes" .= _gridNodes grid
-        , "hlinks" .= _gridHlinks grid
-        , "vlinks" .= _gridVlinks grid
+        [ "structure" .= _gridStructure grid
         , "bounds" .= _gridBounds grid
         ]
 
 makeLensesWith abbreviatedFields 'Grid
 
+point :: Point -> Lens' (Seq (Seq a)) a
+point (x, y) = lens getter setter where
+    getter s = Seq.index (Seq.index s y) x
+    setter s v = Seq.adjust (Seq.update x v) y s
+
+chunkNode :: Point -> Lens' (Grid a b) [a]
+chunkNode p = structure . point p . _1
+
+chunkLink :: Point -> Direction -> Lens' (Grid a b) (Maybe b)
+chunkLink p d = if d `elem` [West, East]
+    then structure . point (min p $ nextPosition d p) . _2
+    else structure . point (min p $ nextPosition d p) . _3
+
 makeGrid :: Int -> Int -> Grid a b
 makeGrid w h = grid where
-    hbounds = ((0, 0), (w-2, h-1))
-    vbounds = ((0, 0), (w-1, h-2))
-    ibounds = ((0, 0), (w-1, h-1))
     grid = Grid
-        { _gridNodes = listArray ibounds $ repeat []
-        , _gridHlinks = listArray hbounds $ repeat Nothing
-        , _gridVlinks = listArray vbounds $ repeat Nothing
+        { _gridStructure = Seq.replicate h $ Seq.replicate w chunk
         , _gridBounds = (w-1, h-1)
         }
+    chunk = ([], Nothing, Nothing)
 
 isInside :: Point -> Grid a b -> Bool
 isInside (x, y) grid = checkX && checkY where
@@ -98,71 +86,65 @@ isInside (x, y) grid = checkX && checkY where
     (cols, rows) = _gridBounds grid
 
 getNode :: Point -> Grid a b -> [a]
-getNode p grid = grid ^. nodes . ix p
+getNode p grid = grid ^. chunkNode p
 
 setNode :: Point -> [a] -> Grid a b -> Grid a b
-setNode p node = nodes . ix p .~ node
+setNode p node = chunkNode p .~ node
 
 nodePeek :: Point -> Grid a b -> a
-nodePeek p grid = head $ grid ^. nodes . ix p
+nodePeek p grid = head $ grid ^. chunkNode p
 
 nodePush :: (Point, a) -> Grid a b -> Grid a b
-nodePush (p, t) = nodes . ix p %~ (t:)
+nodePush (p, t) = chunkNode p %~ (t:)
 
 nodePop :: Point -> Grid a b -> Grid a b
-nodePop p = nodes . ix p %~ tail
+nodePop p = chunkNode p %~ tail
 
 nodeTransfer :: Point -> Point -> Grid a b -> Grid a b
 nodeTransfer p p' grid = let t = nodePeek p grid in
     nodePush (p', t) $ nodePop p grid
 
 getLink :: Point -> Direction -> Grid a b -> Maybe b
-getLink p d grid = if d `elem` [West, East]
-    then (grid ^. hlinks)!p'
-    else (grid ^. vlinks)!p' where
-        p' = min p $ nextPosition d p
+getLink p d grid = grid ^. chunkLink p d
 
 setLink :: Point -> Direction -> Maybe b -> Grid a b -> Grid a b
-setLink p d link = if d `elem` [West, East]
-    then hlinks . ix p' .~ link
-    else vlinks . ix p' .~ link where
-        p' = min p $ nextPosition d p
+setLink p d link = chunkLink p d .~ link
 
 getHlink :: Point -> Grid a b -> Maybe b
-getHlink p grid = (grid ^. hlinks)!p
+getHlink p grid = grid ^. chunkLink p East
 
 setHlink :: Point -> Maybe b -> Grid a b -> Grid a b
-setHlink p link = hlinks . ix p .~ link
+setHlink p link = chunkLink p East .~ link
 
 getVlink :: Point -> Grid a b -> Maybe b
-getVlink p grid = (grid ^. vlinks)!p
+getVlink p grid = grid ^. chunkLink p South
 
 setVlink :: Point -> Maybe b -> Grid a b -> Grid a b
-setVlink p link = vlinks . ix p .~ link
+setVlink p link = chunkLink p South .~ link
 
 getNodeIndices :: Grid a b -> [Point]
-getNodeIndices grid = indices $ grid ^. nodes
+getNodeIndices grid = range ((0, 0), grid ^. bounds)
 
 getHlinkIndices :: Grid a b -> [Point]
-getHlinkIndices grid = indices $ grid ^. hlinks
+getHlinkIndices grid = range ((0, 0), grid ^. bounds & _1 -~ 1)
 
 getVlinkIndices :: Grid a b -> [Point]
-getVlinkIndices grid = indices $ grid ^. vlinks
+getVlinkIndices grid = range ((0, 0), grid ^. bounds & _2 -~ 1)
 
 getNodeSequence :: Grid a b -> Seq (Point, [a])
 getNodeSequence grid = Seq.fromList $ f <$> xs where
     xs = getNodeIndices grid
-    f p = (p, (grid ^. nodes)!p)
+    f p = (p, grid ^. chunkNode p)
 
 getHlinkSequence :: Grid a b -> Seq (Point, Maybe b)
 getHlinkSequence grid = Seq.fromList $ f <$> xs where
     xs = getHlinkIndices grid
-    f p = (p, (grid ^. hlinks)!p)
+    f p = (p, grid ^. chunkLink p East)
 
 getVlinkSequence :: Grid a b -> Seq (Point, Maybe b)
 getVlinkSequence grid = Seq.fromList $ f <$> xs where
     xs = getVlinkIndices grid
-    f p = (p, (grid ^. vlinks)!p)
+    f p = (p, grid ^. chunkLink p South)
 
 gridMap
     :: ([a] -> [a'])
@@ -170,8 +152,9 @@ gridMap
     -> (Maybe b -> Maybe b')
     -> Grid a b
     -> Grid a' b'
-gridMap nodeTransform hlinkTransform vlinkTransform grid = grid
-    { _gridNodes = amap nodeTransform $ grid ^. nodes
-    , _gridHlinks = amap hlinkTransform $ grid ^. hlinks
-    , _gridVlinks = amap vlinkTransform $ grid ^. vlinks
-    }
+gridMap fn fh fv grid = newGrid where
+    newGrid = grid
+        { _gridStructure = newStructure
+        }
+    newStructure = _gridStructure grid & traverse . traverse %~ f
+    f (node, hlink, vlink) = (fn node, fh hlink, fv vlink)

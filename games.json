@@ -6,154 +6,190 @@
                     4,
                     4
                 ],
-                "hlinks": {
-                    "array": [
-                        "LinkForward",
-                        null,
-                        null,
-                        null,
-                        null,
-                        "LinkForward",
-                        "LinkForward",
-                        "LinkBack",
-                        null,
-                        null,
-                        null,
-                        "LinkForward",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                    ],
-                    "end_bounds": [
-                        3,
-                        4
-                    ],
-                    "start_bounds": [
-                        0,
-                        0
-                    ]
-                },
-                "nodes": {
-                    "array": [
+                "structure": [
+                    [
                         [
-                            {
-                                "contents": 0,
-                                "tag": "NodePath"
-                            }
-                        ],
-                        [],
-                        [],
-                        [],
-                        [],
-                        [
-                            {
-                                "contents": 2,
-                                "tag": "NodePath"
-                            }
+                            [
+                                {
+                                    "contents": 0,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            "LinkForward",
+                            null
                         ],
                         [
-                            {
-                                "contents": 7,
-                                "tag": "NodePath"
-                            }
+                            [
+                                {
+                                    "contents": 2,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            "LinkForward",
+                            null
                         ],
                         [
-                            {
-                                "contents": 14,
-                                "tag": "NodePath"
-                            }
-                        ],
-                        [],
-                        [],
-                        [
-                            {
-                                "contents": 4,
-                                "tag": "NodePath"
-                            }
+                            [
+                                {
+                                    "contents": 4,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            null,
+                            "LinkForward"
                         ],
                         [
-                            {
-                                "contents": 9,
-                                "tag": "NodePath"
-                            },
-                            {
-                                "contents": 8,
-                                "tag": "NodePath"
-                            }
+                            [],
+                            null,
+                            null
                         ],
                         [
-                            {
-                                "contents": 16,
-                                "tag": "NodePath"
-                            }
-                        ],
-                        [],
-                        [],
-                        [],
-                        [
-                            {
-                                "tag": "NodePilgrim"
-                            }
-                        ],
-                        [],
-                        [],
-                        [],
-                        [],
-                        [],
-                        [],
-                        [],
-                        [
-                            {
-                                "tag": "NodeGoal"
-                            }
+                            [],
+                            null,
+                            null
                         ]
                     ],
-                    "end_bounds": [
-                        4,
-                        4
+                    [
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [
+                                {
+                                    "contents": 7,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            "LinkForward",
+                            "LinkBack"
+                        ],
+                        [
+                            [
+                                {
+                                    "contents": 9,
+                                    "tag": "NodePath"
+                                },
+                                {
+                                    "contents": 8,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            "LinkForward",
+                            "LinkForward"
+                        ],
+                        [
+                            [
+                                {
+                                    "tag": "NodePilgrim"
+                                }
+                            ],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ]
                     ],
-                    "start_bounds": [
-                        0,
-                        0
+                    [
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [
+                                {
+                                    "contents": 14,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            "LinkBack",
+                            null
+                        ],
+                        [
+                            [
+                                {
+                                    "contents": 16,
+                                    "tag": "NodePath"
+                                }
+                            ],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ]
+                    ],
+                    [
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ]
+                    ],
+                    [
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [],
+                            null,
+                            null
+                        ],
+                        [
+                            [
+                                {
+                                    "tag": "NodeGoal"
+                                }
+                            ],
+                            null,
+                            null
+                        ]
                     ]
-                },
-                "vlinks": {
-                    "array": [
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "LinkBack",
-                        null,
-                        null,
-                        "LinkForward",
-                        "LinkForward",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                    ],
-                    "end_bounds": [
-                        4,
-                        3
-                    ],
-                    "start_bounds": [
-                        0,
-                        0
-                    ]
-                }
+                ]
             },
             "pilgrim": {
                 "path": [
@@ -207,6 +243,6 @@
                 "tax": 11
             }
         },
-        "5x5\t\tTax: 11.0\t\tX: 3\tY: 1\t\t2023-01-07 10:55:38.895582773 MSK"
+        "5x5\t\tTax: 11.0\t\tX: 3\tY: 1\t\t2023-01-08 20:39:58.382221072 MSK"
     ]
 ]
