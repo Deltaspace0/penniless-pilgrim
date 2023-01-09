@@ -37,11 +37,10 @@ initState gcData wenv = def
 mergeState
     :: GameControlState
     -> WidgetEnv s e
-    -> Millisecond
     -> GameControlData s
     -> WidgetNode s e
     -> (GameControlState, [WidgetRequest s e])
-mergeState oldState wenv ts gcData newNode = (newState, reqs) where
+mergeState oldState wenv gcData newNode = (newState, reqs) where
     newState = if sameFixedRect
         then oldState
         else GameControlState
@@ -65,3 +64,4 @@ mergeState oldState wenv ts gcData newNode = (newState, reqs) where
     widgetId = newNode ^. L.info . L.widgetId
     animationDuration' = floor animationDuration
     animationDuration = _gccAnimationDuration $ _gcdConfig gcData
+    ts = wenv ^. L.timestamp

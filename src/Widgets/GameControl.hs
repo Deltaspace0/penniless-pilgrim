@@ -49,8 +49,7 @@ makeGameControl gcData state = widget where
         result = resultReqs resNode reqs
         resNode = (makeChildren wenv newNode gcData) & L.widget .~ w
         w = makeGameControl gcData state'
-        (state', reqs) = mergeState oldState wenv ts gcData newNode
-        ts = wenv ^. L.timestamp
+        (state', reqs) = mergeState oldState wenv gcData newNode
 
     handleEvent wenv node _ event = case event of
         KeyAction _ code KeyPressed
