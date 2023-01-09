@@ -81,11 +81,11 @@ mergeState oldState ts nodeData newNode = (newState, reqs) where
     oldVisualStates = _nsVisualStates oldState
     newVisualStates = if null oldVisualStates
         then [visualState, def]
-        else visualState:(head oldVisualStates):filteredTail
+        else visualState:(oldRunningStates ++ (take 1 notRunning))
     visualState = VisualState
         { _vsVisual = newVisual
         , _vsStart = ts
         }
-    filteredTail = filter f $ tail oldVisualStates
+    (oldRunningStates, notRunning) = span f oldVisualStates
     f = isRunningVisualState animationDuration ts
     animationDuration = getAnimationDuration nodeData
