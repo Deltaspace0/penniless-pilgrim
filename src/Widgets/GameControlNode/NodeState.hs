@@ -7,6 +7,7 @@ module Widgets.GameControlNode.NodeState
     , mergeState
     ) where
 
+import Control.Lens
 import Data.Default
 import Monomer
 
@@ -27,16 +28,13 @@ instance Default NodeState where
 
 initState :: NodeData s -> NodeState
 initState nodeData = def
-    { _nsVisualStates = [visualState]
-    } where
-        visualState = VisualState
-            { _vsVisual = visual
+    { _nsVisualStates =
+        [ VisualState
+            { _vsVisual = _ndVisualStack nodeData ^? ix 0
             , _vsStart = -1000000
             }
-        visual = if null visualStack
-            then Nothing
-            else Just $ head visualStack
-        visualStack = _ndVisualStack nodeData
+        ]
+    }
 
 changeState
     :: NodeState
@@ -77,13 +75,9 @@ mergeState oldState ts nodeData newNode = (newState, reqs) where
     reqs = if newVisual == oldVisual
         then []
         else [requestRenderEvery newNode animationDuration]
-    newVisual = if null visualStack
-        then Nothing
-        else Just $ head visualStack
+    newVisual = visualStack ^? ix 0
+    oldVisual = _vsVisual =<< oldVisualStates ^? ix 0
     visualStack = _ndVisualStack nodeData
-    oldVisual = if null oldVisualStates
-        then Nothing
-        else _vsVisual $ head oldVisualStates
     oldVisualStates = _nsVisualStates oldState
     newVisualStates = if null oldVisualStates
         then [visualState, def]

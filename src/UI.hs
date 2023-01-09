@@ -81,6 +81,4 @@ bigNumberLabel number text = styledLabel where
         , textSize 24
         , sizeReqW $ expandSize 800 1
         ]
-    label' = if null number
-        then label text
-        else label $ text <> showt' (fromJust number)
+    label' = label $ fromMaybe text $ (text <>) . showt' <$> number
