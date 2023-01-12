@@ -46,15 +46,17 @@ data Grid a b = Grid
     } deriving (Eq, Show)
 
 instance (FromJSON a, FromJSON b) => FromJSON (Grid a b) where
-    parseJSON = withObject "Grid" $ \v -> Grid
-        <$> v .: "structure"
-        <*> v .: "bounds"
+    parseJSON v = do
+        structure' <- parseJSON v
+        let w = Seq.length $ Seq.index structure' 0
+            h = Seq.length structure'
+        return $ Grid
+            { _gridStructure = structure'
+            , _gridBounds = (w-1, h-1)
+            }
 
 instance (ToJSON a, ToJSON b) => ToJSON (Grid a b) where
-    toJSON grid = object
-        [ "structure" .= _gridStructure grid
-        , "bounds" .= _gridBounds grid
-        ]
+    toJSON grid = toJSON $ _gridStructure grid
 
 makeLensesWith abbreviatedFields 'Grid
 
