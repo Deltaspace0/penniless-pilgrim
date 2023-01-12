@@ -5,8 +5,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.Grid
-    ( Grid(..)
+    ( Grid
     , makeGrid
+    , getBounds
     , isInside
     , getNode
     , setNode
@@ -80,6 +81,9 @@ makeGrid w h = grid where
         , _gridBounds = (w-1, h-1)
         }
     chunk = ([], Nothing, Nothing)
+
+getBounds :: Grid a b -> (Int, Int)
+getBounds = _gridBounds
 
 isInside :: Point -> Grid a b -> Bool
 isInside (x, y) grid = checkX && checkY where
