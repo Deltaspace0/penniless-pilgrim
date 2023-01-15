@@ -58,7 +58,7 @@ changeState state ts nodeData node message = (state', reqs) where
     reqs = if message == NodeStartShake
         then [requestRenderEvery node animationDuration]
         else []
-    animationDuration = getAnimationDuration nodeData
+    animationDuration = _ndAnimationDuration nodeData
 
 mergeState
     :: NodeState
@@ -88,4 +88,4 @@ mergeState oldState ts nodeData newNode = (newState, reqs) where
         }
     (oldRunningStates, notRunning) = span f oldVisualStates
     f = isRunningVisualState animationDuration ts
-    animationDuration = getAnimationDuration nodeData
+    animationDuration = _ndAnimationDuration nodeData

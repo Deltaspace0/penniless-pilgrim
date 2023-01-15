@@ -8,7 +8,7 @@ import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControlNode.NodeColorConfig
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeState
 import Widgets.GameControlNode.NodeVisual
@@ -32,7 +32,7 @@ runRenderer nodeRenderer = do
         visualStates = reverse $ _nsVisualStates state
         style = currentStyle wenv node
         vp = getShakeArea nodeRenderer
-        animationDuration = getAnimationDuration nodeData
+        animationDuration = _ndAnimationDuration nodeData
     if null visualStates || floor animationDuration == 0
         then drawEllipse renderer vp $ _sstFgColor style
         else mapM_ (renderVisual nodeRenderer vp ts) visualStates
@@ -61,7 +61,7 @@ getShakeArea nodeRenderer = shakeArea where
     progress = max 0 $ min 1 $ delta/animationDuration
     delta = fromIntegral $ ts-(_ssStart $ _nsShakeState state)
     style = currentStyle wenv node
-    animationDuration = getAnimationDuration nodeData
+    animationDuration = _ndAnimationDuration nodeData
     ts = wenv ^. L.timestamp
 
 renderVisual
@@ -78,7 +78,7 @@ renderVisual nodeRenderer vp ts visualState = do
         VisualState visual start = visualState
         Rect x y w h = vp
         delta = fromIntegral $ ts-start
-        animationDuration = getAnimationDuration nodeData
+        animationDuration = _ndAnimationDuration nodeData
         progress = max 0 $ min 1 $ delta/animationDuration
         dx = w*(1-progress)/2
         dy = h*(1-progress)/2
