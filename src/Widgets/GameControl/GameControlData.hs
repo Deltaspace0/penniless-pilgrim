@@ -99,7 +99,9 @@ makeChildren wenv node gcData = resNode where
     linkData (p, link) = LinkData
         { _ldLink = link
         , _ldPosition = p
-        , _ldConfig = config
+        , _ldColorConfig = _gcccLink $ _gccColorConfig config
+        , _ldAnimationDuration = _gccAnimationDuration config
+        , _ldNodeToWidthRatio = _gccNodeToWidthRatio config
         }
     widgetId = node ^. L.info . L.widgetId
     config = _gcdConfig gcData

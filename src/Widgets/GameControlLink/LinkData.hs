@@ -4,20 +4,20 @@ module Widgets.GameControlLink.LinkData
     ( LinkData(..)
     , gameControlHlinkWidgetType
     , gameControlVlinkWidgetType
-    , getLinkColorConfig
-    , getAnimationDuration
     ) where
 
 import Monomer
 import TextShow
 
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControlLink.LinkColorConfig
 import Widgets.GameControlLink.LinkVisual
 
 data LinkData = LinkData
     { _ldLink :: Maybe LinkVisual
     , _ldPosition :: (Int, Int)
-    , _ldConfig :: GameControlConfig
+    , _ldColorConfig :: LinkColorConfig
+    , _ldAnimationDuration :: Double
+    , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)
 
 gameControlHlinkWidgetType :: LinkData -> WidgetType
@@ -27,11 +27,3 @@ gameControlHlinkWidgetType linkData = WidgetType widgetType where
 gameControlVlinkWidgetType :: LinkData -> WidgetType
 gameControlVlinkWidgetType linkData = WidgetType widgetType where
     widgetType = "gameControlVlink" <> showt (_ldPosition linkData)
-
-getLinkColorConfig :: LinkData -> LinkColorConfig
-getLinkColorConfig linkData = _gcccLink config where
-    config = _gccColorConfig $ _ldConfig linkData
-
-getAnimationDuration :: LinkData -> Double
-getAnimationDuration linkData = _gccAnimationDuration config where
-    config = _ldConfig linkData

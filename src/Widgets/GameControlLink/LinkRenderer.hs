@@ -8,7 +8,7 @@ import Monomer
 import qualified Monomer.Lens as L
 
 import Model.Game
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControlLink.LinkColorConfig
 import Widgets.GameControlLink.LinkData
 import Widgets.GameControlLink.LinkState
 import Widgets.GameControlLink.LinkVisual
@@ -32,11 +32,11 @@ runRenderer linkRenderer = do
         newLink = _lsLink state
         oldLink = _lsOldLink state
         delta = fromIntegral $ ts-(_lsStart state)
-        animationDuration = getAnimationDuration linkData
+        animationDuration = _ldAnimationDuration linkData
         progress = max 0 $ min 1 $ delta/animationDuration
         Just newLink' = newLink
         Just oldLink' = oldLink
-        colorConfig = getLinkColorConfig linkData
+        colorConfig = _ldColorConfig linkData
         new@(newColor, newForm) = if null newLink
             then (_lccDefault colorConfig, Nothing)
             else (_linkColor newLink', _linkForm newLink')
@@ -62,8 +62,7 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         linkData = _lrLinkData linkRenderer
         isHz = _lrIsHz linkRenderer
         style = currentStyle wenv node
-        vp = getContentArea node style
-        Rect x y linkSize nodeSize = vp
+        Rect x y linkSize nodeSize = getContentArea node style
         c = Just color'
         totalSize = linkSize-nodeSize*2
         totalSize' = totalSize*progress
@@ -72,7 +71,7 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         f x = if x == Just LinkBack then rest else 0
         s = s' + if null form' then f form'' else f form'
         b = s+totalSize'
-        nodeToWidthRatio = _gccNodeToWidthRatio $ _ldConfig linkData
+        nodeToWidthRatio = _ldNodeToWidthRatio linkData
         linkWidth = nodeSize/nodeToWidthRatio
         ars = if totalSize' > linkWidth*3
             then linkWidth*1.5

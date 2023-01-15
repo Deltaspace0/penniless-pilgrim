@@ -56,4 +56,4 @@ mergeState oldState ts linkData newNode = (newState, reqs) where
     delta = min animationDuration' (ts-oldStart)
     newStart = ts - animationDuration' + delta
     animationDuration' = floor animationDuration
-    animationDuration = getAnimationDuration linkData
+    animationDuration = _ldAnimationDuration linkData
