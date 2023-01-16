@@ -64,9 +64,9 @@ movePilgrim d game = result where
     grid = _grid game
     pilgrim = _pilgrim game
     p = _position pilgrim
-    p' = nextPosition d p
+    p' = getPositionInDirection d p
     inside = isInside p' grid
-    goingBack = isBack d pilgrim
+    goingBack = isOppositeToPilgrim d pilgrim
     linkEmpty = null $ getLink p d grid
     nodeUpdate = if goingBack
         then nodeTransfer p p' . nodePop p'
@@ -79,13 +79,14 @@ movePilgrim d game = result where
 jumpPilgrim :: (Int, Int) -> Game -> Maybe Game
 jumpPilgrim p game
     | not (null direction) = movePilgrim (fromJust direction) game
-    | elem p previousPositions = applyPath (reverse directions) game
+    | elem p previousPositions = applyPath directions game
     | otherwise = Nothing
     where
         direction = directionFromGame p game
         previousPositions = _previousPositions $ _pilgrim game
         path = _path $ _pilgrim game
-        directions = map (getOpposite . snd) $ ds ++ [head ds']
+        directions = reverse $ map f $ ds ++ [head ds']
+        f = getOppositeDirection . snd
         (ds, ds') = span ((/= p) . fst) $ zip previousPositions path
 
 applyPath :: [Direction] -> Game -> Maybe Game
@@ -98,7 +99,7 @@ directionFromGame (x, y) game
     | null (movePilgrim (fromJust direction) game) = Nothing
     | otherwise = direction
     where
-        direction = relativeDirection p (x, y)
+        direction = getRelativeDirection p (x, y)
         p = _position $ _pilgrim game
 
 taxFromGame :: (Int, Int) -> Game -> Maybe Double

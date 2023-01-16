@@ -4,7 +4,7 @@ module Model.Game.Pilgrim
     ( module Model.Direction
     , Pilgrim(..)
     , updateTax
-    , isBack
+    , isOppositeToPilgrim
     , updatePilgrim
     ) where
 
@@ -49,14 +49,14 @@ updateTax South t = t*2
 updateTax West t = t-2
 updateTax East t = t+2
 
-isBack :: Direction -> Pilgrim -> Bool
-isBack d pilgrim = not (null path) && d == opposite where
+isOppositeToPilgrim :: Direction -> Pilgrim -> Bool
+isOppositeToPilgrim d pilgrim = not (null path) && d == opp where
     path = _path pilgrim
-    opposite = getOpposite $ head path
+    opp = getOppositeDirection $ head path
 
 updatePilgrim :: Direction -> Pilgrim -> Pilgrim
 updatePilgrim d pilgrim = Pilgrim
-    { _position = nextPosition d $ _position pilgrim
+    { _position = getPositionInDirection d $ _position pilgrim
     , _previousPositions = if goingBack
         then tail previousPositions
         else (p:previousPositions)
@@ -65,7 +65,7 @@ updatePilgrim d pilgrim = Pilgrim
         else (d:path)
     , _tax = updateTax d $ _tax pilgrim
     } where
-        goingBack = isBack d pilgrim
+        goingBack = isOppositeToPilgrim d pilgrim
         p = _position pilgrim
         previousPositions = _previousPositions pilgrim
         path = _path pilgrim

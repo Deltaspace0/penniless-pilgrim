@@ -71,8 +71,8 @@ chunkNode p = structure . point p . _1
 
 chunkLink :: Point -> Direction -> Lens' (Grid a b) (Maybe b)
 chunkLink p d = if d `elem` [West, East]
-    then structure . point (min p $ nextPosition d p) . _2
-    else structure . point (min p $ nextPosition d p) . _3
+    then structure . point (min p $ getPositionInDirection d p) . _2
+    else structure . point (min p $ getPositionInDirection d p) . _3
 
 makeGrid :: Int -> Int -> Grid a b
 makeGrid w h = grid where
