@@ -10,6 +10,7 @@ import Monomer
 import qualified Monomer.Lens as L
 
 import Util
+import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
 
@@ -28,16 +29,21 @@ instance Default GameControlState where
         , _gcsStart = 0
         }
 
-initState :: GameControlData s -> WidgetEnv s e -> GameControlState
+initState
+    :: (ControlledGame a)
+    => GameControlData s a
+    -> WidgetEnv s e
+    -> GameControlState
 initState gcData wenv = def
     { _gcsFixedRect = getFixedRect gcData wenv
     , _gcsOldFixedRect = getFixedRect gcData wenv
     }
 
 mergeState
-    :: GameControlState
+    :: (ControlledGame a)
+    => GameControlState
     -> WidgetEnv s e
-    -> GameControlData s
+    -> GameControlData s a
     -> WidgetNode s e
     -> (GameControlState, [WidgetRequest s e])
 mergeState oldState wenv gcData newNode = (newState, reqs) where

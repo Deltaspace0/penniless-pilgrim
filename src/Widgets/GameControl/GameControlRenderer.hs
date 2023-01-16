@@ -12,15 +12,15 @@ import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
 import Widgets.GameControl.GameControlState
 
-data GameControlRenderer s e = GameControlRenderer
+data GameControlRenderer s e a = GameControlRenderer
     { _gcrEnv :: WidgetEnv s e
     , _gcrNode :: WidgetNode s e
     , _gcrRenderer :: Renderer
-    , _gcrData :: GameControlData s
+    , _gcrData :: GameControlData s a
     , _gcrState :: GameControlState
     }
 
-runRenderer :: GameControlRenderer s e -> IO ()
+runRenderer :: GameControlRenderer s e a -> IO ()
 runRenderer gcRenderer = do
     let wenv = _gcrEnv gcRenderer
         node = _gcrNode gcRenderer

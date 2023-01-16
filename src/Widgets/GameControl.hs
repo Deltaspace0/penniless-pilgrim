@@ -13,19 +13,24 @@ import Monomer
 import Monomer.Widgets.Container
 import qualified Monomer.Lens as L
 
-import Model
+import Model.Direction
+import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
 import Widgets.GameControl.GameControlRenderer
 import Widgets.GameControl.GameControlState
 
-gameControl :: GameControlData s -> WidgetNode s e
+gameControl
+    :: (ControlledGame a)
+    => GameControlData s a
+    -> WidgetNode s e
 gameControl gcData = node where
     node = defaultWidgetNode "gameControl" widget
     widget = makeGameControl gcData def
 
 makeGameControl
-    :: GameControlData s
+    :: (ControlledGame a)
+    => GameControlData s a
     -> GameControlState
     -> Widget s e
 makeGameControl gcData state = widget where
@@ -51,27 +56,27 @@ makeGameControl gcData state = widget where
         w = makeGameControl gcData state'
         (state', reqs) = mergeState oldState wenv gcData newNode
 
-    handleEvent wenv node _ event = case event of
-        KeyAction _ code KeyPressed
-            | isKeyNorth code -> handle North
-            | isKeySouth code -> handle South
-            | isKeyWest code -> handle West
-            | isKeyEast code -> handle East
-            where
-                isKeyNorth code = isKeyUp code || isKeyW code
-                isKeySouth code = isKeyDown code || isKeyS code
-                isKeyWest code = isKeyLeft code || isKeyA code
-                isKeyEast code = isKeyRight code || isKeyD code
-        ButtonAction _ _ BtnPressed _ -> Just result where
-            result = resultReqs node [SetFocus widgetId]
-        _ -> Nothing
-        where
-            widgetId = node ^. L.info . L.widgetId
-            handle = handleGameChange wenv node gcData . movePilgrim
+    handleEvent wenv node _ event = result where
+        result = case event of
+            KeyAction _ code KeyPressed
+                | isKeyNorth code -> handle North
+                | isKeySouth code -> handle South
+                | isKeyWest code -> handle West
+                | isKeyEast code -> handle East
+                where
+                    isKeyNorth code = isKeyUp code || isKeyW code
+                    isKeySouth code = isKeyDown code || isKeyS code
+                    isKeyWest code = isKeyLeft code || isKeyA code
+                    isKeyEast code = isKeyRight code || isKeyD code
+            ButtonAction _ _ BtnPressed _ -> Just result where
+                result = resultReqs node [SetFocus widgetId]
+            _ -> Nothing
+        widgetId = node ^. L.info . L.widgetId
+        handle = handleGameChange wenv node gcData . moveToDirection
 
     handleMessage wenv node _ message = result where
         result = cast message >>= handle
-        handle = handleGameChange wenv node gcData . jumpPilgrim
+        handle = handleGameChange wenv node gcData . moveToPosition
 
     getSizeReq _ _ _ = (fixedSize width, fixedSize height) where
         width = _gccWidth $ _gcdConfig gcData

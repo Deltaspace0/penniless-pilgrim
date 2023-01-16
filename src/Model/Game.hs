@@ -25,6 +25,7 @@ import Model.Game.GameLink
 import Model.Game.GameNode
 import Model.Game.Pilgrim
 import Model.Grid
+import Widgets.GameControl.ControlledGame
 
 data Game = Game
     { _grid :: Grid GameNode GameLink
@@ -41,6 +42,13 @@ instance ToJSON Game where
         [ "grid" .= _grid game
         , "pilgrim" .= _pilgrim game
         ]
+
+instance ControlledGame Game where
+    getCurrentPosition = _position . _pilgrim
+    getGameGrid = _grid
+    getScoreByPosition = taxFromGame
+    moveToDirection = movePilgrim
+    moveToPosition = jumpPilgrim
 
 makeGame :: Int -> Int -> Game
 makeGame w h = makeGame_ w h def
