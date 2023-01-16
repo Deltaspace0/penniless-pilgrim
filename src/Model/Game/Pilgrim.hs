@@ -15,15 +15,13 @@ import Model.Direction
 
 data Pilgrim = Pilgrim
     { _position :: (Int, Int)
-    , _previousPositions :: [(Int, Int)]
-    , _path :: [Direction]
+    , _path :: [((Int, Int), Direction)]
     , _tax :: Double
     } deriving (Eq, Show)
 
 instance Default Pilgrim where
     def = Pilgrim
         { _position = (0, 0)
-        , _previousPositions = []
         , _path = []
         , _tax = 0
         }
@@ -31,14 +29,12 @@ instance Default Pilgrim where
 instance FromJSON Pilgrim where
     parseJSON = withObject "Pilgrim" $ \v -> Pilgrim
         <$> v .: "position"
-        <*> v .: "previous_positions"
         <*> v .: "path"
         <*> v .: "tax"
 
 instance ToJSON Pilgrim where
     toJSON pilgrim = object
         [ "position" .= _position pilgrim
-        , "previous_positions" .= _previousPositions pilgrim
         , "path" .= _path pilgrim
         , "tax" .= _tax pilgrim
         ]
@@ -52,20 +48,13 @@ updateTax East t = t+2
 isOppositeToPilgrim :: Direction -> Pilgrim -> Bool
 isOppositeToPilgrim d pilgrim = not (null path) && d == opp where
     path = _path pilgrim
-    opp = getOppositeDirection $ head path
+    opp = getOppositeDirection $ snd $ head path
 
 updatePilgrim :: Direction -> Pilgrim -> Pilgrim
 updatePilgrim d pilgrim = Pilgrim
     { _position = getPositionInDirection d $ _position pilgrim
-    , _previousPositions = if goingBack
-        then tail previousPositions
-        else (p:previousPositions)
-    , _path = if goingBack
-        then tail path
-        else (d:path)
+    , _path = if isOppositeToPilgrim d pilgrim
+        then tail $ _path pilgrim
+        else (_position pilgrim, d):(_path pilgrim)
     , _tax = updateTax d $ _tax pilgrim
-    } where
-        goingBack = isOppositeToPilgrim d pilgrim
-        p = _position pilgrim
-        previousPositions = _previousPositions pilgrim
-        path = _path pilgrim
+    }

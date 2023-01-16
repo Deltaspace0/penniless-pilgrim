@@ -40,8 +40,8 @@ updateGameWithConfigHandle model = [Model model'] where
         & initGame .~ game
         & gameSaves . currentData .~ game'
     game = gameFromConfig $ model ^. configModel
-    game' = fromMaybe game $ applyPath directions game
-    directions = _path $ _pilgrim $ model ^. gameSaves . currentData
+    game' = fromMaybe game $ transferPath oldGame game
+    oldGame = model ^. gameSaves . currentData
 
 setGameHandle :: Game -> EventHandle
 setGameHandle game model = [Model model'] where

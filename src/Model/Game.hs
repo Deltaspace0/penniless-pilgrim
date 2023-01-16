@@ -11,6 +11,7 @@ module Model.Game
     , movePilgrim
     , jumpPilgrim
     , applyPath
+    , transferPath
     , directionFromGame
     , taxFromGame
     ) where
@@ -79,19 +80,22 @@ movePilgrim d game = result where
 jumpPilgrim :: (Int, Int) -> Game -> Maybe Game
 jumpPilgrim p game
     | not (null direction) = movePilgrim (fromJust direction) game
-    | elem p previousPositions = applyPath directions game
+    | elem p (map fst path) = applyPath directions game
     | otherwise = Nothing
     where
         direction = directionFromGame p game
-        previousPositions = _previousPositions $ _pilgrim game
         path = _path $ _pilgrim game
         directions = reverse $ map f $ ds ++ [head ds']
         f = getOppositeDirection . snd
-        (ds, ds') = span ((/= p) . fst) $ zip previousPositions path
+        (ds, ds') = span ((/= p) . fst) path
 
 applyPath :: [Direction] -> Game -> Maybe Game
 applyPath directions game = foldr f (Just game) directions where
     f = (=<<) . movePilgrim
+
+transferPath :: Game -> Game -> Maybe Game
+transferPath oldGame game = applyPath directions game where
+    directions = map snd $ _path $ _pilgrim oldGame
 
 directionFromGame :: (Int, Int) -> Game -> Maybe Direction
 directionFromGame (x, y) game
