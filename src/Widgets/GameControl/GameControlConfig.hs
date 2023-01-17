@@ -1,15 +1,20 @@
 module Widgets.GameControl.GameControlConfig
     ( module Widgets.GameControl.GameControlColorConfig
-    , GameControlConfig(..)
+    , GameControlConfig
+    , getColorConfig
+    , getAnimationDuration
+    , getLinkToNodeRatio
+    , getNodeToWidthRatio
+    , getWidth
+    , getHeight
     ) where
 
 import Widgets.GameControl.GameControlColorConfig
 
-data GameControlConfig = GameControlConfig
-    { _gccColorConfig :: GameControlColorConfig
-    , _gccAnimationDuration :: Double
-    , _gccLinkToNodeRatio :: Double
-    , _gccNodeToWidthRatio :: Double
-    , _gccWidth :: Double
-    , _gccHeight :: Double
-    } deriving (Eq, Show)
+class GameControlConfig a where
+    getColorConfig :: a -> GameControlColorConfig
+    getAnimationDuration :: a -> Double
+    getLinkToNodeRatio :: a -> Double
+    getNodeToWidthRatio :: a -> Double
+    getWidth :: a -> Double
+    getHeight :: a -> Double

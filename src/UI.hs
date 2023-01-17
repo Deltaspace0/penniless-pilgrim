@@ -22,10 +22,15 @@ buildUI _ model = widgetTree where
     hstack' = hstack_ [childSpacing_ 32]
     boxCenter = box_ [alignCenter]
     widgetTree = hstack'
-        [ boxCenter $ gameControlM model `nodeKey` "mainGrid"
+        [ boxCenter $ gameControlM `nodeKey` "mainGrid"
         , separatorLine
         , side
         ] `styleBasic` [padding 32]
+    gameControlM = gameControl $ GameControlData
+        { _gcdGameLens = gameSaves . currentData
+        , _gcdNextTaxLens = nextTax
+        , _gcdConfig = model ^. configModel . parameters
+        }
     side = case model ^. activeMenu of
         Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine
@@ -41,7 +46,7 @@ buildUI _ model = widgetTree where
         _ -> boxCenter $ vstack' sideWidgets
     sideWidgets =
         [ bigNumberLabel totalTax "Total tax: "
-        , bigNumberLabel nextTax' "Next tax: "
+        , bigNumberLabel (model ^. nextTax) "Next tax: "
         , boxCenter $ hstack' $
             [ button "Reset" $ AppSetGame $ model ^. initGame
             , optionButton "Save/load game" gameSavesMenu activeMenu
@@ -50,26 +55,9 @@ buildUI _ model = widgetTree where
         ]
     totalTax = Just $ _tax $ _pilgrim currentGame
     currentGame = model ^. gameSaves . currentData
-    nextTax' = model ^. nextTax
     gameSavesMenu = Just GameSavesMenu
     configMenu = Just ConfigMenu
     hideButton = optionButton "Hide" Nothing activeMenu
-
-gameControlM :: AppModel -> WidgetNode AppModel AppEvent
-gameControlM model = gameControl $ GameControlData
-    { _gcdGameLens = gameSaves . currentData
-    , _gcdNextTaxLens = nextTax
-    , _gcdConfig = GameControlConfig
-        { _gccColorConfig = _ccGameControl $ get colorConfig
-        , _gccAnimationDuration = getS gridAnimationSlider
-        , _gccLinkToNodeRatio = getS linkToNodeSlider
-        , _gccNodeToWidthRatio = getS nodeToWidthSlider
-        , _gccWidth = get gameControlWidth
-        , _gccHeight = get gameControlHeight
-        }
-    } where
-        get f = model ^. configModel . parameters . f
-        getS slider = get $ slider . currentValue
 
 bigNumberLabel
     :: Maybe Double

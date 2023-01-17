@@ -32,6 +32,7 @@ import qualified Data.ByteString.Lazy.UTF8 as BLU
 import Composites.Config.Parameters.ColorConfig
 import Composites.Config.Parameters.ConfigSlider
 import Model.Game
+import Widgets.GameControl.GameControlConfig
 
 data Parameters = Parameters
     { _apGridColumnsSlider :: ConfigSlider
@@ -110,6 +111,14 @@ instance ToJSON Parameters where
         , "game_control_height" .= (p ^. gameControlHeight)
         , "color_config" .= (p ^. colorConfig)
         ]
+
+instance GameControlConfig Parameters where
+    getColorConfig p = _ccGameControl $ p ^. colorConfig
+    getAnimationDuration p = p ^. gridAnimationSlider . currentValue
+    getLinkToNodeRatio p = p ^. linkToNodeSlider . currentValue
+    getNodeToWidthRatio p = p ^. nodeToWidthSlider . currentValue
+    getWidth p = p ^. gameControlWidth
+    getHeight p = p ^. gameControlHeight
 
 gameFromParameters :: Parameters -> Game
 gameFromParameters parameters' = game where

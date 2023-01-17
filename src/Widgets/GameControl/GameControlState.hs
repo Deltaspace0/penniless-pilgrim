@@ -30,8 +30,8 @@ instance Default GameControlState where
         }
 
 initState
-    :: (ControlledGame a)
-    => GameControlData s a
+    :: (ControlledGame a, GameControlConfig b)
+    => GameControlData s a b
     -> WidgetEnv s e
     -> GameControlState
 initState gcData wenv = def
@@ -40,10 +40,10 @@ initState gcData wenv = def
     }
 
 mergeState
-    :: (ControlledGame a)
+    :: (ControlledGame a, GameControlConfig b)
     => GameControlState
     -> WidgetEnv s e
-    -> GameControlData s a
+    -> GameControlData s a b
     -> WidgetNode s e
     -> (GameControlState, [WidgetRequest s e])
 mergeState oldState wenv gcData newNode = (newState, reqs) where
@@ -69,5 +69,5 @@ mergeState oldState wenv gcData newNode = (newState, reqs) where
     progress = delta/animationDuration
     widgetId = newNode ^. L.info . L.widgetId
     animationDuration' = floor animationDuration
-    animationDuration = _gccAnimationDuration $ _gcdConfig gcData
+    animationDuration = getAnimationDuration $ _gcdConfig gcData
     ts = wenv ^. L.timestamp

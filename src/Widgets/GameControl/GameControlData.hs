@@ -20,15 +20,15 @@ import Widgets.GameControl.GameControlConfig
 import Widgets.GameControlLink
 import Widgets.GameControlNode
 
-data GameControlData s a = GameControlData
+data GameControlData s a b = GameControlData
     { _gcdGameLens :: ALens' s a
     , _gcdNextTaxLens :: ALens' s (Maybe Double)
-    , _gcdConfig :: GameControlConfig
+    , _gcdConfig :: b
     }
 
 getFixedRect
-    :: (ControlledGame a)
-    => GameControlData s a
+    :: (ControlledGame a, GameControlConfig b)
+    => GameControlData s a b
     -> WidgetEnv s e
     -> Rect
 getFixedRect gcData wenv = Rect x y linkSize nodeSize where
@@ -39,9 +39,9 @@ getFixedRect gcData wenv = Rect x y linkSize nodeSize where
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
     (cols, rows) = getBounds $ getGrid gcData wenv
-    width = _gccWidth config
-    height = _gccHeight config
-    linkToNodeRatio = _gccLinkToNodeRatio config
+    width = getWidth config
+    height = getHeight config
+    linkToNodeRatio = getLinkToNodeRatio config
     config = _gcdConfig gcData
 
 getMiddleRect :: Rect -> Rect -> Double -> Rect
@@ -55,10 +55,10 @@ getMiddleRect rectA rectB progress = rect where
     Rect xB yB linkSizeB nodeSizeB = rectB
 
 assignAreas
-    :: (ControlledGame a)
+    :: (ControlledGame a, GameControlConfig b)
     => WidgetEnv s e
     -> Rect
-    -> GameControlData s a
+    -> GameControlData s a b
     -> Seq Rect
 assignAreas wenv vp gcData = assignedAreas where
     assignedAreas =
@@ -78,10 +78,10 @@ assignAreas wenv vp gcData = assignedAreas where
     Rect x y linkSize nodeSize = getFixedRect gcData wenv
 
 makeChildren
-    :: (ControlledGame a)
+    :: (ControlledGame a, GameControlConfig b)
     => WidgetEnv s e
     -> WidgetNode s e
-    -> GameControlData s a
+    -> GameControlData s a b
     -> WidgetNode s e
 makeChildren wenv node gcData = resNode where
     resNode = node & L.children .~ fmap fn nodeSequence
@@ -99,17 +99,17 @@ makeChildren wenv node gcData = resNode where
         , _ndClickable = not $ null tax
         , _ndNextTax = tax
         , _ndNextTaxLens = nextTaxLens
-        , _ndColorConfig = _gcccNode $ _gccColorConfig config
-        , _ndAnimationDuration = _gccAnimationDuration config
+        , _ndColorConfig = _gcccNode $ getColorConfig config
+        , _ndAnimationDuration = getAnimationDuration config
         } where tax = getScoreByPosition p game
     fh = gameControlHlink . linkData
     fv = gameControlVlink . linkData
     linkData (p, link) = LinkData
         { _ldLink = link
         , _ldPosition = p
-        , _ldColorConfig = _gcccLink $ _gccColorConfig config
-        , _ldAnimationDuration = _gccAnimationDuration config
-        , _ldNodeToWidthRatio = _gccNodeToWidthRatio config
+        , _ldColorConfig = _gcccLink $ getColorConfig config
+        , _ldAnimationDuration = getAnimationDuration config
+        , _ldNodeToWidthRatio = getNodeToWidthRatio config
         }
     widgetId = node ^. L.info . L.widgetId
     config = _gcdConfig gcData
@@ -117,10 +117,10 @@ makeChildren wenv node gcData = resNode where
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 handleGameChange
-    :: (ControlledGame a)
+    :: (ControlledGame a, GameControlConfig b)
     => WidgetEnv s e
     -> WidgetNode s e
-    -> GameControlData s a
+    -> GameControlData s a b
     -> (a -> Maybe a)
     -> Maybe (WidgetResult s e)
 handleGameChange wenv node gcData f = result where
@@ -142,9 +142,9 @@ handleGameChange wenv node gcData f = result where
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 gridFromGame
-    :: (ControlledGame a)
+    :: (ControlledGame a, GameControlConfig b)
     => a
-    -> GameControlConfig
+    -> b
     -> Grid NodeVisual LinkVisual
 gridFromGame game config = gridMap nt ht vt $ getGameGrid game where
     nt = nodeTransform nodeColorConfig
@@ -152,11 +152,11 @@ gridFromGame game config = gridMap nt ht vt $ getGameGrid game where
     vt = vlinkTransform linkColorConfig
     nodeColorConfig = _gcccNode colorConfig
     linkColorConfig = _gcccLink colorConfig
-    colorConfig = _gccColorConfig config
+    colorConfig = getColorConfig config
 
 getGrid
-    :: (ControlledGame a)
-    => GameControlData s a
+    :: (ControlledGame a, GameControlConfig b)
+    => GameControlData s a b
     -> WidgetEnv s e
     -> Grid NodeVisual LinkVisual
 getGrid gcData wenv = gridFromGame game config where

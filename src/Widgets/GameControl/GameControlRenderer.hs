@@ -12,31 +12,31 @@ import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
 import Widgets.GameControl.GameControlState
 
-data GameControlRenderer s e a = GameControlRenderer
+data GameControlRenderer s e a b = GameControlRenderer
     { _gcrEnv :: WidgetEnv s e
     , _gcrNode :: WidgetNode s e
     , _gcrRenderer :: Renderer
-    , _gcrData :: GameControlData s a
+    , _gcrData :: GameControlData s a b
     , _gcrState :: GameControlState
     }
 
-runRenderer :: GameControlRenderer s e a -> IO ()
+runRenderer
+    :: (GameControlConfig b)
+    => GameControlRenderer s e a b
+    -> IO ()
 runRenderer gcRenderer = do
     let wenv = _gcrEnv gcRenderer
         node = _gcrNode gcRenderer
         renderer = _gcrRenderer gcRenderer
         gcData = _gcrData gcRenderer
         state = _gcrState gcRenderer
-        config = _gcdConfig gcData
-        style = currentStyle wenv node
-        vp = getContentArea node style
-        ts = wenv ^. L.timestamp
+        vp = getContentArea node $ currentStyle wenv node
         Rect x y linkSize _ = _gcsFixedRect state
         Rect x' y' linkSize' _ = _gcsOldFixedRect state
         running = _gcsRunning state
         start = _gcsStart state
-        delta = fromIntegral $ ts-start
-        animationDuration = _gccAnimationDuration config
+        delta = fromIntegral $ (wenv ^. L.timestamp)-start
+        animationDuration = getAnimationDuration $ _gcdConfig gcData
         progress = max 0 $ min 1 $ delta/animationDuration
     saveContext renderer
     when (running && progress < 1) $ do

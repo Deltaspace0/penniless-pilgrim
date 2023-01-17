@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Widgets.GameControl
-    ( module Widgets.GameControl.GameControlConfig
-    , GameControlData(..)
+    ( GameControlData(..)
     , gameControl
     ) where
 
@@ -21,16 +20,16 @@ import Widgets.GameControl.GameControlRenderer
 import Widgets.GameControl.GameControlState
 
 gameControl
-    :: (ControlledGame a)
-    => GameControlData s a
+    :: (ControlledGame a, GameControlConfig b)
+    => GameControlData s a b
     -> WidgetNode s e
 gameControl gcData = node where
     node = defaultWidgetNode "gameControl" widget
     widget = makeGameControl gcData def
 
 makeGameControl
-    :: (ControlledGame a)
-    => GameControlData s a
+    :: (ControlledGame a, GameControlConfig b)
+    => GameControlData s a b
     -> GameControlState
     -> Widget s e
 makeGameControl gcData state = widget where
@@ -79,8 +78,8 @@ makeGameControl gcData state = widget where
         handle = handleGameChange wenv node gcData . moveToPosition
 
     getSizeReq _ _ _ = (fixedSize width, fixedSize height) where
-        width = _gccWidth $ _gcdConfig gcData
-        height = _gccHeight $ _gcdConfig gcData
+        width = getWidth $ _gcdConfig gcData
+        height = getHeight $ _gcdConfig gcData
 
     resize wenv node vp _ = (resultNode node, assignedAreas) where
         assignedAreas = assignAreas wenv vp gcData        
