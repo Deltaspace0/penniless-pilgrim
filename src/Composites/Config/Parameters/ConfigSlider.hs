@@ -1,13 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Composites.Config.Parameters.ConfigSlider
     ( ConfigSlider(..)
-    , csCurrent
-    , csMin
-    , csMax
-    , csChangeRate
-    , csCaption
+    , currentValue
     ) where
 
 import Control.Lens hiding ((.=))
@@ -22,8 +17,6 @@ data ConfigSlider = ConfigSlider
     , _csCaption :: Text
     } deriving (Eq, Show)
 
-makeLenses 'ConfigSlider
-
 instance FromJSON ConfigSlider where
     parseJSON = withObject "ConfigSlider" $ \v -> ConfigSlider
         <$> v .: "default"
@@ -34,9 +27,16 @@ instance FromJSON ConfigSlider where
 
 instance ToJSON ConfigSlider where
     toJSON configSlider = object
-        [ "default" .= (configSlider ^. csCurrent)
-        , "min" .= (configSlider ^. csMin)
-        , "max" .= (configSlider ^. csMax)
-        , "change_rate" .= (configSlider ^. csChangeRate)
-        , "caption" .= (configSlider ^. csCaption)
+        [ "default" .= (_csCurrent configSlider)
+        , "min" .= (_csMin configSlider)
+        , "max" .= (_csMax configSlider)
+        , "change_rate" .= (_csChangeRate configSlider)
+        , "caption" .= (_csCaption configSlider)
         ]
+
+currentValue :: Lens' ConfigSlider Double
+currentValue = lens getter setter where
+    getter = _csCurrent
+    setter configSlider newValue = configSlider
+        { _csCurrent = newValue
+        }

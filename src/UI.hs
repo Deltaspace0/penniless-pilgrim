@@ -69,7 +69,7 @@ gameControlM model = gameControl $ GameControlData
         }
     } where
         get f = model ^. configModel . parameters . f
-        getS slider = get $ slider . csCurrent
+        getS slider = get $ slider . currentValue
 
 bigNumberLabel
     :: Maybe Double

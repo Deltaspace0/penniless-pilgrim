@@ -114,8 +114,8 @@ instance ToJSON Parameters where
 gameFromParameters :: Parameters -> Game
 gameFromParameters parameters' = game where
     game = makeGame (floor gridColumns) (floor gridRows)
-    gridColumns = parameters' ^. gridColumnsSlider . csCurrent
-    gridRows = parameters' ^. gridRowsSlider . csCurrent
+    gridColumns = _csCurrent $ parameters' ^. gridColumnsSlider
+    gridRows = _csCurrent $ parameters' ^. gridRowsSlider
 
 parametersFromFile :: String -> IO (Bool, Parameters)
 parametersFromFile path = do

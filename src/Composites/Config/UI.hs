@@ -43,19 +43,18 @@ configSlider_
     -> [ConfigEvent]
     -> [WidgetNode ConfigModel ConfigEvent]
 configSlider_ model slider events =
-    [ label $ caption <> " " <> showt' current
+    [ label $ caption <> " " <> showt' (_csCurrent slider')
     , hstack_ [childSpacing_ 32]
         [ hslider_ field a b config
         , button' "-" $ ConfigSetParameters decreasedParameters
         , button' "+" $ ConfigSetParameters increasedParameters
         ]
     ] where
-        current = slider' ^. csCurrent
-        a = slider' ^. csMin
-        b = slider' ^. csMax
-        changeRate = slider' ^. csChangeRate
-        caption = slider' ^. csCaption
-        field = parameters . slider . csCurrent
+        a = _csMin slider'
+        b = _csMax slider'
+        changeRate = _csChangeRate slider'
+        caption = _csCaption slider'
+        field = parameters . slider . currentValue
         config =
             [ wheelRate 0
             , dragRate $ toRational changeRate
@@ -69,12 +68,12 @@ configSlider_ model slider events =
         const' e = const e :: Double -> ConfigEvent
         saveConfigCaption' = model ^. initialSaveCaption
         loadConfigCaption' = model ^. initialLoadCaption
-        slider' = p ^. slider
         p = model ^. parameters
         decreasedParameters = p & slider .~ decreasedSlider
         increasedParameters = p & slider .~ increasedSlider
-        decreasedSlider = slider' & csCurrent %~ decrease
-        increasedSlider = slider' & csCurrent %~ increase
+        decreasedSlider = slider' & currentValue %~ decrease
+        increasedSlider = slider' & currentValue %~ increase
+        slider' = p ^. slider
         decrease c = max a $ c-changeRate
         increase c = min b $ c+changeRate
         button' c e = button_ c e buttonConfig `styleBasic`

@@ -38,8 +38,8 @@ makeLensesWith abbreviatedFields 'ConfigModel
 
 configFromGame :: Game -> ConfigModel -> ConfigModel
 configFromGame game model = model
-    & parameters . gridColumnsSlider . csCurrent .~ cols'
-    & parameters . gridRowsSlider . csCurrent .~ rows' where
+    & parameters . gridColumnsSlider . currentValue .~ cols'
+    & parameters . gridRowsSlider . currentValue .~ rows' where
         (cols, rows) = getBounds $ _grid game
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
