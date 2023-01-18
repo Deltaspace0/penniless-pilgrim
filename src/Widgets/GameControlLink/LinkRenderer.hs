@@ -7,9 +7,9 @@ import Control.Lens
 import Monomer
 import qualified Monomer.Lens as L
 
-import Model.Game
 import Widgets.GameControlLink.LinkColorConfig
 import Widgets.GameControlLink.LinkData
+import Widgets.GameControlLink.LinkForm
 import Widgets.GameControlLink.LinkState
 import Widgets.GameControlLink.LinkVisual
 
@@ -38,10 +38,10 @@ runRenderer linkRenderer = do
         Just oldLink' = oldLink
         colorConfig = _ldColorConfig linkData
         new@(newColor, newForm) = if null newLink
-            then (_lccDefault colorConfig, Nothing)
+            then (_lccDefault colorConfig, LinkDefault)
             else (_linkColor newLink', _linkForm newLink')
         old@(oldColor, oldForm) = if null oldLink
-            then (_lccDefault colorConfig, Nothing)
+            then (_lccDefault colorConfig, LinkDefault)
             else (_linkColor oldLink', _linkForm oldLink')
     if _lsRunning state && progress < 1
         then if progress < 0.5
@@ -51,8 +51,8 @@ runRenderer linkRenderer = do
 
 renderForm
     :: LinkRenderer s e
-    -> (Color, Maybe GameLink)
-    -> (Color, Maybe GameLink)
+    -> (Color, LinkForm)
+    -> (Color, LinkForm)
     -> Double
     -> IO ()
 renderForm linkRenderer (color', form') (_, form'') progress = do
@@ -68,8 +68,8 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         totalSize' = totalSize*progress
         rest = totalSize-totalSize'
         s' = nodeSize + if isHz then x else y
-        f x = if x == Just LinkBack then rest else 0
-        s = s' + if null form' then f form'' else f form'
+        f x = if x == LinkBack then rest else 0
+        s = s' + if form' == LinkDefault then f form'' else f form'
         b = s+totalSize'
         nodeToWidthRatio = _ldNodeToWidthRatio linkData
         linkWidth = nodeSize/nodeToWidthRatio
@@ -88,12 +88,12 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
             y1 = y-ars
             y2 = y+ars
     case form' of
-        Just LinkBack -> do
+        LinkBack -> do
             let b' = s+ars*2
             drawLine' (b'-1) b
             drawTriangle' s b'
-        Just LinkForward -> do
+        LinkForward -> do
             let b' = b-ars*2
             drawLine' s (b'+1)
             drawTriangle' b b'
-        _ -> drawLine' s b
+        LinkDefault -> drawLine' s b
