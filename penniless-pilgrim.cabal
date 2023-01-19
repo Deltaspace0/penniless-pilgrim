@@ -51,6 +51,7 @@ library
       UI
       Util
       Widgets.GameControl
+      Widgets.GameControl.ControlledGame
       Widgets.GameControl.GameControlColorConfig
       Widgets.GameControl.GameControlConfig
       Widgets.GameControl.GameControlData
@@ -59,6 +60,7 @@ library
       Widgets.GameControlLink
       Widgets.GameControlLink.LinkColorConfig
       Widgets.GameControlLink.LinkData
+      Widgets.GameControlLink.LinkForm
       Widgets.GameControlLink.LinkRenderer
       Widgets.GameControlLink.LinkState
       Widgets.GameControlLink.LinkVisual

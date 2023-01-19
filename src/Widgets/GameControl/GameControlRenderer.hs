@@ -21,7 +21,7 @@ data GameControlRenderer s e a b = GameControlRenderer
     }
 
 runRenderer
-    :: (GameControlConfig b)
+    :: (GameControlConfig b c)
     => GameControlRenderer s e a b
     -> IO ()
 runRenderer gcRenderer = do

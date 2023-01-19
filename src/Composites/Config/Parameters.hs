@@ -112,8 +112,8 @@ instance ToJSON Parameters where
         , "color_config" .= (p ^. colorConfig)
         ]
 
-instance GameControlConfig Parameters where
-    getColorConfig p = _ccGameControl $ p ^. colorConfig
+instance GameControlConfig Parameters ColorConfig where
+    getColorConfig p = p ^. colorConfig
     getAnimationDuration p = p ^. gridAnimationSlider . currentValue
     getLinkToNodeRatio p = p ^. linkToNodeSlider . currentValue
     getNodeToWidthRatio p = p ^. nodeToWidthSlider . currentValue

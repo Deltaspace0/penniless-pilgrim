@@ -30,7 +30,7 @@ instance Default GameControlState where
         }
 
 initState
-    :: (ControlledGame a, GameControlConfig b)
+    :: (ControlledGame a, GameControlConfig b c)
     => GameControlData s a b
     -> WidgetEnv s e
     -> GameControlState
@@ -40,7 +40,7 @@ initState gcData wenv = def
     }
 
 mergeState
-    :: (ControlledGame a, GameControlConfig b)
+    :: (ControlledGame a, GameControlConfig b c)
     => GameControlState
     -> WidgetEnv s e
     -> GameControlData s a b

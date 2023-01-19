@@ -1,3 +1,5 @@
+{-# LANGUAGE FunctionalDependencies #-}
+
 module Widgets.GameControl.GameControlConfig
     ( module Widgets.GameControl.GameControlColorConfig
     , GameControlConfig
@@ -11,10 +13,11 @@ module Widgets.GameControl.GameControlConfig
 
 import Widgets.GameControl.GameControlColorConfig
 
-class GameControlConfig a where
-    getColorConfig :: a -> GameControlColorConfig
-    getAnimationDuration :: a -> Double
-    getLinkToNodeRatio :: a -> Double
-    getNodeToWidthRatio :: a -> Double
-    getWidth :: a -> Double
-    getHeight :: a -> Double
+class (GameControlColorConfig b) =>
+    GameControlConfig a b | a -> b where
+        getColorConfig :: a -> b
+        getAnimationDuration :: a -> Double
+        getLinkToNodeRatio :: a -> Double
+        getNodeToWidthRatio :: a -> Double
+        getWidth :: a -> Double
+        getHeight :: a -> Double
