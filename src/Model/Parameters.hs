@@ -3,9 +3,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Composites.Config.Parameters
-    ( module Composites.Config.Parameters.ColorConfig
-    , module Composites.Config.Parameters.ConfigSlider
+module Model.Parameters
+    ( module Model.Parameters.ColorConfig
+    , module Model.Parameters.ConfigSlider
     , Parameters(..)
     , gridColumnsSlider
     , gridRowsSlider
@@ -29,8 +29,8 @@ import Data.Maybe
 import System.IO
 import qualified Data.ByteString.Lazy.UTF8 as BLU
 
-import Composites.Config.Parameters.ColorConfig
-import Composites.Config.Parameters.ConfigSlider
+import Model.Parameters.ColorConfig
+import Model.Parameters.ConfigSlider
 import Model.Game
 import Widgets.GameControl.GameControlConfig
 

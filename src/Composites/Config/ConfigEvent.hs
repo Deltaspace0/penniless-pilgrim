@@ -13,7 +13,7 @@ import Data.Text (Text)
 import Monomer
 
 import Composites.Config.ConfigModel
-import Composites.Config.Parameters
+import Model.Parameters
 
 data ConfigEvent
     = ConfigSave

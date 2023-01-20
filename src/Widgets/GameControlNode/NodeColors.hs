@@ -7,7 +7,7 @@ module Widgets.GameControlNode.NodeColors
 import Data.Aeson
 import Monomer
 
-import Composites.Config.Parameters.RGB
+import Model.Parameters.RGB
 
 data NodeColors = NodeColors
     { _nodeHighlight :: Color

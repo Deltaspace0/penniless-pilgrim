@@ -4,8 +4,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Composites.Config.ConfigModel
-    ( module Composites.Config.Parameters
-    , ConfigModel(..)
+    ( ConfigModel(..)
     , filePath
     , initialSaveCaption
     , initialLoadCaption
@@ -22,7 +21,7 @@ import Data.Default
 import Data.Maybe
 import Data.Text (Text)
 
-import Composites.Config.Parameters
+import Model.Parameters
 import Model.Game
 
 data ConfigModel = ConfigModel

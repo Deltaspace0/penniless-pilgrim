@@ -11,7 +11,7 @@ import Monomer.EnhancedSlider
 
 import Composites.Config.ConfigEvent
 import Composites.Config.ConfigModel
-import Composites.Config.Parameters
+import Model.Parameters
 import Util
 
 buildUI :: UIBuilder ConfigModel ConfigEvent

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Composites.Config.Parameters.ConfigSlider
+module Model.Parameters.ConfigSlider
     ( ConfigSlider(..)
     , currentValue
     ) where

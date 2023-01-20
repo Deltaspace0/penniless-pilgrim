@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Composites.Config.Parameters.RGB
+module Model.Parameters.RGB
     ( RGB(..)
     , fromRGB
     , toRGB

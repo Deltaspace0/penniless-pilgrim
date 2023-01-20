@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Composites.Config.Parameters.ColorConfig
+module Model.Parameters.ColorConfig
     ( ColorConfig(..)
     ) where
 

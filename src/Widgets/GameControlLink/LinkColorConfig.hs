@@ -8,7 +8,7 @@ import Data.Aeson
 import Data.Default
 import Monomer
 
-import Composites.Config.Parameters.RGB
+import Model.Parameters.RGB
 
 data LinkColorConfig = LinkColorConfig
     { _lccDefault :: Color
