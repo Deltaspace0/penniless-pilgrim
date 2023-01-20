@@ -31,6 +31,7 @@ import qualified Data.Text as T
 import Composites
 import Model.AppMenu
 import Model.Game
+import Model.Parameters
 
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu
@@ -46,7 +47,7 @@ makeLensesWith abbreviatedFields 'AppModel
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
     configModel' <- initConfigModel configPath
-    let game = gameFromConfig configModel'
+    let game = gameFromParameters $ configModel' ^. parameters
         gameSaves' = initSaveManagerModel game
         handler = const $ return "" :: SomeException -> IO String
     file <- catch (readFile $ fromJust gamesPath) handler

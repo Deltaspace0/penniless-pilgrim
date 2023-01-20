@@ -12,7 +12,6 @@ module Composites.Config.ConfigModel
     , loadCaption
     , parameters
     , configFromGame
-    , gameFromConfig
     , initConfigModel
     ) where
 
@@ -42,9 +41,6 @@ configFromGame game model = model
         (cols, rows) = getBounds $ _grid game
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
-
-gameFromConfig :: ConfigModel -> Game
-gameFromConfig model = gameFromParameters $ model ^. parameters
 
 initConfigModel :: Maybe String -> IO ConfigModel
 initConfigModel path = do

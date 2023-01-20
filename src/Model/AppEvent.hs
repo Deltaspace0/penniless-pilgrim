@@ -17,6 +17,7 @@ import qualified Data.ByteString.Lazy.UTF8 as BLU
 import Composites
 import Model.AppModel
 import Model.Game
+import Model.Parameters
 
 data AppEvent
     = AppInit
@@ -39,7 +40,7 @@ updateGameWithConfigHandle model = [Model model'] where
     model' = model
         & initGame .~ game
         & gameSaves . currentData .~ game'
-    game = gameFromConfig $ model ^. configModel
+    game = gameFromParameters $ model ^. configModel . parameters
     game' = fromMaybe game $ transferPath oldGame game
     oldGame = model ^. gameSaves . currentData
 
