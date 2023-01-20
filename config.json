@@ -4,35 +4,35 @@
         "max": 8,
         "default": 2,
         "change_rate": 0.2,
-        "caption": "Node size to link width ratio:"
+        "caption": "Node size to link width ratio"
     },
     "link_to_node_slider": {
         "min": 3,
         "max": 8,
         "default": 5,
         "change_rate": 0.2,
-        "caption": "Link size to node size ratio:"
+        "caption": "Link size to node size ratio"
     },
     "grid_rows_slider": {
         "min": 2,
         "max": 32,
         "default": 5,
         "change_rate": 1,
-        "caption": "Rows:"
+        "caption": "Rows"
     },
     "grid_columns_slider": {
         "min": 2,
         "max": 32,
         "default": 5,
         "change_rate": 1,
-        "caption": "Columns:"
+        "caption": "Columns"
     },
     "grid_animation_slider": {
         "min": 0,
         "max": 1000,
         "default": 300,
         "change_rate": 10,
-        "caption": "Animation duration (in milliseconds):"
+        "caption": "Animation duration (in milliseconds)"
     },
     "game_control_width": 400,
     "game_control_height": 500,

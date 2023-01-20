@@ -27,6 +27,7 @@ dependencies:
 - data-default
 - lens
 - monomer
+- monomer-widgets
 - text
 - text-show
 - time

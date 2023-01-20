@@ -7,6 +7,7 @@ module Composites.Config.UI
 
 import Control.Lens
 import Monomer
+import Monomer.EnhancedSlider
 
 import Composites.Config.ConfigEvent
 import Composites.Config.ConfigModel
@@ -21,7 +22,7 @@ buildUI _ model = widgetTree where
         , vscroll_ [wheelRate 20] paddedConfigSliders
         ]
     paddedConfigSliders = configSliders `styleBasic` [paddingR 16]
-    configSliders = vstack' $ concat
+    configSliders = vstack'
         [ configSlider_ model gridColumnsSlider [reportEvent]
         , configSlider_ model gridRowsSlider [reportEvent]
         , configSlider model gridAnimationSlider
@@ -34,50 +35,30 @@ buildUI _ model = widgetTree where
 configSlider
     :: ConfigModel
     -> Lens' Parameters ConfigSlider
-    -> [WidgetNode ConfigModel ConfigEvent]
+    -> WidgetNode ConfigModel ConfigEvent
 configSlider model slider = configSlider_ model slider []
 
 configSlider_
     :: ConfigModel
     -> Lens' Parameters ConfigSlider
     -> [ConfigEvent]
-    -> [WidgetNode ConfigModel ConfigEvent]
-configSlider_ model slider events =
-    [ label $ caption <> " " <> showt' (_csCurrent slider')
-    , hstack_ [childSpacing_ 32]
-        [ hslider_ field a b config
-        , button' "-" $ ConfigSetParameters decreasedParameters
-        , button' "+" $ ConfigSetParameters increasedParameters
+    -> WidgetNode ConfigModel ConfigEvent
+configSlider_ model slider events = widget where
+    widget = enhancedSlider_ field a b config
+    field = parameters . slider . currentValue
+    a = _csMin slider'
+    b = _csMax slider'
+    config =
+        [ dragRate $ toRational $ _csChangeRate slider'
+        , titleCaption $ _csCaption slider'
+        ] <> map transformEvent events'
+    events' = saveLoadCaptionEvents <> events
+    saveLoadCaptionEvents =
+        [ ConfigSetSaveCaption saveConfigCaption'
+        , ConfigSetLoadCaption loadConfigCaption'
         ]
-    ] where
-        a = _csMin slider'
-        b = _csMax slider'
-        changeRate = _csChangeRate slider'
-        caption = _csCaption slider'
-        field = parameters . slider . currentValue
-        config =
-            [ wheelRate 0
-            , dragRate $ toRational changeRate
-            ] <> map transformEvent events'
-        events' = saveLoadCaptionEvents <> events
-        saveLoadCaptionEvents =
-            [ ConfigSetSaveCaption saveConfigCaption'
-            , ConfigSetLoadCaption loadConfigCaption'
-            ]
-        transformEvent = onChange . const'
-        const' e = const e :: Double -> ConfigEvent
-        saveConfigCaption' = model ^. initialSaveCaption
-        loadConfigCaption' = model ^. initialLoadCaption
-        p = model ^. parameters
-        decreasedParameters = p & slider .~ decreasedSlider
-        increasedParameters = p & slider .~ increasedSlider
-        decreasedSlider = slider' & currentValue %~ decrease
-        increasedSlider = slider' & currentValue %~ increase
-        slider' = p ^. slider
-        decrease c = max a $ c-changeRate
-        increase c = min b $ c+changeRate
-        button' c e = button_ c e buttonConfig `styleBasic`
-            [ width 32
-            , height 24
-            ]
-        buttonConfig = map onClick events'
+    transformEvent = onChange . const'
+    const' e = const e :: Double -> ConfigEvent
+    saveConfigCaption' = model ^. initialSaveCaption
+    loadConfigCaption' = model ^. initialLoadCaption
+    slider' = model ^. parameters . slider
