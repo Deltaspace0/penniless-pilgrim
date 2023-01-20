@@ -11,7 +11,6 @@ module Composites.Config.ConfigModel
     , saveCaption
     , loadCaption
     , parameters
-    , configFromGame
     , initConfigModel
     ) where
 
@@ -21,7 +20,6 @@ import Data.Maybe
 import Data.Text (Text)
 
 import Model.Parameters
-import Model.Game
 
 data ConfigModel = ConfigModel
     { _cfgFilePath :: Maybe String
@@ -33,14 +31,6 @@ data ConfigModel = ConfigModel
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'ConfigModel
-
-configFromGame :: Game -> ConfigModel -> ConfigModel
-configFromGame game model = model
-    & parameters . gridColumnsSlider . currentValue .~ cols'
-    & parameters . gridRowsSlider . currentValue .~ rows' where
-        (cols, rows) = getBounds $ _grid game
-        cols' = fromIntegral $ cols+1
-        rows' = fromIntegral $ rows+1
 
 initConfigModel :: Maybe String -> IO ConfigModel
 initConfigModel path = do

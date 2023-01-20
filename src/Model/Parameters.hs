@@ -16,6 +16,7 @@ module Model.Parameters
     , gameControlHeight
     , colorConfig
     , gameFromParameters
+    , parametersFromGame
     , parametersFromFile
     , parametersToFile
     ) where
@@ -125,6 +126,14 @@ gameFromParameters parameters' = game where
     game = makeGame (floor gridColumns) (floor gridRows)
     gridColumns = _csCurrent $ parameters' ^. gridColumnsSlider
     gridRows = _csCurrent $ parameters' ^. gridRowsSlider
+
+parametersFromGame :: Game -> Parameters -> Parameters
+parametersFromGame game p = p
+    & gridColumnsSlider . currentValue .~ cols'
+    & gridRowsSlider . currentValue .~ rows' where
+        (cols, rows) = getBounds $ _grid game
+        cols' = fromIntegral $ cols+1
+        rows' = fromIntegral $ rows+1
 
 parametersFromFile :: String -> IO (Bool, Parameters)
 parametersFromFile path = do

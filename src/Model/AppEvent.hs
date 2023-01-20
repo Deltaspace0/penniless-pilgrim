@@ -48,7 +48,8 @@ setGameHandle :: Game -> EventHandle
 setGameHandle game model = [Model model'] where
     model' = model & updateGame & updateConfig
     updateGame = gameSaves . currentData .~ game
-    updateConfig = configModel %~ configFromGame game
+    updateConfig = configModel . parameters %~ f
+    f = parametersFromGame game
 
 saveGamesToFileHandle :: Saves Game -> EventHandle
 saveGamesToFileHandle games model = [Producer handler] where
