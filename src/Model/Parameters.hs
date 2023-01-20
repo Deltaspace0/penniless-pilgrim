@@ -17,21 +17,15 @@ module Model.Parameters
     , colorConfig
     , gameFromParameters
     , parametersFromGame
-    , parametersFromFile
-    , parametersToFile
     ) where
 
-import Control.Exception
 import Control.Lens hiding ((.=))
 import Data.Aeson
-import Data.Aeson.Encode.Pretty
 import Data.Default
-import Data.Maybe
-import System.IO
-import qualified Data.ByteString.Lazy.UTF8 as BLU
 
 import Model.Parameters.ColorConfig
 import Model.Parameters.ConfigSlider
+import Model.File
 import Model.Game
 import Widgets.GameControl.GameControlConfig
 
@@ -113,6 +107,9 @@ instance ToJSON Parameters where
         , "color_config" .= (p ^. colorConfig)
         ]
 
+instance FromFile Parameters
+instance ToFile Parameters
+
 instance GameControlConfig Parameters ColorConfig where
     getColorConfig p = p ^. colorConfig
     getAnimationDuration p = p ^. gridAnimationSlider . currentValue
@@ -134,22 +131,3 @@ parametersFromGame game p = p
         (cols, rows) = getBounds $ _grid game
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
-
-parametersFromFile :: String -> IO (Bool, Parameters)
-parametersFromFile path = do
-    let handler = const $ return "" :: SomeException -> IO String
-    file <- catch (readFile path) handler
-    let contents = BLU.fromString file
-        parameters = decode contents :: Maybe Parameters
-    return $ fromMaybe (False, def) $ (,) True <$> parameters
-
-parametersToFile :: Parameters -> String -> IO Bool
-parametersToFile parameters path = do
-    let config = defConfig {confCompare = flip compare}
-        converted = encodePretty' config parameters
-        contents = BLU.toString converted
-        operation = writeFile path contents
-    result <- try operation :: IO (Either SomeException ())
-    case result of
-        Left _ -> return False
-        Right _ -> return True

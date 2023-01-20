@@ -19,6 +19,7 @@ import Data.Default
 import Data.Maybe
 import Data.Text (Text)
 
+import Model.File
 import Model.Parameters
 
 data ConfigModel = ConfigModel
@@ -34,7 +35,7 @@ makeLensesWith abbreviatedFields 'ConfigModel
 
 initConfigModel :: Maybe String -> IO ConfigModel
 initConfigModel path = do
-    let f = fmap snd . parametersFromFile
+    let f = fmap snd . fromFile
     parameters' <- fromMaybe (pure def) $ f <$> path
     let saveCaption' = "Save config to file"
         loadCaption' = "Load config from file"

@@ -5,18 +5,15 @@ module Model.AppEvent
     , handleEvent
     ) where
 
-import Control.Exception
 import Control.Lens
-import Data.Aeson.Encode.Pretty
-import Data.Foldable
 import Data.Maybe
 import Monomer
 import Monomer.SaveManager
-import qualified Data.ByteString.Lazy.UTF8 as BLU
 
 import Composites
 import Model.AppModel
 import Model.Game
+import Model.File
 import Model.Parameters
 
 data AppEvent
@@ -53,7 +50,5 @@ setGameHandle game model = [Model model'] where
 
 saveGamesToFileHandle :: Saves Game -> EventHandle
 saveGamesToFileHandle games model = [Producer handler] where
-    handler _ = fromMaybe (pure ()) $ (>> pure ()) <$> res
-    res = try <$> operation :: Maybe (IO (Either SomeException ()))
-    operation = (flip writeFile) contents <$> model ^. gameSavesPath
-    contents = BLU.toString $ encodePretty $ toList games
+    handler _ = fromMaybe (pure ()) $ (>> pure ()) <$> operation
+    operation = toFile games <$> model ^. gameSavesPath

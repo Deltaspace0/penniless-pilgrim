@@ -1,13 +1,78 @@
 [
     [
         {
+            "pilgrim": {
+                "tax": 11,
+                "position": [
+                    3,
+                    1
+                ],
+                "path": [
+                    [
+                        [
+                            2,
+                            1
+                        ],
+                        "East"
+                    ],
+                    [
+                        [
+                            1,
+                            1
+                        ],
+                        "East"
+                    ],
+                    [
+                        [
+                            1,
+                            2
+                        ],
+                        "North"
+                    ],
+                    [
+                        [
+                            2,
+                            2
+                        ],
+                        "West"
+                    ],
+                    [
+                        [
+                            2,
+                            1
+                        ],
+                        "South"
+                    ],
+                    [
+                        [
+                            2,
+                            0
+                        ],
+                        "South"
+                    ],
+                    [
+                        [
+                            1,
+                            0
+                        ],
+                        "East"
+                    ],
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        "East"
+                    ]
+                ]
+            },
             "grid": [
                 [
                     [
                         [
                             {
-                                "contents": 0,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 0
                             }
                         ],
                         "LinkForward",
@@ -16,8 +81,8 @@
                     [
                         [
                             {
-                                "contents": 2,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 2
                             }
                         ],
                         "LinkForward",
@@ -26,8 +91,8 @@
                     [
                         [
                             {
-                                "contents": 4,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 4
                             }
                         ],
                         null,
@@ -53,8 +118,8 @@
                     [
                         [
                             {
-                                "contents": 7,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 7
                             }
                         ],
                         "LinkForward",
@@ -63,12 +128,12 @@
                     [
                         [
                             {
-                                "contents": 9,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 9
                             },
                             {
-                                "contents": 8,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 8
                             }
                         ],
                         "LinkForward",
@@ -98,8 +163,8 @@
                     [
                         [
                             {
-                                "contents": 14,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 14
                             }
                         ],
                         "LinkBack",
@@ -108,8 +173,8 @@
                     [
                         [
                             {
-                                "contents": 16,
-                                "tag": "NodePath"
+                                "tag": "NodePath",
+                                "contents": 16
                             }
                         ],
                         null,
@@ -184,73 +249,8 @@
                         null
                     ]
                 ]
-            ],
-            "pilgrim": {
-                "path": [
-                    [
-                        [
-                            2,
-                            1
-                        ],
-                        "East"
-                    ],
-                    [
-                        [
-                            1,
-                            1
-                        ],
-                        "East"
-                    ],
-                    [
-                        [
-                            1,
-                            2
-                        ],
-                        "North"
-                    ],
-                    [
-                        [
-                            2,
-                            2
-                        ],
-                        "West"
-                    ],
-                    [
-                        [
-                            2,
-                            1
-                        ],
-                        "South"
-                    ],
-                    [
-                        [
-                            2,
-                            0
-                        ],
-                        "South"
-                    ],
-                    [
-                        [
-                            1,
-                            0
-                        ],
-                        "East"
-                    ],
-                    [
-                        [
-                            0,
-                            0
-                        ],
-                        "East"
-                    ]
-                ],
-                "position": [
-                    3,
-                    1
-                ],
-                "tax": 11
-            }
+            ]
         },
-        "5x5\t\tTax: 11.0\t\tX: 3\tY: 1\t\t2023-01-16 18:58:30.465028587 MSK"
+        "5x5\t\tTax: 11.0\t\tX: 3\tY: 1\t\t2023-01-20 22:56:42.717489259 MSK"
     ]
 ]

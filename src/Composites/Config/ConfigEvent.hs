@@ -13,6 +13,7 @@ import Data.Text (Text)
 import Monomer
 
 import Composites.Config.ConfigModel
+import Model.File
 import Model.Parameters
 
 data ConfigEvent
@@ -42,7 +43,7 @@ handleEvent onGameChange _ _ model event = case event of
 saveHandle :: EventHandle sp ep
 saveHandle model = [Task taskHandler] where
     taskHandler = do
-        let f = parametersToFile (model ^. parameters)
+        let f = toFile $ model ^. parameters
         success <- fromMaybe (pure False) $ f <$> model ^. filePath
         return $ ConfigSetSaveCaption $ if success
             then "Successfully saved config to file"
@@ -51,7 +52,7 @@ saveHandle model = [Task taskHandler] where
 loadHandle :: EventHandle sp ep
 loadHandle model = [Producer producerHandler] where
     producerHandler raiseEvent = do
-        let x = parametersFromFile <$> model ^. filePath
+        let x = fromFile <$> model ^. filePath
         (success, parameters') <- fromMaybe (pure (False, def)) x
         let model' = model & parameters .~ parameters'
             caption = if success

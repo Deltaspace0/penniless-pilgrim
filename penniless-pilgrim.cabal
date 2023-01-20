@@ -34,6 +34,7 @@ library
       Model.AppMenu
       Model.AppModel
       Model.Direction
+      Model.File
       Model.Game
       Model.Game.GameLink
       Model.Game.GameNode

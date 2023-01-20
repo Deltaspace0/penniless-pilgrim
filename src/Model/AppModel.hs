@@ -16,20 +16,18 @@ module Model.AppModel
     , gameSavesCaptionMethod
     ) where
 
-import Control.Exception
 import Control.Lens
-import Data.Aeson
+import Data.Default
 import Data.Maybe
 import Data.Text (Text)
 import Data.Time.LocalTime (ZonedTime)
 import Monomer.SaveManager
 import TextShow
-import qualified Data.ByteString.Lazy.UTF8 as BLU
-import qualified Data.Sequence as Seq
 import qualified Data.Text as T
 
 import Composites
 import Model.AppMenu
+import Model.File
 import Model.Game
 import Model.Parameters
 
@@ -44,18 +42,16 @@ data AppModel = AppModel
 
 makeLensesWith abbreviatedFields 'AppModel
 
+instance FromFile (Saves Game)
+instance ToFile (Saves Game)
+
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
     configModel' <- initConfigModel configPath
     let game = gameFromParameters $ configModel' ^. parameters
         gameSaves' = initSaveManagerModel game
-        handler = const $ return "" :: SomeException -> IO String
-    file <- catch (readFile $ fromJust gamesPath) handler
-    let contents = BLU.fromString file
-        decoded = decode contents :: Maybe (Saves Game)
-        savedGames = if null gamesPath || null decoded
-            then Seq.empty
-            else fromJust decoded
+        f = fmap snd . fromFile
+    savedGames <- fromMaybe (pure def) $ f <$> gamesPath
     return $ AppModel
         { _appActiveMenu = Nothing
         , _appConfigModel = configModel'
