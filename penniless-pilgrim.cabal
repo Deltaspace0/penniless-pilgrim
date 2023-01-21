@@ -44,11 +44,6 @@ library
       Model.Parameters.ColorConfig
       Model.Parameters.ConfigSlider
       Model.Parameters.RGB
-      Monomer.SaveManager
-      Monomer.SaveManager.SaveManagerCfg
-      Monomer.SaveManager.SaveManagerEvent
-      Monomer.SaveManager.SaveManagerModel
-      Monomer.SaveManager.UI
       UI
       Util
       Widgets.GameControl
