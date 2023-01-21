@@ -42,9 +42,6 @@ data AppModel = AppModel
 
 makeLensesWith abbreviatedFields 'AppModel
 
-instance FromFile (Saves Game)
-instance ToFile (Saves Game)
-
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
     configModel' <- initConfigModel configPath

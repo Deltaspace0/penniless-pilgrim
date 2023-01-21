@@ -9,7 +9,6 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 import Monomer.SaveManager
-import qualified Monomer.Lens as L
 
 import Composites
 import Model

@@ -32,15 +32,15 @@ getFixedRect
     -> WidgetEnv s e
     -> Rect
 getFixedRect gcData wenv = Rect x y linkSize nodeSize where
-    x = (width-linkSize*factorW)/2
-    y = (height-linkSize*factorH)/2
-    linkSize = min (width/factorW) (height/factorH)
+    x = (width'-linkSize*factorW)/2
+    y = (height'-linkSize*factorH)/2
+    linkSize = min (width'/factorW) (height'/factorH)
     nodeSize = linkSize/linkToNodeRatio
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
     (cols, rows) = getBounds $ getGrid gcData wenv
-    width = getWidth config
-    height = getHeight config
+    width' = getWidth config
+    height' = getHeight config
     linkToNodeRatio = getLinkToNodeRatio config
     config = _gcdConfig gcData
 
@@ -66,13 +66,13 @@ assignAreas wenv vp gcData = assignedAreas where
         >< fmap (getLinkArea . fst) (getHlinkSequence grid)
         >< fmap (getLinkArea . fst) (getVlinkSequence grid)
     grid = getGrid gcData wenv
-    getNodeArea (i, j) = Rect x y d d where
-        x = vx+linkSize*(fromIntegral i)
-        y = vy+linkSize*(fromIntegral j)
+    getNodeArea (i, j) = Rect x' y' d d where
+        x' = vx+linkSize*(fromIntegral i)
+        y' = vy+linkSize*(fromIntegral j)
         d = nodeSize*2
-    getLinkArea (i, j) = Rect x y linkSize nodeSize where
-        x = vx+linkSize*(fromIntegral i)+nodeSize
-        y = vy+linkSize*(fromIntegral j)+nodeSize
+    getLinkArea (i, j) = Rect x' y' linkSize nodeSize where
+        x' = vx+linkSize*(fromIntegral i)+nodeSize
+        y' = vy+linkSize*(fromIntegral j)+nodeSize
     vx = x+(vp ^. L.x)
     vy = y+(vp ^. L.y)
     Rect x y linkSize nodeSize = getFixedRect gcData wenv

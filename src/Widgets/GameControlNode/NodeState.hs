@@ -14,7 +14,6 @@ import Monomer
 import Util
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeMessage
-import Widgets.GameControlNode.NodeVisual
 import Widgets.GameControlNode.ShakeState
 import Widgets.GameControlNode.VisualState
 

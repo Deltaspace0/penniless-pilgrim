@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Model.File
@@ -12,6 +13,8 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import Data.Default
 import Data.Maybe
+import Model.Game
+import Monomer.SaveManager
 import qualified Data.ByteString.Lazy.UTF8 as BLU
 
 class (Default a, FromJSON a) => FromFile a where
@@ -34,3 +37,6 @@ class (ToJSON a) => ToFile a where
         case result of
             Left _ -> return False
             Right _ -> return True
+
+instance FromFile (Saves Game)
+instance ToFile (Saves Game)

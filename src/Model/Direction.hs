@@ -9,9 +9,7 @@ module Model.Direction
     ) where
 
 import Data.Aeson
-import Data.List
-import Data.Maybe
-import Data.Text (pack)
+import Data.List (elemIndex)
 import GHC.Generics
 
 data Direction

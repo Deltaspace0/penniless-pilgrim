@@ -31,7 +31,7 @@ makeGameControlNode nodeData state = widget where
     widget = createSingle state def
         { singleGetBaseStyle = getBaseStyle
         , singleGetCurrentStyle = getCurrentStyle
-        , singleInit = init
+        , singleInit = init'
         , singleMerge = merge
         , singleHandleEvent = handleEvent
         , singleHandleMessage = handleMessage
@@ -45,7 +45,7 @@ makeGameControlNode nodeData state = widget where
         style = currentStyle_ c wenv node
         c = def & L.isHovered .~ isNodeHoveredEllipse_ vp
 
-    init _ node = resultNode resNode where
+    init' _ node = resultNode resNode where
         resNode = node & L.widget .~ w
         w = makeGameControlNode nodeData state'
         state' = initState nodeData
@@ -57,7 +57,7 @@ makeGameControlNode nodeData state = widget where
         (newState, reqs) = mergeState oldState ts nodeData newNode
         ts = wenv ^. L.timestamp
 
-    handleEvent wenv node _ event = case event of
+    handleEvent _ node _ event = case event of
         Enter _ -> makeResult reqs where
             reqs = widgetDataSet nextTaxField nextTax
         Leave _ -> makeResult reqs where
@@ -66,13 +66,13 @@ makeGameControlNode nodeData state = widget where
             valid = isPointInNodeVp node p && clickable
             reqs =
                 [ SendMessage gcId position
-                , ResetCursorIcon id
+                , ResetCursorIcon id'
                 ]
         _ -> Nothing
         where
             makeResult = Just . resultReqs node
             gcId = _ndGameControlId nodeData
-            id = node ^. L.info . L.widgetId
+            id' = node ^. L.info . L.widgetId
             nextTaxField = _ndNextTaxLens nodeData
             nextTax = _ndNextTax nodeData
             clickable = _ndClickable nodeData

@@ -4,7 +4,6 @@ module Widgets.GameControlNode.VisualState
     ) where
 
 import Data.Default
-import Data.Maybe
 import Monomer
 
 import Widgets.GameControlNode.NodeVisual

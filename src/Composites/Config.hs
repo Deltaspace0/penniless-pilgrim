@@ -14,13 +14,13 @@ import Composites.Config.ConfigModel
 import Composites.Config.UI
 
 configComposite
-    :: (Eq ep, CompositeEvent sp, CompositeEvent ep)
+    :: (CompositeEvent sp, CompositeEvent ep)
     => ALens' sp ConfigModel
     -> WidgetNode sp ep
 configComposite modelLens = configComposite_ modelLens Nothing
 
 configComposite_
-    :: (Eq ep, CompositeEvent sp, CompositeEvent ep)
+    :: (CompositeEvent sp, CompositeEvent ep)
     => ALens' sp ConfigModel
     -> Maybe ep
     -> WidgetNode sp ep

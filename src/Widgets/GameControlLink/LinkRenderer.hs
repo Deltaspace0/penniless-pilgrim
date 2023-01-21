@@ -4,6 +4,7 @@ module Widgets.GameControlLink.LinkRenderer
     ) where
 
 import Control.Lens
+import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
@@ -25,7 +26,6 @@ data LinkRenderer s e = LinkRenderer
 runRenderer :: LinkRenderer s e -> IO ()
 runRenderer linkRenderer = do
     let wenv = _lrEnv linkRenderer
-        node = _lrNode linkRenderer
         linkData = _lrLinkData linkRenderer
         state = _lrLinkState linkRenderer
         ts = wenv ^. L.timestamp
@@ -34,13 +34,13 @@ runRenderer linkRenderer = do
         delta = fromIntegral $ ts-(_lsStart state)
         animationDuration = _ldAnimationDuration linkData
         progress = max 0 $ min 1 $ delta/animationDuration
-        Just newLink' = newLink
-        Just oldLink' = oldLink
+        newLink' = fromJust newLink
+        oldLink' = fromJust oldLink
         colorConfig = _ldColorConfig linkData
-        new@(newColor, newForm) = if null newLink
+        new = if null newLink
             then (_lccDefault colorConfig, LinkDefault)
             else (_linkColor newLink', _linkForm newLink')
-        old@(oldColor, oldForm) = if null oldLink
+        old = if null oldLink
             then (_lccDefault colorConfig, LinkDefault)
             else (_linkColor oldLink', _linkForm oldLink')
     if _lsRunning state && progress < 1
@@ -68,7 +68,7 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         totalSize' = totalSize*progress
         rest = totalSize-totalSize'
         s' = nodeSize + if isHz then x else y
-        f x = if x == LinkBack then rest else 0
+        f a = if a == LinkBack then rest else 0
         s = s' + if form' == LinkDefault then f form'' else f form'
         b = s+totalSize'
         nodeToWidthRatio = _ldNodeToWidthRatio linkData
@@ -76,13 +76,13 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         ars = if totalSize' > linkWidth*3
             then linkWidth*1.5
             else totalSize'/2
-        drawLine' a b = drawLine renderer p1 p2 linkWidth c where
+        drawLine' a a1 = drawLine renderer p1 p2 linkWidth c where
             p1 = if isHz then Point a y else Point x a
-            p2 = if isHz then Point b y else Point x b
-        drawTriangle' a b = drawTriangle renderer p1 p2 p3 c where
+            p2 = if isHz then Point a1 y else Point x a1
+        drawTriangle' a a1 = drawTriangle renderer p1 p2 p3 c where
             p1 = if isHz then Point a y else Point x a
-            p2 = if isHz then Point b y1 else Point x1 b
-            p3 = if isHz then Point b y2 else Point x2 b
+            p2 = if isHz then Point a1 y1 else Point x1 a1
+            p3 = if isHz then Point a1 y2 else Point x2 a1
             x1 = x+ars
             x2 = x-ars
             y1 = y-ars

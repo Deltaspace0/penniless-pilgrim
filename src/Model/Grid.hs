@@ -33,7 +33,6 @@ module Model.Grid
 import Control.Lens hiding ((.=))
 import Data.Aeson
 import Data.Ix
-import Data.Maybe
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 

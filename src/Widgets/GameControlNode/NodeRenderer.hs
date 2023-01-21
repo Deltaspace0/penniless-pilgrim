@@ -33,7 +33,7 @@ runRenderer nodeRenderer = do
         style = currentStyle wenv node
         vp = getShakeArea nodeRenderer
         animationDuration = _ndAnimationDuration nodeData
-    if null visualStates || floor animationDuration == 0
+    if null visualStates || (floor animationDuration :: Int) == 0
         then drawEllipse renderer vp $ _sstFgColor style
         else mapM_ (renderVisual nodeRenderer vp ts) visualStates
     let visualStack = _ndVisualStack nodeData

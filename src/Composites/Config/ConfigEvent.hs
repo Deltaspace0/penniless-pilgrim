@@ -54,8 +54,7 @@ loadHandle model = [Producer producerHandler] where
     producerHandler raiseEvent = do
         let x = fromFile <$> model ^. filePath
         (success, parameters') <- fromMaybe (pure (False, def)) x
-        let model' = model & parameters .~ parameters'
-            caption = if success
+        let caption = if success
                 then "Successfully loaded config from file"
                 else "Couldn't load config from file"
         when success $ do

@@ -34,7 +34,7 @@ makeGameControl
     -> Widget s e
 makeGameControl gcData state = widget where
     widget = createContainer state def
-        { containerInit = init
+        { containerInit = init'
         , containerMerge = merge
         , containerHandleEvent = handleEvent
         , containerHandleMessage = handleMessage
@@ -44,7 +44,7 @@ makeGameControl gcData state = widget where
         , containerRenderAfter = renderAfter
         }
 
-    init wenv node = resultNode resNode where
+    init' wenv node = resultNode resNode where
         resNode = (makeChildren wenv node gcData) & L.widget .~ w
         w = makeGameControl gcData state'
         state' = initState gcData wenv
@@ -58,17 +58,12 @@ makeGameControl gcData state = widget where
     handleEvent wenv node _ event = result where
         result = case event of
             KeyAction _ code KeyPressed
-                | isKeyNorth code -> handle North
-                | isKeySouth code -> handle South
-                | isKeyWest code -> handle West
-                | isKeyEast code -> handle East
-                where
-                    isKeyNorth code = isKeyUp code || isKeyW code
-                    isKeySouth code = isKeyDown code || isKeyS code
-                    isKeyWest code = isKeyLeft code || isKeyA code
-                    isKeyEast code = isKeyRight code || isKeyD code
-            ButtonAction _ _ BtnPressed _ -> Just result where
-                result = resultReqs node [SetFocus widgetId]
+                | isKeyUp code || isKeyW code -> handle North
+                | isKeyDown code || isKeyS code -> handle South
+                | isKeyLeft code || isKeyA code -> handle West
+                | isKeyRight code || isKeyD code -> handle East
+            ButtonAction _ _ BtnPressed _ -> Just result' where
+                result' = resultReqs node [SetFocus widgetId]
             _ -> Nothing
         widgetId = node ^. L.info . L.widgetId
         handle = handleGameChange wenv node gcData . moveToDirection
@@ -77,9 +72,9 @@ makeGameControl gcData state = widget where
         result = cast message >>= handle
         handle = handleGameChange wenv node gcData . moveToPosition
 
-    getSizeReq _ _ _ = (fixedSize width, fixedSize height) where
-        width = getWidth $ _gcdConfig gcData
-        height = getHeight $ _gcdConfig gcData
+    getSizeReq _ _ _ = (fixedSize width', fixedSize height') where
+        width' = getWidth $ _gcdConfig gcData
+        height' = getHeight $ _gcdConfig gcData
 
     resize wenv node vp _ = (resultNode node, assignedAreas) where
         assignedAreas = assignAreas wenv vp gcData        

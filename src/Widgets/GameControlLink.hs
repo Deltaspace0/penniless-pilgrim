@@ -33,12 +33,12 @@ gameControlVlink linkData = node where
 makeGameControlLink :: Bool -> LinkData -> LinkState -> Widget s e
 makeGameControlLink isHz linkData state = widget where
     widget = createSingle state def
-        { singleInit = init
+        { singleInit = init'
         , singleMerge = merge
         , singleRender = render
         }
 
-    init _ node = resultNode resNode where
+    init' _ node = resultNode resNode where
         resNode = node & L.widget .~ w
         w = makeGameControlLink isHz linkData state'
         state' = initState linkData

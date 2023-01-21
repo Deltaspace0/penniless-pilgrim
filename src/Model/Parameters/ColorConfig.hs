@@ -8,8 +8,6 @@ import Data.Aeson
 import Data.Default
 
 import Widgets.GameControl.GameControlColorConfig
-import Widgets.GameControlLink.LinkColorConfig
-import Widgets.GameControlNode.NodeColorConfig
 
 data ColorConfig = ColorConfig
     { _ccGameControlLink :: LinkColorConfig

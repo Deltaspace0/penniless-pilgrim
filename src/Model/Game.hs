@@ -120,5 +120,5 @@ taxFromGame p game = moveResult <|> nodeResult where
     nextGame = directionFromGame p game >>= (flip movePilgrim) game
     nodeResult = getTax $ getNode p $ _grid game
     getTax [] = Nothing
-    getTax (NodePath tax:xs) = Just tax
+    getTax (NodePath tax:_) = Just tax
     getTax (_:xs) = getTax xs

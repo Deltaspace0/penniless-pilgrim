@@ -5,15 +5,15 @@ module Util
 
 import Control.Lens
 import Data.Text (Text, pack)
-import Monomer
-import TextShow
+import Monomer.Core
 import qualified Monomer.Lens as L
 
 showt' :: Double -> Text
 showt' number = pack result where
     result = if m == ".0" then i else t
     (i, m) = break (== '.') t
-    t = show $ (fromIntegral $ round $ number*1000)/1000
+    t = show $ ((fromIntegral r)/1000 :: Double)
+    r = round $ number*1000 :: Integer
 
 requestRenderEvery
     :: WidgetNode s e

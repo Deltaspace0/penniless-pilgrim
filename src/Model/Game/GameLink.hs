@@ -6,7 +6,6 @@ module Model.Game.GameLink
     ) where
 
 import Data.Aeson
-import Data.Text
 import GHC.Generics
 
 data GameLink

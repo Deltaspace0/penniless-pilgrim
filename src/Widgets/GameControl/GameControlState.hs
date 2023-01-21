@@ -68,6 +68,6 @@ mergeState oldState wenv gcData newNode = (newState, reqs) where
     delta = fromIntegral $ ts-oldStart
     progress = delta/animationDuration
     widgetId = newNode ^. L.info . L.widgetId
-    animationDuration' = floor animationDuration
+    animationDuration' = floor animationDuration :: Integer
     animationDuration = getAnimationDuration $ _gcdConfig gcData
     ts = wenv ^. L.timestamp
