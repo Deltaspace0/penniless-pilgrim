@@ -8,20 +8,20 @@ import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.GameControlNode.NodeColors
+import Widgets.ButtonColors
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeState
 import Widgets.GameControlNode.NodeVisual
 
-data NodeRenderer s e = NodeRenderer
+data NodeRenderer s e c = NodeRenderer
     { _nrEnv :: WidgetEnv s e
     , _nrNode :: WidgetNode s e
     , _nrRenderer :: Renderer
-    , _nrNodeData :: NodeData s
+    , _nrNodeData :: NodeData s c
     , _nrNodeState :: NodeState
     }
 
-runRenderer :: NodeRenderer s e -> IO ()
+runRenderer :: (ButtonColors c) => NodeRenderer s e c -> IO ()
 runRenderer nodeRenderer = do
     let wenv = _nrEnv nodeRenderer
         node = _nrNode nodeRenderer
@@ -37,15 +37,15 @@ runRenderer nodeRenderer = do
         then drawEllipse renderer vp $ _sstFgColor style
         else mapM_ (renderVisual nodeRenderer vp ts) visualStates
     let visualStack = _ndVisualStack nodeData
-        colorConfig = _ndDefaultColors nodeData
+        config = _ndDefaultColors nodeData
         visual = head visualStack
         highlightColor
             | not $ _ndClickable nodeData = Nothing
-            | null visualStack = Just $ _nodeHighlight colorConfig
+            | null visualStack = Just $ getHighlightColor config
             | otherwise = Just $ _nodeColorHighlight visual
     drawEllipseBorder renderer vp highlightColor 2
 
-getShakeArea :: NodeRenderer s e -> Rect
+getShakeArea :: NodeRenderer s e c -> Rect
 getShakeArea nodeRenderer = shakeArea where
     shakeArea = if _ssRunning $ _nsShakeState state
         then Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
@@ -65,7 +65,8 @@ getShakeArea nodeRenderer = shakeArea where
     ts = wenv ^. L.timestamp
 
 renderVisual
-    :: NodeRenderer s e
+    :: (ButtonColors c)
+    => NodeRenderer s e c
     -> Rect
     -> Millisecond
     -> VisualState
@@ -86,16 +87,22 @@ renderVisual nodeRenderer vp ts visualState = do
         clickable = _ndClickable nodeData
         isActive = clickable && isNodeActive wenv node
         isHovered = clickable && isNodeHovered wenv node
-        color = Just $ getColor nodeData isActive isHovered visual
+        config = _ndDefaultColors nodeData
+        color = Just $ getColor config isActive isHovered visual
     drawEllipse renderer vp' color
 
-getColor :: NodeData s -> Bool -> Bool -> Maybe NodeVisual -> Color
-getColor nodeData isActive isHovered visual
-    | isActive = fromMaybe (_nodeActive colorConfig) visualActive
-    | isHovered = fromMaybe (_nodeHover colorConfig) visualHover
-    | otherwise = fromMaybe (_nodeDefault colorConfig) visualDefault
+getColor
+    :: (ButtonColors a, ButtonColors b)
+    => a
+    -> Bool
+    -> Bool
+    -> Maybe b
+    -> Color
+getColor config isActive isHovered visual
+    | isActive = fromMaybe (getActiveColor config) visualActive
+    | isHovered = fromMaybe (getHoverColor config) visualHover
+    | otherwise = fromMaybe (getDefaultColor config) visualDefault
     where
-        colorConfig = _ndDefaultColors nodeData
-        visualActive = _nodeColorActive <$> visual
-        visualHover = _nodeColorHover <$> visual
-        visualDefault = _nodeColorDefault <$> visual
+        visualActive = getActiveColor <$> visual
+        visualHover = getHoverColor <$> visual
+        visualDefault = getDefaultColor <$> visual

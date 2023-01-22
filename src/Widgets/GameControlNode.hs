@@ -14,19 +14,27 @@ import Monomer
 import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
 
+import Widgets.ButtonColors
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeMessage
 import Widgets.GameControlNode.NodeRenderer
 import Widgets.GameControlNode.NodeState
 import Widgets.GameControlNode.NodeVisual
 
-gameControlNode :: NodeData s -> WidgetNode s e
+gameControlNode
+    :: (ButtonColors c)
+    => NodeData s c
+    -> WidgetNode s e
 gameControlNode nodeData = node where
     node = defaultWidgetNode widgetType widget
     widgetType = gameControlNodeWidgetType nodeData
     widget = makeGameControlNode nodeData def
 
-makeGameControlNode :: NodeData s -> NodeState -> Widget s e
+makeGameControlNode
+    :: (ButtonColors c)
+    => NodeData s c
+    -> NodeState
+    -> Widget s e
 makeGameControlNode nodeData state = widget where
     widget = createSingle state def
         { singleGetBaseStyle = getBaseStyle
