@@ -8,6 +8,7 @@ import Data.Aeson
 import Monomer
 
 import Model.Parameters.RGB
+import Widgets.ButtonColors
 
 data NodeColors = NodeColors
     { _nodeHighlight :: Color
@@ -32,3 +33,9 @@ instance ToJSON NodeColors where
         , "hover" .= toRGB (_nodeHover colors)
         , "active" .= toRGB (_nodeActive colors)
         ]
+
+instance ButtonColors NodeColors where
+    getDefaultColor = _nodeDefault
+    getHighlightColor = _nodeHighlight
+    getHoverColor = _nodeHover
+    getActiveColor = _nodeActive

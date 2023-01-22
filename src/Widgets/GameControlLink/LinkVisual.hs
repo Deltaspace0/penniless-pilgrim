@@ -5,9 +5,13 @@ module Widgets.GameControlLink.LinkVisual
 
 import Monomer
 
+import Widgets.ButtonColors
 import Widgets.GameControlLink.LinkForm
 
 data LinkVisual = LinkVisual
     { _linkColor :: Color
     , _linkForm :: LinkForm
     } deriving (Eq, Show)
+
+instance ButtonColors LinkVisual where
+    getDefaultColor = _linkColor
