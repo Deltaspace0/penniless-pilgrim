@@ -8,7 +8,6 @@ import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.GameControlLink.LinkColorConfig
 import Widgets.GameControlLink.LinkData
 import Widgets.GameControlLink.LinkForm
 import Widgets.GameControlLink.LinkState
@@ -29,33 +28,27 @@ runRenderer linkRenderer = do
         linkData = _lrLinkData linkRenderer
         state = _lrLinkState linkRenderer
         ts = wenv ^. L.timestamp
-        newLink = _lsLink state
-        oldLink = _lsOldLink state
         delta = fromIntegral $ ts-(_lsStart state)
         animationDuration = _ldAnimationDuration linkData
         progress = max 0 $ min 1 $ delta/animationDuration
-        newLink' = fromJust newLink
-        oldLink' = fromJust oldLink
-        colorConfig = _ldColorConfig linkData
-        new = if null newLink
-            then (_lccDefault colorConfig, LinkDefault)
-            else (_linkColor newLink', _linkForm newLink')
-        old = if null oldLink
-            then (_lccDefault colorConfig, LinkDefault)
-            else (_linkColor oldLink', _linkForm oldLink')
+        empty = LinkVisual undefined LinkDefault
+        new = fromMaybe empty $ _lsLink state
+        old = fromMaybe empty $ _lsOldLink state
+        newForm = _linkForm new
+        oldForm = _linkForm old
     if _lsRunning state && progress < 1
         then if progress < 0.5
-            then renderForm linkRenderer old new $ 1-progress*2
-            else renderForm linkRenderer new old $ progress*2-1
-        else renderForm linkRenderer new old 1
+            then renderForm linkRenderer old newForm $ 1-progress*2
+            else renderForm linkRenderer new oldForm $ progress*2-1
+        else renderForm linkRenderer new oldForm 1
 
 renderForm
     :: LinkRenderer s e
-    -> (Color, LinkForm)
-    -> (Color, LinkForm)
+    -> LinkVisual
+    -> LinkForm
     -> Double
     -> IO ()
-renderForm linkRenderer (color', form') (_, form'') progress = do
+renderForm linkRenderer new oldForm progress = do
     let wenv = _lrEnv linkRenderer
         node = _lrNode linkRenderer
         renderer = _lrRenderer linkRenderer
@@ -63,13 +56,14 @@ renderForm linkRenderer (color', form') (_, form'') progress = do
         isHz = _lrIsHz linkRenderer
         style = currentStyle wenv node
         Rect x y linkSize nodeSize = getContentArea node style
+        LinkVisual color' form' = new
         c = Just color'
         totalSize = linkSize-nodeSize*2
         totalSize' = totalSize*progress
         rest = totalSize-totalSize'
         s' = nodeSize + if isHz then x else y
         f a = if a == LinkBack then rest else 0
-        s = s' + if form' == LinkDefault then f form'' else f form'
+        s = s' + if form' == LinkDefault then f oldForm else f form'
         b = s+totalSize'
         nodeToWidthRatio = _ldNodeToWidthRatio linkData
         linkWidth = nodeSize/nodeToWidthRatio
