@@ -110,8 +110,11 @@ instance ToJSON Parameters where
 instance FromFile Parameters
 instance ToFile Parameters
 
-instance GameControlConfig Parameters ColorConfig Game where
-    getColorConfig p = p ^. colorConfig
+instance GameControlColorConfig Parameters Game where
+    getDefaultNodeColors = getDefaultNodeColors . _apColorConfig
+    getVisualGrid game = getVisualGrid game . _apColorConfig
+
+instance GameControlConfig Parameters Game where
     getAnimationDuration p = p ^. gridAnimationSlider . currentValue
     getLinkToNodeRatio p = p ^. linkToNodeSlider . currentValue
     getNodeToWidthRatio p = p ^. nodeToWidthSlider . currentValue

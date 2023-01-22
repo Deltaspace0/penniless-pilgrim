@@ -20,7 +20,7 @@ import Widgets.GameControl.GameControlRenderer
 import Widgets.GameControl.GameControlState
 
 gameControl
-    :: (ControlledGame a, GameControlConfig b c a)
+    :: (ControlledGame a, GameControlConfig b a)
     => GameControlData s a b
     -> WidgetNode s e
 gameControl gcData = node where
@@ -28,7 +28,7 @@ gameControl gcData = node where
     widget = makeGameControl gcData def
 
 makeGameControl
-    :: (ControlledGame a, GameControlConfig b c a)
+    :: (ControlledGame a, GameControlConfig b a)
     => GameControlData s a b
     -> GameControlState
     -> Widget s e
