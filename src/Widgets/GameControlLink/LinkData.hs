@@ -9,13 +9,11 @@ module Widgets.GameControlLink.LinkData
 import Monomer
 import TextShow
 
-import Widgets.GameControlLink.LinkColorConfig
 import Widgets.GameControlLink.LinkVisual
 
 data LinkData = LinkData
     { _ldLink :: Maybe LinkVisual
     , _ldPosition :: (Int, Int)
-    , _ldColorConfig :: LinkColorConfig
     , _ldAnimationDuration :: Double
     , _ldNodeToWidthRatio :: Double
     } deriving (Eq, Show)

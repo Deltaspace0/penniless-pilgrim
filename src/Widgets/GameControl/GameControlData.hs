@@ -107,7 +107,6 @@ makeChildren wenv node gcData = resNode where
     linkData (p, link) = LinkData
         { _ldLink = link
         , _ldPosition = p
-        , _ldColorConfig = linkColorConfig
         , _ldAnimationDuration = getAnimationDuration config
         , _ldNodeToWidthRatio = getNodeToWidthRatio config
         }
@@ -116,7 +115,6 @@ makeChildren wenv node gcData = resNode where
     gameLens = WidgetLens $ _gcdGameLens gcData
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
     nodeColorConfig = getNodeColorConfig $ getColorConfig config
-    linkColorConfig = getLinkColorConfig $ getColorConfig config
 
 handleGameChange
     :: (ControlledGame a, GameControlConfig b c)
