@@ -1,14 +1,16 @@
+{-# LANGUAGE FunctionalDependencies #-}
+
 module Widgets.GameControl.GameControlColorConfig
-    ( module Widgets.GameControlLink.LinkColorConfig
-    , module Widgets.GameControlNode.NodeColorConfig
-    , GameControlColorConfig
-    , getLinkColorConfig
-    , getNodeColorConfig
+    ( GameControlColorConfig
+    , getDefaultNodeColors
+    , getVisualGrid
     ) where
 
-import Widgets.GameControlLink.LinkColorConfig
-import Widgets.GameControlNode.NodeColorConfig
+import Model.Grid
+import Widgets.GameControlNode.NodeColors
+import Widgets.GameControlNode.NodeVisual
+import Widgets.GameControlLink.LinkVisual
 
-class GameControlColorConfig a where
-    getLinkColorConfig :: a -> LinkColorConfig
-    getNodeColorConfig :: a -> NodeColorConfig
+class GameControlColorConfig a b | a -> b where
+    getDefaultNodeColors :: a -> NodeColors
+    getVisualGrid :: b -> a -> Grid NodeVisual LinkVisual

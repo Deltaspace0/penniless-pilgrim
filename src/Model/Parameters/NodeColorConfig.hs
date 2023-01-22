@@ -1,14 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Widgets.GameControlNode.NodeColorConfig
+module Model.Parameters.NodeColorConfig
     ( module Widgets.GameControlNode.NodeColors
     , NodeColorConfig(..)
+    , nodeTransform
     ) where
 
 import Data.Aeson
 import Data.Default
 import Monomer
 
+import Model.Game
+import Widgets.GameControlNode
 import Widgets.GameControlNode.NodeColors
 
 data NodeColorConfig = NodeColorConfig
@@ -60,3 +63,16 @@ instance ToJSON NodeColorConfig where
         , "path" .= _nccPath config
         , "goal" .= _nccGoal config
         ]
+
+nodeTransform :: NodeColorConfig -> [GameNode] -> [NodeVisual]
+nodeTransform config = map getVisual where
+    getVisual node = f $ case node of
+        NodePilgrim -> _nccPilgrim config
+        NodePath _ -> _nccPath config
+        NodeGoal -> _nccGoal config
+    f colors = NodeVisual
+        { _nodeColorHighlight = _nodeHighlight colors
+        , _nodeColorDefault = _nodeDefault colors
+        , _nodeColorHover = _nodeHover colors
+        , _nodeColorActive = _nodeActive colors
+        }

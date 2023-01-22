@@ -43,6 +43,8 @@ library
       Model.Parameters
       Model.Parameters.ColorConfig
       Model.Parameters.ConfigSlider
+      Model.Parameters.LinkColorConfig
+      Model.Parameters.NodeColorConfig
       Model.Parameters.RGB
       UI
       Util
@@ -54,14 +56,12 @@ library
       Widgets.GameControl.GameControlRenderer
       Widgets.GameControl.GameControlState
       Widgets.GameControlLink
-      Widgets.GameControlLink.LinkColorConfig
       Widgets.GameControlLink.LinkData
       Widgets.GameControlLink.LinkForm
       Widgets.GameControlLink.LinkRenderer
       Widgets.GameControlLink.LinkState
       Widgets.GameControlLink.LinkVisual
       Widgets.GameControlNode
-      Widgets.GameControlNode.NodeColorConfig
       Widgets.GameControlNode.NodeColors
       Widgets.GameControlNode.NodeData
       Widgets.GameControlNode.NodeMessage

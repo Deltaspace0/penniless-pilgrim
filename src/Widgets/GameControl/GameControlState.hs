@@ -10,7 +10,6 @@ import Monomer
 import qualified Monomer.Lens as L
 
 import Util
-import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
 
@@ -30,7 +29,7 @@ instance Default GameControlState where
         }
 
 initState
-    :: (ControlledGame a, GameControlConfig b c)
+    :: (GameControlConfig b c a)
     => GameControlData s a b
     -> WidgetEnv s e
     -> GameControlState
@@ -40,7 +39,7 @@ initState gcData wenv = def
     }
 
 mergeState
-    :: (ControlledGame a, GameControlConfig b c)
+    :: (GameControlConfig b c a)
     => GameControlState
     -> WidgetEnv s e
     -> GameControlData s a b

@@ -45,7 +45,6 @@ instance ToJSON Game where
 
 instance ControlledGame Game where
     getCurrentPosition = _position . _pilgrim
-    getGameGrid = _grid
     getScoreByPosition = taxFromGame
     moveToDirection = movePilgrim
     moveToPosition = jumpPilgrim

@@ -110,7 +110,7 @@ instance ToJSON Parameters where
 instance FromFile Parameters
 instance ToFile Parameters
 
-instance GameControlConfig Parameters ColorConfig where
+instance GameControlConfig Parameters ColorConfig Game where
     getColorConfig p = p ^. colorConfig
     getAnimationDuration p = p ^. gridAnimationSlider . currentValue
     getLinkToNodeRatio p = p ^. linkToNodeSlider . currentValue

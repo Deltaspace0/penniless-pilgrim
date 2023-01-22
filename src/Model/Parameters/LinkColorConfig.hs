@@ -1,14 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Widgets.GameControlLink.LinkColorConfig
+module Model.Parameters.LinkColorConfig
     ( LinkColorConfig(..)
+    , hlinkTransform
+    , vlinkTransform
     ) where
 
 import Data.Aeson
 import Data.Default
 import Monomer
 
+import Model.Game
 import Model.Parameters.RGB
+import Widgets.GameControlLink hiding
+    ( LinkDefault
+    , LinkBack
+    , LinkForward
+    )
+import qualified Widgets.GameControlLink as C
 
 data LinkColorConfig = LinkColorConfig
     { _lccDefault :: Color
@@ -45,3 +54,37 @@ instance ToJSON LinkColorConfig where
         , "west" .= toRGB (_lccWest config)
         , "east" .= toRGB (_lccEast config)
         ]
+
+hlinkTransform
+    :: LinkColorConfig
+    -> Maybe GameLink
+    -> Maybe LinkVisual
+hlinkTransform config Nothing = Just LinkVisual
+    { _linkColor = _lccDefault config
+    , _linkForm = C.LinkDefault
+    }
+hlinkTransform config (Just LinkBack) = Just LinkVisual
+    { _linkColor = _lccWest config
+    , _linkForm = C.LinkBack
+    }
+hlinkTransform config (Just LinkForward) = Just LinkVisual
+    { _linkColor = _lccEast config
+    , _linkForm = C.LinkForward
+    }
+
+vlinkTransform
+    :: LinkColorConfig
+    -> Maybe GameLink
+    -> Maybe LinkVisual
+vlinkTransform config Nothing = Just LinkVisual
+    { _linkColor = _lccDefault config
+    , _linkForm = C.LinkDefault
+    }
+vlinkTransform config (Just LinkBack) = Just LinkVisual
+    { _linkColor = _lccNorth config
+    , _linkForm = C.LinkBack
+    }
+vlinkTransform config (Just LinkForward) = Just LinkVisual
+    { _linkColor = _lccSouth config
+    , _linkForm = C.LinkForward
+    }
