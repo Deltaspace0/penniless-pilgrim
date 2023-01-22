@@ -15,6 +15,7 @@ import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Model.Grid
+import Widgets.ButtonColors
 import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControlLink
@@ -27,7 +28,7 @@ data GameControlData s a b = GameControlData
     }
 
 getFixedRect
-    :: (GameControlConfig b a)
+    :: (GameControlConfig b a c)
     => GameControlData s a b
     -> WidgetEnv s e
     -> Rect
@@ -55,7 +56,7 @@ getMiddleRect rectA rectB progress = rect where
     Rect xB yB linkSizeB nodeSizeB = rectB
 
 assignAreas
-    :: (GameControlConfig b a)
+    :: (GameControlConfig b a c)
     => WidgetEnv s e
     -> Rect
     -> GameControlData s a b
@@ -78,7 +79,7 @@ assignAreas wenv vp gcData = assignedAreas where
     Rect x y linkSize nodeSize = getFixedRect gcData wenv
 
 makeChildren
-    :: (ControlledGame a, GameControlConfig b a)
+    :: (ControlledGame a, ButtonColors c, GameControlConfig b a c)
     => WidgetEnv s e
     -> WidgetNode s e
     -> GameControlData s a b
@@ -116,7 +117,7 @@ makeChildren wenv node gcData = resNode where
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 handleGameChange
-    :: (ControlledGame a, GameControlConfig b a)
+    :: (ControlledGame a, GameControlConfig b a c)
     => WidgetEnv s e
     -> WidgetNode s e
     -> GameControlData s a b
@@ -141,7 +142,7 @@ handleGameChange wenv node gcData f = result where
     nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 getGrid
-    :: (GameControlConfig b a)
+    :: (GameControlConfig b a c)
     => GameControlData s a b
     -> WidgetEnv s e
     -> Grid NodeVisual LinkVisual

@@ -2,7 +2,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Parameters.ColorConfig
-    ( ColorConfig(..)
+    ( module Model.Parameters.LinkColorConfig
+    , module Model.Parameters.NodeColorConfig
+    , ColorConfig(..)
     ) where
 
 import Data.Aeson
@@ -34,7 +36,7 @@ instance ToJSON ColorConfig where
         , "game_control_node" .= _ccGameControlNode config
         ]
 
-instance GameControlColorConfig ColorConfig Game where
+instance GameControlColorConfig ColorConfig Game NodeColors where
     getDefaultNodeColors = _nccDefault . _ccGameControlNode
     getVisualGrid = transformGrid
 

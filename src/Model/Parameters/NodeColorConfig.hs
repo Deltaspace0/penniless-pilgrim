@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Model.Parameters.NodeColorConfig
-    ( module Widgets.GameControlNode.NodeColors
+    ( module Model.Parameters.NodeColors
     , NodeColorConfig(..)
     , nodeTransform
     ) where
@@ -11,8 +11,8 @@ import Data.Default
 import Monomer
 
 import Model.Game
+import Model.Parameters.NodeColors
 import Widgets.GameControlNode
-import Widgets.GameControlNode.NodeColors
 
 data NodeColorConfig = NodeColorConfig
     { _nccDefault :: NodeColors

@@ -7,10 +7,9 @@ module Widgets.GameControl.GameControlColorConfig
     ) where
 
 import Model.Grid
-import Widgets.GameControlNode.NodeColors
 import Widgets.GameControlNode.NodeVisual
 import Widgets.GameControlLink.LinkVisual
 
-class GameControlColorConfig a b | a -> b where
-    getDefaultNodeColors :: a -> NodeColors
+class GameControlColorConfig a b c | a -> b c where
+    getDefaultNodeColors :: a -> c
     getVisualGrid :: b -> a -> Grid NodeVisual LinkVisual
