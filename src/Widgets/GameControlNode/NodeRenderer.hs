@@ -8,7 +8,7 @@ import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.GameControlNode.NodeColorConfig
+import Widgets.GameControlNode.NodeColors
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeState
 import Widgets.GameControlNode.NodeVisual
@@ -37,7 +37,7 @@ runRenderer nodeRenderer = do
         then drawEllipse renderer vp $ _sstFgColor style
         else mapM_ (renderVisual nodeRenderer vp ts) visualStates
     let visualStack = _ndVisualStack nodeData
-        colorConfig = getDefaultNodeColors nodeData
+        colorConfig = _ndDefaultColors nodeData
         visual = head visualStack
         highlightColor
             | not $ _ndClickable nodeData = Nothing
@@ -95,7 +95,7 @@ getColor nodeData isActive isHovered visual
     | isHovered = fromMaybe (_nodeHover colorConfig) visualHover
     | otherwise = fromMaybe (_nodeDefault colorConfig) visualDefault
     where
-        colorConfig = getDefaultNodeColors nodeData
+        colorConfig = _ndDefaultColors nodeData
         visualActive = _nodeColorActive <$> visual
         visualHover = _nodeColorHover <$> visual
         visualDefault = _nodeColorDefault <$> visual

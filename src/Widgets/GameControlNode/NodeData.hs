@@ -3,7 +3,6 @@
 module Widgets.GameControlNode.NodeData
     ( NodeData(..)
     , gameControlNodeWidgetType
-    , getDefaultNodeColors
     , baseStyleFromNodeData
     ) where
 
@@ -11,7 +10,7 @@ import Data.Default
 import Monomer
 import TextShow
 
-import Widgets.GameControlNode.NodeColorConfig
+import Widgets.GameControlNode.NodeColors
 import Widgets.GameControlNode.NodeVisual
 
 data NodeData s = NodeData
@@ -21,16 +20,13 @@ data NodeData s = NodeData
     , _ndClickable :: Bool
     , _ndNextTax :: Maybe Double
     , _ndNextTaxLens :: WidgetData s (Maybe Double)
-    , _ndColorConfig :: NodeColorConfig
+    , _ndDefaultColors :: NodeColors
     , _ndAnimationDuration :: Double
     }
 
 gameControlNodeWidgetType :: NodeData s -> WidgetType
 gameControlNodeWidgetType nodeData = WidgetType widgetType where
     widgetType = "gameControlNode" <> showt (_ndPosition nodeData)
-
-getDefaultNodeColors :: NodeData s -> NodeColors
-getDefaultNodeColors = _nccDefault . _ndColorConfig
 
 baseStyleFromNodeData :: NodeData s -> Maybe Style
 baseStyleFromNodeData nodeData = Just style where
@@ -59,4 +55,4 @@ baseStyleFromNodeData nodeData = Just style where
             }
         }
     visualStack = _ndVisualStack nodeData
-    colorConfig = getDefaultNodeColors nodeData
+    colorConfig = _ndDefaultColors nodeData
