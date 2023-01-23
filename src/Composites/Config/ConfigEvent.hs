@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Composites.Config.ConfigEvent
     ( ConfigEvent(..)
     , handleEvent

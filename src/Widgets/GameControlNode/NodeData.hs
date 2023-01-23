@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Widgets.GameControlNode.NodeData
     ( NodeData(..)
     , gameControlNodeWidgetType

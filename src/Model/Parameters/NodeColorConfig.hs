@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Model.Parameters.NodeColorConfig
     ( module Model.Parameters.NodeColors
     , NodeColorConfig(..)

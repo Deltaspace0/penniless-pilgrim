@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Composites.Config
     ( module Composites.Config.ConfigModel
     , configComposite

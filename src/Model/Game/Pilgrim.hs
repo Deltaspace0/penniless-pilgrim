@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Model.Game.Pilgrim
     ( module Model.Direction
     , Pilgrim(..)

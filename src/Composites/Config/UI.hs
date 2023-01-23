@@ -1,5 +1,4 @@
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Composites.Config.UI
     ( buildUI

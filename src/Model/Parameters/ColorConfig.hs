@@ -1,5 +1,4 @@
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Model.Parameters.ColorConfig
     ( module Model.Parameters.LinkColorConfig

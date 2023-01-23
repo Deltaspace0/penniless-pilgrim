@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Model.Parameters.ConfigSlider
     ( ConfigSlider(..)
     , currentValue

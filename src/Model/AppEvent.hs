@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Model.AppEvent
     ( AppEvent(..)
     , handleEvent

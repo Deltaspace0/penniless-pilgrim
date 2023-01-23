@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Model.Game
     ( module Model.Game.GameLink
     , module Model.Game.GameNode

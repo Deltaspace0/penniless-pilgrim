@@ -33,6 +33,9 @@ dependencies:
 - time
 - utf8-string
 
+default-extensions:
+- OverloadedStrings
+
 ghc-options:
 - -Wall
 - -Wcompat

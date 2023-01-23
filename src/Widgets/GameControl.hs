@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Widgets.GameControl
     ( GameControlData(..)
     , gameControl
