@@ -11,6 +11,7 @@ import Monomer.EnhancedSlider
 import Composites.Config.ConfigEvent
 import Composites.Config.ConfigModel
 import Model.Parameters
+import Util
 
 buildUI :: UIBuilder ConfigModel ConfigEvent
 buildUI _ model = widgetTree where
@@ -48,7 +49,7 @@ configSlider_ model slider events = widget where
     b = _csMax slider'
     config =
         [ dragRate $ toRational $ _csChangeRate slider'
-        , titleCaption $ _csCaption slider'
+        , titleMethod $ (((_csCaption slider') <> ": ") <>) . showt'
         ] <> map transformEvent events'
     events' = saveLoadCaptionEvents <> events
     saveLoadCaptionEvents =
