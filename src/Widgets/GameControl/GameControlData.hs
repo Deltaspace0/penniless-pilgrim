@@ -23,7 +23,7 @@ import Widgets.GameControlNode
 
 data GameControlData s a b = GameControlData
     { _gcdGameLens :: ALens' s a
-    , _gcdNextTaxLens :: ALens' s (Maybe Double)
+    , _gcdNextTaxLens :: Maybe (ALens' s (Maybe Double))
     , _gcdConfig :: b
     }
 
@@ -99,7 +99,7 @@ makeChildren wenv node gcData = resNode where
         , _ndPosition = p
         , _ndClickable = not $ null tax
         , _ndNextTax = tax
-        , _ndNextTaxLens = nextTaxLens
+        , _ndNextTaxLens = getNextTaxLens gcData
         , _ndDefaultColors = getDefaultNodeColors config
         , _ndAnimationDuration = getAnimationDuration config
         } where tax = getScoreByPosition p game
@@ -114,7 +114,6 @@ makeChildren wenv node gcData = resNode where
     widgetId = node ^. L.info . L.widgetId
     config = _gcdConfig gcData
     gameLens = WidgetLens $ _gcdGameLens gcData
-    nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 handleGameChange
     :: (ControlledGame a, GameControlConfig b a c)
@@ -132,14 +131,13 @@ handleGameChange wenv node gcData f = result where
         then [SendMessage shakeNodeId NodeStartShake]
         else concat
             [ widgetDataSet gameLens nextGame'
-            , widgetDataSet nextTaxLens Nothing
+            , widgetDataSet (getNextTaxLens gcData) Nothing
             ]
     shakeNodeId = shakeNode ^. L.info ^. L.widgetId
     shakeNode = Seq.index (node ^. L.children) $ x*(rows+1)+y
     (x, y) = getCurrentPosition game
     rows = snd $ getBounds $ getGrid gcData wenv
     gameLens = WidgetLens $ _gcdGameLens gcData
-    nextTaxLens = WidgetLens $ _gcdNextTaxLens gcData
 
 getGrid
     :: (GameControlConfig b a c)
@@ -149,3 +147,10 @@ getGrid
 getGrid gcData wenv = getVisualGrid game $ _gcdConfig gcData where
     game = widgetDataGet (wenv ^. L.model) gameLens
     gameLens = WidgetLens $ _gcdGameLens gcData
+
+getNextTaxLens
+    :: GameControlData s a b
+    -> WidgetData s (Maybe Double)
+getNextTaxLens gcData = fromMaybe value nextTaxLens where
+    value = WidgetValue Nothing
+    nextTaxLens = WidgetLens <$> _gcdNextTaxLens gcData

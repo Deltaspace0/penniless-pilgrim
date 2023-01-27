@@ -25,7 +25,7 @@ buildUI _ model = widgetTree where
         ] `styleBasic` [padding 32]
     gameControlM = gameControl $ GameControlData
         { _gcdGameLens = gameSaves . currentData
-        , _gcdNextTaxLens = nextTax
+        , _gcdNextTaxLens = Just nextTax
         , _gcdConfig = model ^. configModel . parameters
         }
     side = case model ^. activeMenu of
