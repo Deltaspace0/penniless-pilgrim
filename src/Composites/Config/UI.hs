@@ -5,6 +5,7 @@ module Composites.Config.UI
     ) where
 
 import Control.Lens
+import Data.Maybe
 import Monomer
 import Monomer.EnhancedSlider
 
@@ -15,11 +16,16 @@ import Util
 
 buildUI :: UIBuilder ConfigModel ConfigEvent
 buildUI _ model = widgetTree where
-    widgetTree = vstack'
-        [ button (model ^. saveCaption) ConfigSave
-        , button (model ^. loadCaption) ConfigLoad
-        , vscroll_ [wheelRate 20] paddedConfigSliders
+    widgetTree = zstack
+        [ vstack'
+            [ button "Save config to file" ConfigSave
+            , button "Load config from file" ConfigLoad
+            , vscroll_ [wheelRate 20] paddedConfigSliders
+            ]
+        , alertMsg (fromMaybe "" message) (ConfigSetMessage Nothing)
+            `nodeVisible` (not $ null message)
         ]
+    message = model ^. alertMessage
     paddedConfigSliders = configSliders `styleBasic` [paddingR 16]
     configSliders = vstack'
         [ configSlider_ model gridColumnsSlider [reportEvent]
@@ -50,14 +56,7 @@ configSlider_ model slider events = widget where
     config =
         [ dragRate $ toRational $ _csChangeRate slider'
         , titleMethod $ (((_csCaption slider') <> ": ") <>) . showt'
-        ] <> map transformEvent events'
-    events' = saveLoadCaptionEvents <> events
-    saveLoadCaptionEvents =
-        [ ConfigSetSaveCaption saveConfigCaption'
-        , ConfigSetLoadCaption loadConfigCaption'
-        ]
+        ] <> map transformEvent events
     transformEvent = onChange . const'
     const' e = const e :: Double -> ConfigEvent
-    saveConfigCaption' = model ^. initialSaveCaption
-    loadConfigCaption' = model ^. initialLoadCaption
     slider' = model ^. parameters . slider

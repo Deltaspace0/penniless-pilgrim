@@ -17,8 +17,7 @@ import Model.Parameters
 data ConfigEvent
     = ConfigSave
     | ConfigLoad
-    | ConfigSetSaveCaption Text
-    | ConfigSetLoadCaption Text
+    | ConfigSetMessage (Maybe Text)
     | ConfigSetParameters Parameters
     | ConfigReportGameChange
     deriving (Eq, Show)
@@ -32,8 +31,7 @@ handleEvent
 handleEvent onGameChange _ _ model event = case event of
     ConfigSave -> saveHandle model
     ConfigLoad -> loadHandle model
-    ConfigSetSaveCaption text -> setSaveCaptionHandle text model
-    ConfigSetLoadCaption text -> setLoadCaptionHandle text model
+    ConfigSetMessage m -> setMessageHandle m model
     ConfigSetParameters p -> setParametersHandle p model
     ConfigReportGameChange ->
         reportGameChangeHandle onGameChange model
@@ -43,7 +41,7 @@ saveHandle model = [Task taskHandler] where
     taskHandler = do
         let f = toFile $ model ^. parameters
         success <- fromMaybe (pure False) $ f <$> model ^. filePath
-        return $ ConfigSetSaveCaption $ if success
+        return $ ConfigSetMessage $ Just $ if success
             then "Successfully saved config to file"
             else "Couldn't save config to file"
 
@@ -58,15 +56,11 @@ loadHandle model = [Producer producerHandler] where
         when success $ do
             raiseEvent $ ConfigSetParameters parameters'
             raiseEvent ConfigReportGameChange
-        raiseEvent $ ConfigSetLoadCaption caption
+        raiseEvent $ ConfigSetMessage $ Just caption
 
-setSaveCaptionHandle :: Text -> EventHandle sp ep
-setSaveCaptionHandle text model = [Model model'] where
-    model' = model & saveCaption .~ text
-
-setLoadCaptionHandle :: Text -> EventHandle sp ep
-setLoadCaptionHandle text model = [Model model'] where
-    model' = model & loadCaption .~ text
+setMessageHandle :: Maybe Text -> EventHandle sp ep
+setMessageHandle alertMessage' model = [Model model'] where
+    model' = model & alertMessage .~ alertMessage'
 
 setParametersHandle :: Parameters -> EventHandle sp ep
 setParametersHandle parameters' model = [Model model'] where
