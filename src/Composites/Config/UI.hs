@@ -5,7 +5,6 @@ module Composites.Config.UI
     ) where
 
 import Control.Lens
-import Data.Maybe
 import Monomer
 import Monomer.EnhancedSlider
 
@@ -22,10 +21,8 @@ buildUI _ model = widgetTree where
             , button "Load config from file" ConfigLoad
             , vscroll_ [wheelRate 20] paddedConfigSliders
             ]
-        , alertMsg (fromMaybe "" message) (ConfigSetMessage Nothing)
-            `nodeVisible` (not $ null message)
+        , widgetMaybe (model ^. alertMessage) createAlert
         ]
-    message = model ^. alertMessage
     paddedConfigSliders = configSliders `styleBasic` [paddingR 16]
     configSliders = vstack'
         [ configSlider_ model gridColumnsSlider [reportEvent]
@@ -36,6 +33,7 @@ buildUI _ model = widgetTree where
         ]
     vstack' = vstack_ [childSpacing_ 16]
     reportEvent = ConfigReportGameChange
+    createAlert = (flip alertMsg) $ ConfigSetMessage Nothing
 
 configSlider
     :: ConfigModel
