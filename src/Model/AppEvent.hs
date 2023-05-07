@@ -8,7 +8,6 @@ import Data.Maybe
 import Monomer
 import Monomer.SaveManager
 
-import Composites
 import Model.AppModel
 import Model.File
 import Model.Parameters
@@ -34,16 +33,15 @@ updateGameWithConfigHandle model = [Model model'] where
     model' = model
         & initGame .~ game
         & gameSaves . currentData .~ game'
-    game = gameFromParameters $ model ^. configModel . parameters
+    game = gameFromParameters $ model ^. parameters
     game' = fromMaybe game $ transferPath oldGame game
     oldGame = model ^. gameSaves . currentData
 
 setGameHandle :: Game -> EventHandle
 setGameHandle game model = [Model model'] where
-    model' = model & updateGame & updateConfig
-    updateGame = gameSaves . currentData .~ game
-    updateConfig = configModel . parameters %~ f
-    f = parametersFromGame game
+    model' = model
+        & gameSaves . currentData .~ game
+        & parameters %~ parametersFromGame game
 
 saveGamesToFileHandle :: Saves Game -> EventHandle
 saveGamesToFileHandle games model = [Producer handler] where

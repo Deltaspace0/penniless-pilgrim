@@ -54,7 +54,10 @@ configSlider_ model slider events = widget where
     config =
         [ dragRate $ toRational $ _csChangeRate slider'
         , titleMethod $ (((_csCaption slider') <> ": ") <>) . showt'
+        , onChange $ ConfigSetParameters . newParameters
         ] <> map transformEvent events
     transformEvent = onChange . const'
     const' e = const e :: Double -> ConfigEvent
-    slider' = model ^. parameters . slider
+    slider' = parameters' ^. slider
+    parameters' = model ^. parameters
+    newParameters v = parameters' & slider . currentValue .~ v

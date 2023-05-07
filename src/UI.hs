@@ -26,13 +26,16 @@ buildUI _ model = widgetTree where
     gameControlM = gameControl $ GameControlData
         { _gcdGameLens = gameSaves . currentData
         , _gcdNextTaxLens = Just nextTax
-        , _gcdConfig = model ^. configModel . parameters
+        , _gcdConfig = model ^. parameters
         }
     side = case model ^. activeMenu of
         Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine
-            , configComposite_ configModel onGameChange
-            ] where onGameChange = Just AppUpdateGameWithConfig
+            , configComposite_ parameters
+                [ configFilePath $ model ^. parametersPath
+                , onGameChange AppUpdateGameWithConfig
+                ]
+            ]
         Just GameSavesMenu -> vstack' $ sideWidgets <>
             [ separatorLine
             , saveManager_ gameSaves

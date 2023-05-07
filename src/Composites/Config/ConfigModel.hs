@@ -4,7 +4,6 @@
 
 module Composites.Config.ConfigModel
     ( ConfigModel(..)
-    , filePath
     , alertMessage
     , parameters
     , initConfigModel
@@ -12,23 +11,19 @@ module Composites.Config.ConfigModel
 
 import Control.Lens
 import Data.Text (Text)
+import Data.Default
 
-import Model.File
 import Model.Parameters
 
 data ConfigModel = ConfigModel
-    { _cfgFilePath :: Maybe String
-    , _cfgAlertMessage :: Maybe Text
+    { _cfgAlertMessage :: Maybe Text
     , _cfgParameters :: Parameters
     } deriving (Eq, Show)
 
 makeLensesWith abbreviatedFields 'ConfigModel
 
-initConfigModel :: Maybe String -> IO ConfigModel
-initConfigModel path = do
-    parameters' <- fromMaybeFile path
-    return $ ConfigModel
-        { _cfgFilePath = path
-        , _cfgAlertMessage = Nothing
-        , _cfgParameters = parameters'
-        }
+initConfigModel :: ConfigModel
+initConfigModel = ConfigModel
+    { _cfgAlertMessage = Nothing
+    , _cfgParameters = def
+    }

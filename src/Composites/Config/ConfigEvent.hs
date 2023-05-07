@@ -10,6 +10,7 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
+import Composites.Config.ConfigCfg
 import Composites.Config.ConfigModel
 import Model.File
 import Model.Parameters
@@ -22,33 +23,34 @@ data ConfigEvent
     | ConfigReportGameChange
     deriving (Eq, Show)
 
-type EventHandle sp ep = ConfigModel ->
+type EventHandle sp ep = (ConfigCfg ep) -> ConfigModel ->
     [EventResponse ConfigModel ConfigEvent sp ep]
 
 handleEvent
-    :: Maybe ep
+    :: (WidgetData sp Parameters)
+    -> (ConfigCfg ep)
     -> EventHandler ConfigModel ConfigEvent sp ep
-handleEvent onGameChange _ _ model event = case event of
-    ConfigSave -> saveHandle model
-    ConfigLoad -> loadHandle model
-    ConfigSetMessage m -> setMessageHandle m model
-    ConfigSetParameters p -> setParametersHandle p model
-    ConfigReportGameChange ->
-        reportGameChangeHandle onGameChange model
+handleEvent wd config _ _ model event = case event of
+    ConfigSave -> saveHandle config model
+    ConfigLoad -> loadHandle config model
+    ConfigSetMessage m -> setMessageHandle m config model
+    ConfigSetParameters p -> setParametersHandle p wd config model
+    ConfigReportGameChange -> reportGameChangeHandle config model
 
 saveHandle :: EventHandle sp ep
-saveHandle model = [Task taskHandler] where
+saveHandle config model = [Task taskHandler] where
     taskHandler = do
         let f = toFile $ model ^. parameters
-        success <- fromMaybe (pure False) $ f <$> model ^. filePath
+            filePath = _ccFilePath config
+        success <- fromMaybe (pure False) $ f <$> filePath
         return $ ConfigSetMessage $ Just $ if success
             then "Successfully saved config to file"
             else "Couldn't save config to file"
 
 loadHandle :: EventHandle sp ep
-loadHandle model = [Producer producerHandler] where
+loadHandle config _ = [Producer producerHandler] where
     producerHandler raiseEvent = do
-        let x = fromFile <$> model ^. filePath
+        let x = fromFile <$> _ccFilePath config
         (success, parameters') <- fromMaybe (pure (False, def)) x
         let caption = if success
                 then "Successfully loaded config from file"
@@ -59,13 +61,16 @@ loadHandle model = [Producer producerHandler] where
         raiseEvent $ ConfigSetMessage $ Just caption
 
 setMessageHandle :: Maybe Text -> EventHandle sp ep
-setMessageHandle alertMessage' model = [Model model'] where
+setMessageHandle alertMessage' _ model = [Model model'] where
     model' = model & alertMessage .~ alertMessage'
 
-setParametersHandle :: Parameters -> EventHandle sp ep
-setParametersHandle parameters' model = [Model model'] where
-    model' = model & parameters .~ parameters'
+setParametersHandle
+    :: Parameters
+    -> (WidgetData sp Parameters)
+    -> EventHandle sp ep
+setParametersHandle p wdata _ _ = response where
+    response = RequestParent <$> (widgetDataSet wdata p)
 
-reportGameChangeHandle :: Maybe ep -> EventHandle sp ep
-reportGameChangeHandle onGameChange _ = fromMaybe [] response where
-    response = pure . Report <$> onGameChange
+reportGameChangeHandle :: EventHandle sp ep
+reportGameChangeHandle config _ = fromMaybe [] response where
+    response = pure . Report <$> _ccGameChange config

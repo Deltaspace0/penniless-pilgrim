@@ -6,10 +6,11 @@ module Model.AppModel
     ( module Model.Game
     , AppModel(..)
     , activeMenu
-    , configModel
+    , parameters
     , initGame
     , gameSaves
     , gameSavesPath
+    , parametersPath
     , nextTax
     , initModel
     , gameSavesCaptionMethod
@@ -22,7 +23,6 @@ import Monomer.SaveManager
 import TextShow
 import qualified Data.Text as T
 
-import Composites
 import Model.AppMenu
 import Model.File
 import Model.Game
@@ -30,10 +30,11 @@ import Model.Parameters
 
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu
-    , _appConfigModel :: ConfigModel
+    , _appParameters :: Parameters
     , _appInitGame :: Game
     , _appGameSaves :: SaveManagerModel Game
     , _appGameSavesPath :: Maybe String
+    , _appParametersPath :: Maybe String
     , _appNextTax :: Maybe Double
     } deriving Eq
 
@@ -41,16 +42,17 @@ makeLensesWith abbreviatedFields 'AppModel
 
 initModel :: Maybe String -> Maybe String -> IO AppModel
 initModel configPath gamesPath = do
-    configModel' <- initConfigModel configPath
-    let game = gameFromParameters $ configModel' ^. parameters
-        gameSaves' = initSaveManagerModel game
+    parameters' <- fromMaybeFile configPath
     savedGames <- fromMaybeFile gamesPath
+    let game = gameFromParameters parameters'
+        gameSaves' = initSaveManagerModel game
     return $ AppModel
         { _appActiveMenu = Nothing
-        , _appConfigModel = configModel'
+        , _appParameters = parameters'
         , _appInitGame = game
         , _appGameSaves = gameSaves' & savedData .~ savedGames
         , _appGameSavesPath = gamesPath
+        , _appParametersPath = configPath
         , _appNextTax = Nothing
         }
 
