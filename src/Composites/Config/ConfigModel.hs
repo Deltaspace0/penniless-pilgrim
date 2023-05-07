@@ -11,8 +11,6 @@ module Composites.Config.ConfigModel
     ) where
 
 import Control.Lens
-import Data.Default
-import Data.Maybe
 import Data.Text (Text)
 
 import Model.File
@@ -28,8 +26,7 @@ makeLensesWith abbreviatedFields 'ConfigModel
 
 initConfigModel :: Maybe String -> IO ConfigModel
 initConfigModel path = do
-    let f = fmap snd . fromFile
-    parameters' <- fromMaybe (pure def) $ f <$> path
+    parameters' <- fromMaybeFile path
     return $ ConfigModel
         { _cfgFilePath = path
         , _cfgAlertMessage = Nothing

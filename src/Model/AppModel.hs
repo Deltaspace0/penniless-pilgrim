@@ -16,8 +16,6 @@ module Model.AppModel
     ) where
 
 import Control.Lens
-import Data.Default
-import Data.Maybe
 import Data.Text (Text)
 import Data.Time.LocalTime (ZonedTime)
 import Monomer.SaveManager
@@ -46,8 +44,7 @@ initModel configPath gamesPath = do
     configModel' <- initConfigModel configPath
     let game = gameFromParameters $ configModel' ^. parameters
         gameSaves' = initSaveManagerModel game
-        f = fmap snd . fromFile
-    savedGames <- fromMaybe (pure def) $ f <$> gamesPath
+    savedGames <- fromMaybeFile gamesPath
     return $ AppModel
         { _appActiveMenu = Nothing
         , _appConfigModel = configModel'
