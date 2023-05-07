@@ -19,15 +19,15 @@ packages:
   original:
     hackage: nanovg-0.8.1.0
 - completed:
-    commit: 14608cf419efcd66563aa9dc361cb810140b6039
+    commit: 3e70c5b43f47b042efa216ec03d196765260c000
     git: https://github.com/Deltaspace0/monomer-widgets.git
     name: monomer-widgets
     pantry-tree:
-      sha256: 19640b576cd428c9f4548b7da89c4da61f5cd6dc611b2d243fcfe543c7ac724d
-      size: 2808
+      sha256: a7bd8910a0f70b7475a15bdaf303001c9a1d87ca87d7c7c30349adad7c2cb656
+      size: 6276
     version: 0.1.0.0
   original:
-    commit: 14608cf419efcd66563aa9dc361cb810140b6039
+    commit: 3e70c5b43f47b042efa216ec03d196765260c000
     git: https://github.com/Deltaspace0/monomer-widgets.git
 snapshots:
 - completed:
