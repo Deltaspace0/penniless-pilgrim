@@ -10,20 +10,19 @@ import Data.Maybe
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.ButtonColors
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeState
 import Widgets.GameControlNode.NodeVisual
 
-data NodeRenderer s e c = NodeRenderer
+data NodeRenderer s e = NodeRenderer
     { _nrEnv :: WidgetEnv s e
     , _nrNode :: WidgetNode s e
     , _nrRenderer :: Renderer
-    , _nrNodeData :: NodeData s c
+    , _nrNodeData :: NodeData s
     , _nrNodeState :: NodeState
     }
 
-runRenderer :: (ButtonColors c) => NodeRenderer s e c -> IO ()
+runRenderer :: NodeRenderer s e -> IO ()
 runRenderer nodeRenderer@(NodeRenderer{..}) = do
     let NodeData{..} = _nrNodeData
         NodeState{..} = _nrNodeState
@@ -34,15 +33,15 @@ runRenderer nodeRenderer@(NodeRenderer{..}) = do
     if null visualStates || (floor _ndAnimationDuration :: Int) == 0
         then drawEllipse _nrRenderer vp $ _sstFgColor style
         else mapM_ (renderVisual nodeRenderer vp ts) visualStates
-    let config = _ndDefaultColors
-        visual = head _ndVisualStack
-        highlightColor
-            | not _ndClickable = Nothing
-            | null _ndVisualStack = Just $ getHighlightColor config
-            | otherwise = Just $ _nodeColorHighlight visual
+    let NodeVisual{..} = if null _ndVisualStack
+            then _ndDefaultVisual
+            else head _ndVisualStack
+        highlightColor = if not _ndClickable
+            then Nothing
+            else Just _nodeColorHighlight
     drawEllipseBorder _nrRenderer vp highlightColor 2
 
-getShakeArea :: NodeRenderer s e c -> Rect
+getShakeArea :: NodeRenderer s e -> Rect
 getShakeArea NodeRenderer{..} = shakeArea where
     shakeArea = if _ssRunning
         then Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
@@ -58,8 +57,7 @@ getShakeArea NodeRenderer{..} = shakeArea where
     NodeState{..} = _nrNodeState
 
 renderVisual
-    :: (ButtonColors c)
-    => NodeRenderer s e c
+    :: NodeRenderer s e
     -> Rect
     -> Millisecond
     -> VisualState
@@ -74,21 +72,18 @@ renderVisual NodeRenderer{..} vp ts visualState = do
         vp' = Rect (x+dx) (y+dy) (w-dx*2) (h-dy*2)
         isActive = _ndClickable && isNodeActive _nrEnv _nrNode
         isHovered = _ndClickable && isNodeHovered _nrEnv _nrNode
-        color = getColor _ndDefaultColors isActive isHovered visual
+        color = getColor _ndDefaultVisual isActive isHovered visual
     drawEllipse _nrRenderer vp' $ Just color
 
 getColor
-    :: (ButtonColors a, ButtonColors b)
-    => a
+    :: NodeVisual
     -> Bool
     -> Bool
-    -> Maybe b
+    -> Maybe NodeVisual
     -> Color
-getColor config isActive isHovered visual
-    | isActive = fromMaybe (getActiveColor config) visualActive
-    | isHovered = fromMaybe (getHoverColor config) visualHover
-    | otherwise = fromMaybe (getDefaultColor config) visualDefault
+getColor defaultVisual isActive isHovered visual
+    | isActive = _nodeColorActive
+    | isHovered = _nodeColorHover
+    | otherwise = _nodeColorDefault
     where
-        visualActive = getActiveColor <$> visual
-        visualHover = getHoverColor <$> visual
-        visualDefault = getDefaultColor <$> visual
+        NodeVisual{..} = fromMaybe defaultVisual visual

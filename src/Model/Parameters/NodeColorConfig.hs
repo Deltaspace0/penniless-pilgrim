@@ -66,13 +66,7 @@ instance ToJSON NodeColorConfig where
 
 nodeTransform :: NodeColorConfig -> [GameNode] -> [NodeVisual]
 nodeTransform NodeColorConfig{..} = map getVisual where
-    getVisual node = f $ case node of
+    getVisual node = colorsToVisual $ case node of
         NodePilgrim -> _nccPilgrim
         NodePath _ -> _nccPath
         NodeGoal -> _nccGoal
-    f NodeColors{..} = NodeVisual
-        { _nodeColorHighlight = _nodeHighlight
-        , _nodeColorDefault = _nodeDefault
-        , _nodeColorHover = _nodeHover
-        , _nodeColorActive = _nodeActive
-        }

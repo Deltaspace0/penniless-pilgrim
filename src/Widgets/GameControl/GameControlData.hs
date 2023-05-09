@@ -15,7 +15,6 @@ import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Model.Grid
-import Widgets.ButtonColors
 import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControlLink
@@ -28,7 +27,7 @@ data GameControlData s a b = GameControlData
     }
 
 getFixedRect
-    :: (GameControlConfig b a c)
+    :: (GameControlConfig b a)
     => GameControlData s a b
     -> WidgetEnv s e
     -> Rect
@@ -56,7 +55,7 @@ getMiddleRect rectA rectB progress = rect where
     Rect xB yB linkSizeB nodeSizeB = rectB
 
 assignAreas
-    :: (GameControlConfig b a c)
+    :: (GameControlConfig b a)
     => WidgetEnv s e
     -> Rect
     -> GameControlData s a b
@@ -79,7 +78,7 @@ assignAreas wenv vp gcData = assignedAreas where
     Rect x y linkSize nodeSize = getFixedRect gcData wenv
 
 makeChildren
-    :: (ControlledGame a, ButtonColors c, GameControlConfig b a c)
+    :: (ControlledGame a, GameControlConfig b a)
     => WidgetEnv s e
     -> WidgetNode s e
     -> GameControlData s a b
@@ -100,7 +99,7 @@ makeChildren wenv node gcData = resNode where
         , _ndClickable = not $ null tax
         , _ndNextTax = tax
         , _ndNextTaxLens = getNextTaxLens gcData
-        , _ndDefaultColors = getDefaultNodeColors config
+        , _ndDefaultVisual = getDefaultNodeVisual config
         , _ndAnimationDuration = getAnimationDuration config
         } where tax = getScoreByPosition p game
     fh = gameControlHlink . linkData
@@ -116,7 +115,7 @@ makeChildren wenv node gcData = resNode where
     gameLens = WidgetLens $ _gcdGameLens gcData
 
 handleGameChange
-    :: (ControlledGame a, GameControlConfig b a c)
+    :: (ControlledGame a, GameControlConfig b a)
     => WidgetEnv s e
     -> WidgetNode s e
     -> GameControlData s a b
@@ -140,7 +139,7 @@ handleGameChange wenv node gcData f = result where
     gameLens = WidgetLens $ _gcdGameLens gcData
 
 getGrid
-    :: (GameControlConfig b a c)
+    :: (GameControlConfig b a)
     => GameControlData s a b
     -> WidgetEnv s e
     -> Grid NodeVisual LinkVisual

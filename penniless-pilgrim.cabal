@@ -50,7 +50,6 @@ library
       Model.Parameters.RGB
       UI
       Util
-      Widgets.ButtonColors
       Widgets.GameControl
       Widgets.GameControl.ControlledGame
       Widgets.GameControl.GameControlColorConfig

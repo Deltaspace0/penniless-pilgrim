@@ -11,7 +11,6 @@ import Monomer.Widgets.Container
 import qualified Monomer.Lens as L
 
 import Model.Direction
-import Widgets.ButtonColors
 import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlConfig
 import Widgets.GameControl.GameControlData
@@ -19,7 +18,7 @@ import Widgets.GameControl.GameControlRenderer
 import Widgets.GameControl.GameControlState
 
 gameControl
-    :: (ControlledGame a, ButtonColors c, GameControlConfig b a c)
+    :: (ControlledGame a, GameControlConfig b a)
     => GameControlData s a b
     -> WidgetNode s e
 gameControl gcData = node where
@@ -27,7 +26,7 @@ gameControl gcData = node where
     widget = makeGameControl gcData def
 
 makeGameControl
-    :: (ControlledGame a, ButtonColors c, GameControlConfig b a c)
+    :: (ControlledGame a, GameControlConfig b a)
     => GameControlData s a b
     -> GameControlState
     -> Widget s e

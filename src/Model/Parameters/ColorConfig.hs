@@ -36,8 +36,9 @@ instance ToJSON ColorConfig where
         , "game_control_node" .= _ccGameControlNode
         ]
 
-instance GameControlColorConfig ColorConfig Game NodeColors where
-    getDefaultNodeColors = _nccDefault . _ccGameControlNode
+instance GameControlColorConfig ColorConfig Game where
+    getDefaultNodeVisual = colorsToVisual . getDefault where
+        getDefault = _nccDefault . _ccGameControlNode
     getVisualGrid = transformGrid
 
 transformGrid :: Game -> ColorConfig -> Grid NodeVisual LinkVisual

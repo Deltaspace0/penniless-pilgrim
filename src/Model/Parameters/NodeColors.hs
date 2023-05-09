@@ -2,13 +2,14 @@
 
 module Model.Parameters.NodeColors
     ( NodeColors(..)
+    , colorsToVisual
     ) where
 
 import Data.Aeson
 import Monomer
 
 import Model.Parameters.RGB
-import Widgets.ButtonColors
+import Widgets.GameControlNode
 
 data NodeColors = NodeColors
     { _nodeHighlight :: Color
@@ -34,8 +35,10 @@ instance ToJSON NodeColors where
         , "active" .= toRGB _nodeActive
         ]
 
-instance ButtonColors NodeColors where
-    getDefaultColor = _nodeDefault
-    getHighlightColor = _nodeHighlight
-    getHoverColor = _nodeHover
-    getActiveColor = _nodeActive
+colorsToVisual :: NodeColors -> NodeVisual
+colorsToVisual NodeColors{..} = NodeVisual
+    { _nodeColorHighlight = _nodeHighlight
+    , _nodeColorDefault = _nodeDefault
+    , _nodeColorHover = _nodeHover
+    , _nodeColorActive = _nodeActive
+    }

@@ -12,8 +12,7 @@ module Widgets.GameControl.GameControlConfig
 
 import Widgets.GameControl.GameControlColorConfig
 
-class (GameControlColorConfig a b c)
-        => GameControlConfig a b c where
+class (GameControlColorConfig a b) => GameControlConfig a b where
     getAnimationDuration :: a -> Double
     getLinkToNodeRatio :: a -> Double
     getNodeToWidthRatio :: a -> Double

@@ -27,7 +27,7 @@ data NodeState = NodeState
 instance Default NodeState where
     def = NodeState def def
 
-initState :: NodeData s c -> NodeState
+initState :: NodeData s -> NodeState
 initState nodeData = def
     { _nsVisualStates =
         [ VisualState
@@ -40,7 +40,7 @@ initState nodeData = def
 changeState
     :: NodeState
     -> Millisecond
-    -> NodeData s c
+    -> NodeData s
     -> WidgetNode s e
     -> NodeMessage
     -> (NodeState, [WidgetRequest s e])
@@ -64,7 +64,7 @@ changeState state ts nodeData node message = (state', reqs) where
 mergeState
     :: NodeState
     -> Millisecond
-    -> NodeData s c
+    -> NodeData s
     -> WidgetNode s e
     -> (NodeState, [WidgetRequest s e])
 mergeState oldState ts NodeData{..} newNode = (newState, reqs) where
