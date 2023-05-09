@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.AppModel
@@ -57,13 +58,12 @@ initModel configPath gamesPath = do
         }
 
 gameSavesCaptionMethod :: Game -> ZonedTime -> Text
-gameSavesCaptionMethod game time = caption where
+gameSavesCaptionMethod Game{..} time = caption where
     caption = cols' <> "x" <> rows'
-        <> "\t\tTax: " <> (showt $ _tax pilgrim)
-        <> "\t\tX: " <> (showt $ fst $ _position pilgrim)
-        <> "\tY: " <> (showt $ snd $ _position pilgrim)
+        <> "\t\tTax: " <> (showt _tax)
+        <> "\t\tX: " <> (showt $ fst _position)
+        <> "\tY: " <> (showt $ snd _position)
         <> "\t\t" <> (T.pack $ show time)
-    pilgrim = _pilgrim game
-    cols' = showt $ cols+1
-    rows' = showt $ rows+1
-    (cols, rows) = getBounds $ _grid game
+    Pilgrim{..} = _pilgrim
+    (cols', rows') = (showt $ cols+1, showt $ rows+1)
+    (cols, rows) = getBounds _grid

@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Parameters.NodeColors
     ( NodeColors(..)
     ) where
@@ -25,11 +27,11 @@ instance FromJSON NodeColors where
                 g t = fromRGB <$> v .: t
 
 instance ToJSON NodeColors where
-    toJSON colors = object
-        [ "highlight" .= toRGB (_nodeHighlight colors)
-        , "default" .= toRGB (_nodeDefault colors)
-        , "hover" .= toRGB (_nodeHover colors)
-        , "active" .= toRGB (_nodeActive colors)
+    toJSON NodeColors{..} = object
+        [ "highlight" .= toRGB _nodeHighlight
+        , "default" .= toRGB _nodeDefault
+        , "hover" .= toRGB _nodeHover
+        , "active" .= toRGB _nodeActive
         ]
 
 instance ButtonColors NodeColors where

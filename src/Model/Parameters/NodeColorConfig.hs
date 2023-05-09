@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Parameters.NodeColorConfig
     ( module Model.Parameters.NodeColors
     , NodeColorConfig(..)
@@ -55,22 +57,22 @@ instance FromJSON NodeColorConfig where
         <*> v .: "goal"
 
 instance ToJSON NodeColorConfig where
-    toJSON config = object
-        [ "default" .= _nccDefault config
-        , "pilgrim" .= _nccPilgrim config
-        , "path" .= _nccPath config
-        , "goal" .= _nccGoal config
+    toJSON NodeColorConfig{..} = object
+        [ "default" .= _nccDefault
+        , "pilgrim" .= _nccPilgrim
+        , "path" .= _nccPath
+        , "goal" .= _nccGoal
         ]
 
 nodeTransform :: NodeColorConfig -> [GameNode] -> [NodeVisual]
-nodeTransform config = map getVisual where
+nodeTransform NodeColorConfig{..} = map getVisual where
     getVisual node = f $ case node of
-        NodePilgrim -> _nccPilgrim config
-        NodePath _ -> _nccPath config
-        NodeGoal -> _nccGoal config
-    f colors = NodeVisual
-        { _nodeColorHighlight = _nodeHighlight colors
-        , _nodeColorDefault = _nodeDefault colors
-        , _nodeColorHover = _nodeHover colors
-        , _nodeColorActive = _nodeActive colors
+        NodePilgrim -> _nccPilgrim
+        NodePath _ -> _nccPath
+        NodeGoal -> _nccGoal
+    f NodeColors{..} = NodeVisual
+        { _nodeColorHighlight = _nodeHighlight
+        , _nodeColorDefault = _nodeDefault
+        , _nodeColorHover = _nodeHover
+        , _nodeColorActive = _nodeActive
         }

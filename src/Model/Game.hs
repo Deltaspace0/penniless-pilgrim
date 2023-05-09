@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Game
     ( module Model.Game.GameLink
     , module Model.Game.GameNode
@@ -36,9 +38,9 @@ instance FromJSON Game where
         <*> v .: "pilgrim"
 
 instance ToJSON Game where
-    toJSON game = object
-        [ "grid" .= _grid game
-        , "pilgrim" .= _pilgrim game
+    toJSON Game{..} = object
+        [ "grid" .= _grid
+        , "pilgrim" .= _pilgrim
         ]
 
 instance ControlledGame Game where
@@ -60,24 +62,22 @@ makeGame_ w h pilgrim = Game
     }
 
 movePilgrim :: Direction -> Game -> Maybe Game
-movePilgrim d game = result where
+movePilgrim d Game{..} = result where
     result = if inside && (goingBack || linkEmpty)
         then Just $ Game
-            { _grid = nodeUpdate $ setLink p d link grid
-            , _pilgrim = updatePilgrim d pilgrim
+            { _grid = nodeUpdate $ setLink p d link _grid
+            , _pilgrim = updatePilgrim d _pilgrim
             }
         else Nothing
-    grid = _grid game
-    pilgrim = _pilgrim game
-    p = _position pilgrim
+    p = _position _pilgrim
     p' = getPositionInDirection d p
-    inside = isInside p' grid
-    goingBack = isOppositeToPilgrim d pilgrim
-    linkEmpty = null $ getLink p d grid
+    inside = isInside p' _grid
+    goingBack = isOppositeToPilgrim d _pilgrim
+    linkEmpty = null $ getLink p d _grid
     nodeUpdate = if goingBack
         then nodeTransfer p p' . nodePop p'
         else nodePush (p, NodePath tax) . nodeTransfer p p'
-    tax = _tax pilgrim
+    tax = _tax _pilgrim
     link | goingBack = Nothing
          | p == min p p' = Just LinkForward
          | otherwise = Just LinkBack

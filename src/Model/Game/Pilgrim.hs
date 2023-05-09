@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Game.Pilgrim
     ( module Model.Direction
     , Pilgrim(..)
@@ -31,10 +33,10 @@ instance FromJSON Pilgrim where
         <*> v .: "tax"
 
 instance ToJSON Pilgrim where
-    toJSON pilgrim = object
-        [ "position" .= _position pilgrim
-        , "path" .= _path pilgrim
-        , "tax" .= _tax pilgrim
+    toJSON Pilgrim{..} = object
+        [ "position" .= _position
+        , "path" .= _path
+        , "tax" .= _tax
         ]
 
 updateTax :: Direction -> Double -> Double
@@ -49,10 +51,10 @@ isOppositeToPilgrim d pilgrim = not (null path) && d == opp where
     opp = getOppositeDirection $ snd $ head path
 
 updatePilgrim :: Direction -> Pilgrim -> Pilgrim
-updatePilgrim d pilgrim = Pilgrim
-    { _position = getPositionInDirection d $ _position pilgrim
+updatePilgrim d pilgrim@(Pilgrim{..}) = Pilgrim
+    { _position = getPositionInDirection d _position
     , _path = if isOppositeToPilgrim d pilgrim
-        then tail $ _path pilgrim
-        else (_position pilgrim, d):(_path pilgrim)
-    , _tax = updateTax d $ _tax pilgrim
+        then tail _path
+        else (_position, d):_path
+    , _tax = updateTax d _tax
     }

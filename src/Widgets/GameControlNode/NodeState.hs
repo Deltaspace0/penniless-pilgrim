@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Widgets.GameControlNode.NodeState
     ( module Widgets.GameControlNode.ShakeState
     , module Widgets.GameControlNode.VisualState
@@ -65,7 +67,7 @@ mergeState
     -> NodeData s c
     -> WidgetNode s e
     -> (NodeState, [WidgetRequest s e])
-mergeState oldState ts nodeData newNode = (newState, reqs) where
+mergeState oldState ts NodeData{..} newNode = (newState, reqs) where
     newState = if newVisual == oldVisual
         then oldState
         else oldState
@@ -73,10 +75,9 @@ mergeState oldState ts nodeData newNode = (newState, reqs) where
             }
     reqs = if newVisual == oldVisual
         then []
-        else [requestRenderEvery newNode animationDuration]
-    newVisual = visualStack ^? ix 0
+        else [requestRenderEvery newNode _ndAnimationDuration]
+    newVisual = _ndVisualStack ^? ix 0
     oldVisual = _vsVisual =<< oldVisualStates ^? ix 0
-    visualStack = _ndVisualStack nodeData
     oldVisualStates = _nsVisualStates oldState
     newVisualStates = if null oldVisualStates
         then [visualState, def]
@@ -86,5 +87,4 @@ mergeState oldState ts nodeData newNode = (newState, reqs) where
         , _vsStart = ts
         }
     (oldRunningStates, notRunning) = span f oldVisualStates
-    f = isRunningVisualState animationDuration ts
-    animationDuration = _ndAnimationDuration nodeData
+    f = isRunningVisualState _ndAnimationDuration ts

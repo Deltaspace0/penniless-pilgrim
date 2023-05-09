@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Parameters.ConfigSlider
     ( ConfigSlider(..)
     , currentValue
@@ -24,12 +26,12 @@ instance FromJSON ConfigSlider where
         <*> v .: "caption"
 
 instance ToJSON ConfigSlider where
-    toJSON configSlider = object
-        [ "default" .= (_csCurrent configSlider)
-        , "min" .= (_csMin configSlider)
-        , "max" .= (_csMax configSlider)
-        , "change_rate" .= (_csChangeRate configSlider)
-        , "caption" .= (_csCaption configSlider)
+    toJSON ConfigSlider{..} = object
+        [ "default" .= _csCurrent
+        , "min" .= _csMin
+        , "max" .= _csMax
+        , "change_rate" .= _csChangeRate
+        , "caption" .= _csCaption
         ]
 
 currentValue :: Lens' ConfigSlider Double

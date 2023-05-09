@@ -1,4 +1,5 @@
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Model.Parameters.ColorConfig
     ( module Model.Parameters.LinkColorConfig
@@ -30,9 +31,9 @@ instance FromJSON ColorConfig where
         <*> v .: "game_control_node"
 
 instance ToJSON ColorConfig where
-    toJSON config = object
-        [ "game_control_link" .= _ccGameControlLink config
-        , "game_control_node" .= _ccGameControlNode config
+    toJSON ColorConfig{..} = object
+        [ "game_control_link" .= _ccGameControlLink
+        , "game_control_node" .= _ccGameControlNode
         ]
 
 instance GameControlColorConfig ColorConfig Game NodeColors where
@@ -40,7 +41,8 @@ instance GameControlColorConfig ColorConfig Game NodeColors where
     getVisualGrid = transformGrid
 
 transformGrid :: Game -> ColorConfig -> Grid NodeVisual LinkVisual
-transformGrid game config = gridMap nt ht vt $ _grid game where
-    nt = nodeTransform $ _ccGameControlNode config
-    ht = hlinkTransform $ _ccGameControlLink config
-    vt = vlinkTransform $ _ccGameControlLink config
+transformGrid Game{..} ColorConfig{..} = newGrid where
+    newGrid = gridMap nt ht vt _grid 
+    nt = nodeTransform _ccGameControlNode
+    ht = hlinkTransform _ccGameControlLink
+    vt = vlinkTransform _ccGameControlLink

@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Widgets.GameControlNode
     ( module Widgets.GameControlNode.NodeData
@@ -35,7 +36,7 @@ makeGameControlNode
     => NodeData s c
     -> NodeState
     -> Widget s e
-makeGameControlNode nodeData state = widget where
+makeGameControlNode nodeData@(NodeData{..}) state = widget where
     widget = createSingle state def
         { singleGetBaseStyle = getBaseStyle
         , singleGetCurrentStyle = getCurrentStyle
@@ -55,8 +56,7 @@ makeGameControlNode nodeData state = widget where
 
     init' _ node = resultNode resNode where
         resNode = node & L.widget .~ w
-        w = makeGameControlNode nodeData state'
-        state' = initState nodeData
+        w = makeGameControlNode nodeData $ initState nodeData
 
     merge wenv newNode _ oldState = result where
         result = resultReqs resNode reqs
@@ -67,24 +67,18 @@ makeGameControlNode nodeData state = widget where
 
     handleEvent _ node _ event = case event of
         Enter _ -> makeResult reqs where
-            reqs = widgetDataSet nextTaxField nextTax
+            reqs = widgetDataSet _ndNextTaxLens _ndNextTax
         Leave _ -> makeResult reqs where
-            reqs = widgetDataSet nextTaxField Nothing
+            reqs = widgetDataSet _ndNextTaxLens Nothing
         Click p _ _ | valid -> makeResult reqs where
-            valid = isPointInNodeVp node p && clickable
+            valid = isPointInNodeVp node p && _ndClickable
             reqs =
-                [ SendMessage gcId position
-                , ResetCursorIcon id'
+                [ SendMessage _ndGameControlId _ndPosition
+                , ResetCursorIcon $ node ^. L.info . L.widgetId
                 ]
         _ -> Nothing
         where
             makeResult = Just . resultReqs node
-            gcId = _ndGameControlId nodeData
-            id' = node ^. L.info . L.widgetId
-            nextTaxField = _ndNextTaxLens nodeData
-            nextTax = _ndNextTax nodeData
-            clickable = _ndClickable nodeData
-            position = _ndPosition nodeData
 
     handleMessage wenv node _ message = do
         let ts = wenv ^. L.timestamp

@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Parameters.LinkColorConfig
     ( LinkColorConfig(..)
     , hlinkTransform
@@ -45,12 +47,12 @@ instance FromJSON LinkColorConfig where
                 g t = fromRGB <$> v .: t
 
 instance ToJSON LinkColorConfig where
-    toJSON config = object
-        [ "default" .= toRGB (_lccDefault config)
-        , "north" .= toRGB (_lccNorth config)
-        , "south" .= toRGB (_lccSouth config)
-        , "west" .= toRGB (_lccWest config)
-        , "east" .= toRGB (_lccEast config)
+    toJSON LinkColorConfig{..} = object
+        [ "default" .= toRGB _lccDefault
+        , "north" .= toRGB _lccNorth
+        , "south" .= toRGB _lccSouth
+        , "west" .= toRGB _lccWest
+        , "east" .= toRGB _lccEast
         ]
 
 hlinkTransform

@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Widgets.GameControlNode.VisualState
     ( VisualState(..)
     , isRunningVisualState
@@ -20,5 +22,4 @@ instance Default VisualState where
         }
 
 isRunningVisualState :: Double -> Millisecond -> VisualState -> Bool
-isRunningVisualState animationDuration ts visualState = r where
-    r = ts-(_vsStart visualState) < floor animationDuration
+isRunningVisualState d ts VisualState{..} = ts-_vsStart < floor d

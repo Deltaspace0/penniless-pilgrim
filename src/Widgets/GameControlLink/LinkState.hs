@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Widgets.GameControlLink.LinkState
     ( LinkState(..)
     , initState
@@ -38,22 +40,19 @@ mergeState
     -> LinkData
     -> WidgetNode s e
     -> (LinkState, [WidgetRequest s e])
-mergeState oldState ts linkData newNode = (newState, reqs) where
-    newState = if newLink == oldLink
+mergeState oldState ts LinkData{..} newNode = (newState, reqs) where
+    newState = if _ldLink == oldLink
         then oldState
         else LinkState
-            { _lsLink = newLink
+            { _lsLink = _ldLink
             , _lsOldLink = oldLink
             , _lsRunning = animationDuration' > 0
-            , _lsStart = newStart
+            , _lsStart = ts - animationDuration' + delta
             }
-    reqs = if newLink == oldLink
+    reqs = if _ldLink == oldLink
         then []
-        else [requestRenderEvery newNode animationDuration]
-    newLink = _ldLink linkData
+        else [requestRenderEvery newNode _ldAnimationDuration]
     oldLink = _lsLink oldState
     oldStart = _lsStart oldState
     delta = min animationDuration' (ts-oldStart)
-    newStart = ts - animationDuration' + delta
-    animationDuration' = floor animationDuration
-    animationDuration = _ldAnimationDuration linkData
+    animationDuration' = floor _ldAnimationDuration

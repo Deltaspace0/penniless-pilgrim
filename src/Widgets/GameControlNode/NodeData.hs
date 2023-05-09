@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Widgets.GameControlNode.NodeData
     ( NodeData(..)
     , gameControlNodeWidgetType
@@ -23,37 +25,34 @@ data NodeData s c = NodeData
     }
 
 gameControlNodeWidgetType :: NodeData s c -> WidgetType
-gameControlNodeWidgetType nodeData = WidgetType widgetType where
-    widgetType = "gameControlNode" <> showt (_ndPosition nodeData)
+gameControlNodeWidgetType NodeData{..} = WidgetType widgetType where
+    widgetType = "gameControlNode" <> showt _ndPosition
 
 baseStyleFromNodeData
     :: (ButtonColors c)
     => NodeData s c
     -> Maybe Style
-baseStyleFromNodeData nodeData = Just style where
-    style = if clickable
+baseStyleFromNodeData NodeData{..} = Just style where
+    style = if _ndClickable
         then basicStyle
             { _styleHover = Just $ def
-                { _sstFgColor = Just $ if null visualStack
-                    then getHoverColor colorConfig
-                    else _nodeColorHover $ head visualStack
+                { _sstFgColor = Just $ if null _ndVisualStack
+                    then getHoverColor _ndDefaultColors
+                    else _nodeColorHover $ head _ndVisualStack
                 , _sstCursorIcon = Just CursorHand
                 }
             , _styleActive = Just $ def
-                { _sstFgColor = Just $ if null visualStack
-                    then getActiveColor colorConfig
-                    else _nodeColorActive $ head visualStack
+                { _sstFgColor = Just $ if null _ndVisualStack
+                    then getActiveColor _ndDefaultColors
+                    else _nodeColorActive $ head _ndVisualStack
                 , _sstCursorIcon = Just CursorHand
                 }
             }
         else basicStyle
-    clickable = _ndClickable nodeData
     basicStyle = def
         { _styleBasic = Just $ def
-            { _sstFgColor = Just $ if null visualStack
-                then getDefaultColor colorConfig
-                else _nodeColorDefault $ head visualStack
+            { _sstFgColor = Just $ if null _ndVisualStack
+                then getDefaultColor _ndDefaultColors
+                else _nodeColorDefault $ head _ndVisualStack
             }
         }
-    visualStack = _ndVisualStack nodeData
-    colorConfig = _ndDefaultColors nodeData

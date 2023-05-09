@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Widgets.GameControl.GameControlRenderer
     ( GameControlRenderer(..)
     , runRenderer
@@ -24,25 +26,20 @@ runRenderer
     :: (GameControlConfig b a c)
     => GameControlRenderer s e a b
     -> IO ()
-runRenderer gcRenderer = do
-    let wenv = _gcrEnv gcRenderer
-        node = _gcrNode gcRenderer
-        renderer = _gcrRenderer gcRenderer
-        gcData = _gcrData gcRenderer
-        state = _gcrState gcRenderer
-        vp = getContentArea node $ currentStyle wenv node
-        Rect x y linkSize _ = _gcsFixedRect state
-        Rect x' y' linkSize' _ = _gcsOldFixedRect state
-        running = _gcsRunning state
-        start = _gcsStart state
-        delta = fromIntegral $ (wenv ^. L.timestamp)-start
-        animationDuration = getAnimationDuration $ _gcdConfig gcData
-        progress = max 0 $ min 1 $ delta/animationDuration
-    saveContext renderer
-    when (running && progress < 1) $ do
+runRenderer GameControlRenderer{..} = do
+    let GameControlData{..} = _gcrData
+        GameControlState{..} = _gcrState
+        vp = getContentArea _gcrNode $ currentStyle _gcrEnv _gcrNode
+        Rect x y linkSize _ = _gcsFixedRect
+        Rect x' y' linkSize' _ = _gcsOldFixedRect
+        delta = fromIntegral $ (_gcrEnv ^. L.timestamp)-_gcsStart
+        animation = getAnimationDuration _gcdConfig
+        progress = max 0 $ min 1 $ delta/animation
+    saveContext _gcrRenderer
+    when (_gcsRunning && progress < 1) $ do
         let s = (linkSize'/linkSize)*(1-progress)+progress
             tx = (x'-x)*(1-progress)+(1-s)*(x+(vp ^. L.x))
             ty = (y'-y)*(1-progress)+(1-s)*(y+(vp ^. L.y))
-        intersectScissor renderer vp
-        setTranslation renderer $ Point tx ty
-        setScale renderer $ Point s s
+        intersectScissor _gcrRenderer vp
+        setTranslation _gcrRenderer $ Point tx ty
+        setScale _gcrRenderer $ Point s s

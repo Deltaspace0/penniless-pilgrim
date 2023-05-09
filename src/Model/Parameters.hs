@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters
@@ -95,15 +96,15 @@ instance FromJSON Parameters where
         <*> v .: "color_config"
 
 instance ToJSON Parameters where
-    toJSON p = object
-        [ "grid_columns_slider" .= (p ^. gridColumnsSlider)
-        , "grid_rows_slider" .= (p ^. gridRowsSlider)
-        , "grid_animation_slider" .= (p ^. gridAnimationSlider)
-        , "link_to_node_slider" .= (p ^. linkToNodeSlider)
-        , "node_to_width_slider" .= (p ^. nodeToWidthSlider)
-        , "game_control_width" .= (p ^. gameControlWidth)
-        , "game_control_height" .= (p ^. gameControlHeight)
-        , "color_config" .= (p ^. colorConfig)
+    toJSON Parameters{..} = object
+        [ "grid_columns_slider" .= _apGridColumnsSlider
+        , "grid_rows_slider" .= _apGridRowsSlider
+        , "grid_animation_slider" .= _apGridAnimationSlider
+        , "link_to_node_slider" .= _apLinkToNodeSlider
+        , "node_to_width_slider" .= _apNodeToWidthSlider
+        , "game_control_width" .= _apGameControlWidth
+        , "game_control_height" .= _apGameControlHeight
+        , "color_config" .= _apColorConfig
         ]
 
 instance FromFile Parameters
@@ -121,15 +122,15 @@ instance GameControlConfig Parameters Game NodeColors where
     getHeight p = p ^. gameControlHeight
 
 gameFromParameters :: Parameters -> Game
-gameFromParameters parameters' = game where
+gameFromParameters Parameters{..} = game where
     game = makeGame (floor gridColumns) (floor gridRows)
-    gridColumns = _csCurrent $ parameters' ^. gridColumnsSlider
-    gridRows = _csCurrent $ parameters' ^. gridRowsSlider
+    gridColumns = _csCurrent _apGridColumnsSlider
+    gridRows = _csCurrent _apGridRowsSlider
 
 parametersFromGame :: Game -> Parameters -> Parameters
-parametersFromGame game p = p
+parametersFromGame Game{..} p = p
     & gridColumnsSlider . currentValue .~ cols'
     & gridRowsSlider . currentValue .~ rows' where
-        (cols, rows) = getBounds $ _grid game
+        (cols, rows) = getBounds _grid
         cols' = fromIntegral $ cols+1
         rows' = fromIntegral $ rows+1
