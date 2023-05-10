@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Model.File
+module File
     ( FromFile
     , ToFile
     , fromFile

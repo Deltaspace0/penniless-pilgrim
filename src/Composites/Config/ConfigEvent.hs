@@ -12,8 +12,8 @@ import Monomer
 
 import Composites.Config.ConfigCfg
 import Composites.Config.ConfigModel
-import Model.File
 import Model.Parameters
+import Util
 
 data ConfigEvent
     = ConfigSave

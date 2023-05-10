@@ -25,9 +25,9 @@ import TextShow
 import qualified Data.Text as T
 
 import Model.AppMenu
-import Model.File
 import Model.Game
 import Model.Parameters
+import Util
 
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu

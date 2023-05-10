@@ -30,12 +30,12 @@ library
       Composites.Config.ConfigEvent
       Composites.Config.ConfigModel
       Composites.Config.UI
+      File
       Model
       Model.AppEvent
       Model.AppMenu
       Model.AppModel
       Model.Direction
-      Model.File
       Model.Game
       Model.Game.GameLink
       Model.Game.GameNode

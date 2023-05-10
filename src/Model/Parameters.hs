@@ -25,9 +25,9 @@ import Data.Default
 
 import Model.Parameters.ColorConfig
 import Model.Parameters.ConfigSlider
-import Model.File
 import Model.Game
 import Widgets.GameControl.GameControlConfig
+import Util
 
 data Parameters = Parameters
     { _apGridColumnsSlider :: ConfigSlider
