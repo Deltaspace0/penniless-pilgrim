@@ -13,6 +13,7 @@ import Monomer
 import Common.File
 import Composites.Config.ConfigCfg
 import Composites.Config.ConfigModel
+import Composites.Config.ConfigMenu
 import Model.Parameters
 
 data ConfigEvent
@@ -21,6 +22,7 @@ data ConfigEvent
     | ConfigSetMessage (Maybe Text)
     | ConfigSetParameters Parameters
     | ConfigReportGameChange
+    | ConfigGoto ConfigMenu
     deriving (Eq, Show)
 
 type EventHandle sp ep = (ConfigCfg ep) -> ConfigModel ->
@@ -36,6 +38,7 @@ handleEvent wd config _ _ model event = case event of
     ConfigSetMessage m -> setMessageHandle m config model
     ConfigSetParameters p -> setParametersHandle p wd config model
     ConfigReportGameChange -> reportGameChangeHandle config model
+    ConfigGoto m -> gotoHandle m config model
 
 saveHandle :: EventHandle sp ep
 saveHandle config model = [Task taskHandler] where
@@ -74,3 +77,6 @@ setParametersHandle p wdata _ _ = response where
 reportGameChangeHandle :: EventHandle sp ep
 reportGameChangeHandle config _ = fromMaybe [] response where
     response = pure . Report <$> _ccGameChange config
+
+gotoHandle :: ConfigMenu -> EventHandle sp ep
+gotoHandle m _ model = [Model $ model & currentMenu .~ m]

@@ -1,11 +1,17 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters.NodeColorConfig
     ( module Model.Parameters.NodeColors
     , NodeColorConfig(..)
+    , nccDefault
+    , nccPilgrim
+    , nccPath
+    , nccGoal
     , nodeTransform
     ) where
 
+import Control.Lens hiding ((.=))
 import Data.Aeson
 import Data.Default
 import Monomer
@@ -20,6 +26,8 @@ data NodeColorConfig = NodeColorConfig
     , _nccPath :: NodeColors
     , _nccGoal :: NodeColors
     } deriving (Eq, Show)
+
+makeLenses 'NodeColorConfig
 
 instance Default NodeColorConfig where
     def = NodeColorConfig

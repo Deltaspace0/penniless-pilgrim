@@ -33,6 +33,7 @@ library
       Composites.Config
       Composites.Config.ConfigCfg
       Composites.Config.ConfigEvent
+      Composites.Config.ConfigMenu
       Composites.Config.ConfigModel
       Composites.Config.UI
       Model

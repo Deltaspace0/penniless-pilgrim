@@ -1,11 +1,18 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters.LinkColorConfig
     ( LinkColorConfig(..)
+    , lccDefault
+    , lccNorth
+    , lccSouth
+    , lccWest
+    , lccEast
     , hlinkTransform
     , vlinkTransform
     ) where
 
+import Control.Lens hiding ((.=))
 import Data.Aeson
 import Data.Default
 import Monomer
@@ -26,6 +33,8 @@ data LinkColorConfig = LinkColorConfig
     , _lccWest :: Color
     , _lccEast :: Color
     } deriving (Eq, Show)
+
+makeLenses 'LinkColorConfig
 
 instance Default LinkColorConfig where
     def = LinkColorConfig

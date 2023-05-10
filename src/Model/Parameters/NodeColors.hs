@@ -1,10 +1,16 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters.NodeColors
     ( NodeColors(..)
     , colorsToVisual
+    , nodeHighlight
+    , nodeDefault
+    , nodeHover
+    , nodeActive
     ) where
 
+import Control.Lens hiding ((.=))
 import Data.Aeson
 import Monomer
 
@@ -17,6 +23,8 @@ data NodeColors = NodeColors
     , _nodeHover :: Color
     , _nodeActive :: Color
     } deriving (Eq, Show)
+
+makeLenses 'NodeColors
 
 instance FromJSON NodeColors where
     parseJSON = withObject "NodeColors" f where

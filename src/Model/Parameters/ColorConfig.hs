@@ -1,14 +1,18 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Model.Parameters.ColorConfig
     ( module Model.Parameters.LinkColorConfig
     , module Model.Parameters.NodeColorConfig
     , ColorConfig(..)
+    , ccGameControlLink
+    , ccGameControlNode
     , defaultVisual
     , transformGrid
     ) where
 
+import Control.Lens hiding ((.=))
 import Data.Aeson
 import Data.Default
 
@@ -23,6 +27,8 @@ data ColorConfig = ColorConfig
     { _ccGameControlLink :: LinkColorConfig
     , _ccGameControlNode :: NodeColorConfig
     } deriving (Eq, Show)
+
+makeLenses 'ColorConfig
 
 instance Default ColorConfig where
     def = ColorConfig def def
