@@ -1,10 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Model.Game
     ( module Model.Game.GameLink
     , module Model.Game.GameNode
     , module Model.Game.Pilgrim
-    , module Model.Grid
     , Game(..)
     , makeGame
     , makeGame_
@@ -20,11 +20,12 @@ import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Default
 import Data.Maybe
+import Monomer.SaveManager
 
+import Common
 import Model.Game.GameLink
 import Model.Game.GameNode
 import Model.Game.Pilgrim
-import Model.Grid
 import Widgets.GameControl.ControlledGame
 
 data Game = Game
@@ -48,6 +49,9 @@ instance ControlledGame Game where
     getScoreByPosition = taxFromGame
     moveToDirection = movePilgrim
     moveToPosition = jumpPilgrim
+
+instance FromFile (Saves Game)
+instance ToFile (Saves Game)
 
 makeGame :: Int -> Int -> Game
 makeGame w h = makeGame_ w h def

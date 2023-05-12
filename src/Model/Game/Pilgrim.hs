@@ -1,8 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Model.Game.Pilgrim
-    ( module Model.Direction
-    , Pilgrim(..)
+    ( Pilgrim(..)
     , updateTax
     , isOppositeToPilgrim
     , updatePilgrim
@@ -11,7 +10,7 @@ module Model.Game.Pilgrim
 import Data.Aeson
 import Data.Default
 
-import Model.Direction
+import Common.Direction
 
 data Pilgrim = Pilgrim
     { _position :: (Int, Int)

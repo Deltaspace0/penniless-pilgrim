@@ -9,7 +9,7 @@ import Data.Default
 import Monomer
 import qualified Monomer.Lens as L
 
-import Util
+import Common.Util
 import Widgets.GameControl.GameControlCfg
 import Widgets.GameControl.GameControlData
 

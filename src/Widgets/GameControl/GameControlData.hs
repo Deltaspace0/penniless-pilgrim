@@ -14,7 +14,7 @@ import Monomer
 import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
-import Model.Grid
+import Common.Grid
 import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlCfg
 import Widgets.GameControlLink

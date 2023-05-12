@@ -3,7 +3,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Model.Grid
+module Common.Grid
     ( Grid
     , makeGrid
     , getBounds
@@ -35,7 +35,7 @@ import Data.Ix
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 
-import Model.Direction
+import Common.Direction
 
 type Point = (Int, Int)
 

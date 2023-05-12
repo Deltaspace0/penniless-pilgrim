@@ -10,9 +10,9 @@ import Data.Text (Text)
 import Monomer
 import Monomer.SaveManager
 
+import Common.Util
 import Composites
 import Model
-import Util
 import Widgets.GameControl
 
 buildUI :: UIBuilder AppModel AppEvent

@@ -6,7 +6,7 @@ module Widgets.GameControl.ControlledGame
     , moveToPosition
     ) where
 
-import Model.Direction
+import Common.Direction
 
 class ControlledGame a where
     getCurrentPosition :: a -> (Int, Int)

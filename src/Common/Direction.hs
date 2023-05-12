@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Model.Direction
+module Common.Direction
     ( Direction(..)
     , getOppositeDirection
     , getPositionInDirection

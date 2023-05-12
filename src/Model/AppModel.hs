@@ -25,10 +25,10 @@ import Monomer.SaveManager
 import TextShow
 import qualified Data.Text as T
 
+import Common
 import Model.AppMenu
 import Model.Game
 import Model.Parameters
-import Util
 
 data AppModel = AppModel
     { _appActiveMenu :: Maybe AppMenu

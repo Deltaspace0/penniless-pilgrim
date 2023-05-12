@@ -10,10 +10,10 @@ import Data.Maybe
 import Data.Text (Text)
 import Monomer
 
+import Common.File
 import Composites.Config.ConfigCfg
 import Composites.Config.ConfigModel
 import Model.Parameters
-import Util
 
 data ConfigEvent
     = ConfigSave

@@ -13,7 +13,7 @@ import Control.Lens
 import Data.Default
 import Monomer
 
-import Util
+import Common.Util
 import Widgets.GameControlNode.NodeData
 import Widgets.GameControlNode.NodeMessage
 import Widgets.GameControlNode.ShakeState

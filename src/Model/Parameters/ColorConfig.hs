@@ -12,6 +12,7 @@ module Model.Parameters.ColorConfig
 import Data.Aeson
 import Data.Default
 
+import Common.Grid
 import Model.Game
 import Model.Parameters.LinkColorConfig
 import Model.Parameters.NodeColorConfig

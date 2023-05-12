@@ -1,6 +1,5 @@
-module Util
-    ( module File
-    , showt'
+module Common.Util
+    ( showt'
     , requestRenderEvery
     ) where
 
@@ -8,8 +7,6 @@ import Control.Lens
 import Data.Text (Text, pack)
 import Monomer.Core
 import qualified Monomer.Lens as L
-
-import File
 
 showt' :: Double -> Text
 showt' number = pack result where

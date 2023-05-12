@@ -9,7 +9,7 @@ module Widgets.GameControlLink.LinkState
 import Data.Default
 import Monomer
 
-import Util
+import Common.Util
 import Widgets.GameControlLink.LinkData
 import Widgets.GameControlLink.LinkVisual
 

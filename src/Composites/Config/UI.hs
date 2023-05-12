@@ -8,10 +8,10 @@ import Control.Lens
 import Monomer
 import Monomer.EnhancedSlider
 
+import Common.Util
 import Composites.Config.ConfigEvent
 import Composites.Config.ConfigModel
 import Model.Parameters
-import Util
 
 buildUI :: UIBuilder ConfigModel ConfigEvent
 buildUI _ model = widgetTree where

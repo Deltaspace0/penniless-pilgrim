@@ -11,7 +11,7 @@ import Monomer
 import Monomer.Widgets.Container
 import qualified Monomer.Lens as L
 
-import Model.Direction
+import Common.Direction
 import Widgets.GameControl.ControlledGame
 import Widgets.GameControl.GameControlCfg
 import Widgets.GameControl.GameControlData

@@ -23,10 +23,10 @@ import Control.Lens hiding ((.=))
 import Data.Aeson
 import Data.Default
 
+import Common
 import Model.Parameters.ColorConfig
 import Model.Parameters.ConfigSlider
 import Model.Game
-import Util
 
 data Parameters = Parameters
     { _apGridColumnsSlider :: ConfigSlider
