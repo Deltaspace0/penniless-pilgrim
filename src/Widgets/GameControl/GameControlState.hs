@@ -32,10 +32,11 @@ initState
     :: (GameControlConfig b a)
     => GameControlData s a b
     -> WidgetEnv s e
+    -> Rect
     -> GameControlState
-initState gcData wenv = def
-    { _gcsFixedRect = getFixedRect gcData wenv
-    , _gcsOldFixedRect = getFixedRect gcData wenv
+initState gcData wenv vp = def
+    { _gcsFixedRect = getFixedRect gcData wenv vp
+    , _gcsOldFixedRect = getFixedRect gcData wenv vp
     }
 
 mergeState
@@ -57,7 +58,7 @@ mergeState oldState wenv gcData newNode = (newState, reqs) where
     reqs = (ResizeWidgets widgetId):[reReq | not sameFixedRect]
     reReq = requestRenderEvery newNode animationDuration
     sameFixedRect = newFixedRect == oldFixedRect
-    newFixedRect = getFixedRect gcData wenv
+    newFixedRect = getFixedRect gcData wenv vp
     oldFixedRect = _gcsFixedRect oldState
     olderFixedRect = _gcsOldFixedRect oldState
     oldFixedRect' = if delta < animationDuration
@@ -70,3 +71,4 @@ mergeState oldState wenv gcData newNode = (newState, reqs) where
     animationDuration' = floor animationDuration :: Integer
     animationDuration = getAnimationDuration $ _gcdConfig gcData
     ts = wenv ^. L.timestamp
+    vp = newNode ^. L.info . L.viewport

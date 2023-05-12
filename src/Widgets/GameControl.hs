@@ -45,7 +45,7 @@ makeGameControl gcData state = widget where
     init' wenv node = resultNode resNode where
         resNode = (makeChildren wenv node gcData) & L.widget .~ w
         w = makeGameControl gcData state'
-        state' = initState gcData wenv
+        state' = initState gcData wenv $ node ^. L.info . L.viewport
 
     merge wenv newNode _ oldState = result where
         result = resultReqs resNode reqs
@@ -70,11 +70,17 @@ makeGameControl gcData state = widget where
         result = cast message >>= handle
         handle = handleGameChange wenv node gcData . moveToPosition
 
-    getSizeReq _ _ _ = (fixedSize width', fixedSize height') where
+    getSizeReq _ _ _ = (w, h) where
+        w = rangeSize width' 2000 1
+        h = rangeSize height' 2000 1
         width' = getWidth $ _gcdConfig gcData
         height' = getHeight $ _gcdConfig gcData
 
-    resize wenv node vp _ = (resultNode node, assignedAreas) where
+    resize wenv node vp _ = (resultNode node', assignedAreas) where
+        node' = node & L.widget .~ makeGameControl gcData state'
+        state' = state
+            { _gcsFixedRect = getFixedRect gcData wenv vp
+            }
         assignedAreas = assignAreas wenv vp gcData        
 
     render wenv node renderer = runRenderer $ GameControlRenderer

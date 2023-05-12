@@ -31,7 +31,8 @@ getFixedRect
     => GameControlData s a b
     -> WidgetEnv s e
     -> Rect
-getFixedRect gcData wenv = Rect x y linkSize nodeSize where
+    -> Rect
+getFixedRect gcData wenv vp = Rect x y linkSize nodeSize where
     x = (width'-linkSize*factorW)/2
     y = (height'-linkSize*factorH)/2
     linkSize = min (width'/factorW) (height'/factorH)
@@ -39,10 +40,8 @@ getFixedRect gcData wenv = Rect x y linkSize nodeSize where
     factorW = (fromIntegral cols)+2/linkToNodeRatio
     factorH = (fromIntegral rows)+2/linkToNodeRatio
     (cols, rows) = getBounds $ getGrid gcData wenv
-    width' = getWidth config
-    height' = getHeight config
-    linkToNodeRatio = getLinkToNodeRatio config
-    config = _gcdConfig gcData
+    Rect _ _ width' height' = vp
+    linkToNodeRatio = getLinkToNodeRatio $ _gcdConfig gcData
 
 getMiddleRect :: Rect -> Rect -> Double -> Rect
 getMiddleRect rectA rectB progress = rect where
@@ -75,7 +74,7 @@ assignAreas wenv vp gcData = assignedAreas where
         y' = vy+linkSize*(fromIntegral j)+nodeSize
     vx = x+(vp ^. L.x)
     vy = y+(vp ^. L.y)
-    Rect x y linkSize nodeSize = getFixedRect gcData wenv
+    Rect x y linkSize nodeSize = getFixedRect gcData wenv vp
 
 makeChildren
     :: (ControlledGame a, GameControlConfig b a)
