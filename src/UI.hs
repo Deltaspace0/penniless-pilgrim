@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module UI
     ( buildUI
     ) where
@@ -14,7 +16,7 @@ import Util
 import Widgets.GameControl
 
 buildUI :: UIBuilder AppModel AppEvent
-buildUI _ model = widgetTree where
+buildUI _ AppModel{..} = widgetTree where
     vstack' = vstack_ [childSpacing_ 16]
     hstack' = hstack_ [childSpacing_ 32]
     boxCenter = box_ [alignCenter]
@@ -25,14 +27,22 @@ buildUI _ model = widgetTree where
         ] `styleBasic` [padding 32]
     gameControlM = gameControl $ GameControlData
         { _gcdGameLens = gameSaves . currentData
-        , _gcdNextTaxLens = Just nextTax
-        , _gcdConfig = model ^. parameters
+        , _gcdGetVisualGrid = flip transformGrid _apColorConfig
+        , _gcdConfig = mconcat
+            [ duration $ fp _apGridAnimationSlider
+            , gameLinkToNodeRatio $ fp _apLinkToNodeSlider
+            , gameNodeToWidthRatio $ fp _apNodeToWidthSlider
+            , gameMinWidth _apGameControlWidth
+            , gameMinHeight _apGameControlHeight
+            , gameDefaultNodeVisual $ defaultVisual _apColorConfig
+            , gameNextScoreField nextTax
+            ]
         }
-    side = case model ^. activeMenu of
+    side = case _appActiveMenu of
         Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine
             , configComposite_ parameters
-                [ configFilePath $ model ^. parametersPath
+                [ configFilePath _appParametersPath
                 , onGameChange AppUpdateGameWithConfig
                 ]
             ]
@@ -46,18 +56,19 @@ buildUI _ model = widgetTree where
         _ -> boxCenter $ vstack' sideWidgets
     sideWidgets =
         [ bigNumberLabel totalTax "Total tax: "
-        , bigNumberLabel (model ^. nextTax) "Next tax: "
+        , bigNumberLabel _appNextTax "Next tax: "
         , boxCenter $ hstack' $
-            [ button "Reset" $ AppSetGame $ model ^. initGame
+            [ button "Reset" $ AppSetGame _appInitGame
             , optionButton "Save/load game" gameSavesMenu activeMenu
             , optionButton "Config" configMenu activeMenu
-            ] <> [hideButton | not $ null $ model ^. activeMenu]
+            ] <> [hideButton | not $ null _appActiveMenu]
         ]
-    totalTax = Just $ _tax $ _pilgrim currentGame
-    currentGame = model ^. gameSaves . currentData
+    totalTax = Just $ _tax $ _pilgrim $ _appGameSaves ^. currentData
     gameSavesMenu = Just GameSavesMenu
     configMenu = Just ConfigMenu
     hideButton = optionButton "Hide" Nothing activeMenu
+    Parameters{..} = _appParameters
+    fp = view currentValue
 
 bigNumberLabel
     :: Maybe Double

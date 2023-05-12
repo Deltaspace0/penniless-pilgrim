@@ -52,8 +52,7 @@ library
       Util
       Widgets.GameControl
       Widgets.GameControl.ControlledGame
-      Widgets.GameControl.GameControlColorConfig
-      Widgets.GameControl.GameControlConfig
+      Widgets.GameControl.GameControlCfg
       Widgets.GameControl.GameControlData
       Widgets.GameControl.GameControlRenderer
       Widgets.GameControl.GameControlState

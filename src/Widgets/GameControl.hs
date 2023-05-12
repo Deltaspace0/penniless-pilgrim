@@ -1,5 +1,6 @@
 module Widgets.GameControl
-    ( GameControlData(..)
+    ( module Widgets.GameControl.GameControlCfg
+    , GameControlData(..)
     , gameControl
     ) where
 
@@ -12,22 +13,22 @@ import qualified Monomer.Lens as L
 
 import Model.Direction
 import Widgets.GameControl.ControlledGame
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlCfg
 import Widgets.GameControl.GameControlData
 import Widgets.GameControl.GameControlRenderer
 import Widgets.GameControl.GameControlState
 
 gameControl
-    :: (ControlledGame a, GameControlConfig b a)
-    => GameControlData s a b
+    :: (ControlledGame a)
+    => GameControlData s a
     -> WidgetNode s e
 gameControl gcData = node where
     node = defaultWidgetNode "gameControl" widget
     widget = makeGameControl gcData def
 
 makeGameControl
-    :: (ControlledGame a, GameControlConfig b a)
-    => GameControlData s a b
+    :: (ControlledGame a)
+    => GameControlData s a
     -> GameControlState
     -> Widget s e
 makeGameControl gcData state = widget where

@@ -26,7 +26,6 @@ import Data.Default
 import Model.Parameters.ColorConfig
 import Model.Parameters.ConfigSlider
 import Model.Game
-import Widgets.GameControl.GameControlConfig
 import Util
 
 data Parameters = Parameters
@@ -109,17 +108,6 @@ instance ToJSON Parameters where
 
 instance FromFile Parameters
 instance ToFile Parameters
-
-instance GameControlColorConfig Parameters Game where
-    getDefaultNodeVisual = getDefaultNodeVisual . _apColorConfig
-    getVisualGrid game = getVisualGrid game . _apColorConfig
-
-instance GameControlConfig Parameters Game where
-    getAnimationDuration p = p ^. gridAnimationSlider . currentValue
-    getLinkToNodeRatio p = p ^. linkToNodeSlider . currentValue
-    getNodeToWidthRatio p = p ^. nodeToWidthSlider . currentValue
-    getWidth p = p ^. gameControlWidth
-    getHeight p = p ^. gameControlHeight
 
 gameFromParameters :: Parameters -> Game
 gameFromParameters Parameters{..} = game where

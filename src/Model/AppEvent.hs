@@ -9,7 +9,6 @@ import Monomer
 import Monomer.SaveManager
 
 import Model.AppModel
-import Model.Parameters
 import Util
 
 data AppEvent

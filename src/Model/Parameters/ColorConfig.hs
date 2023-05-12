@@ -5,6 +5,8 @@ module Model.Parameters.ColorConfig
     ( module Model.Parameters.LinkColorConfig
     , module Model.Parameters.NodeColorConfig
     , ColorConfig(..)
+    , defaultVisual
+    , transformGrid
     ) where
 
 import Data.Aeson
@@ -13,7 +15,6 @@ import Data.Default
 import Model.Game
 import Model.Parameters.LinkColorConfig
 import Model.Parameters.NodeColorConfig
-import Widgets.GameControl.GameControlColorConfig
 import Widgets.GameControlLink
 import Widgets.GameControlNode
 
@@ -36,10 +37,8 @@ instance ToJSON ColorConfig where
         , "game_control_node" .= _ccGameControlNode
         ]
 
-instance GameControlColorConfig ColorConfig Game where
-    getDefaultNodeVisual = colorsToVisual . getDefault where
-        getDefault = _nccDefault . _ccGameControlNode
-    getVisualGrid = transformGrid
+defaultVisual :: ColorConfig -> NodeVisual
+defaultVisual = colorsToVisual . _nccDefault . _ccGameControlNode
 
 transformGrid :: Game -> ColorConfig -> Grid NodeVisual LinkVisual
 transformGrid Game{..} ColorConfig{..} = newGrid where

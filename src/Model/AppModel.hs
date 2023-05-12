@@ -5,6 +5,7 @@
 
 module Model.AppModel
     ( module Model.Game
+    , module Model.Parameters
     , AppModel(..)
     , activeMenu
     , parameters

@@ -10,21 +10,20 @@ import Control.Monad
 import Monomer
 import qualified Monomer.Lens as L
 
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlCfg
 import Widgets.GameControl.GameControlData
 import Widgets.GameControl.GameControlState
 
-data GameControlRenderer s e a b = GameControlRenderer
+data GameControlRenderer s e a = GameControlRenderer
     { _gcrEnv :: WidgetEnv s e
     , _gcrNode :: WidgetNode s e
     , _gcrRenderer :: Renderer
-    , _gcrData :: GameControlData s a b
+    , _gcrData :: GameControlData s a
     , _gcrState :: GameControlState
     }
 
 runRenderer
-    :: (GameControlConfig b a)
-    => GameControlRenderer s e a b
+    :: GameControlRenderer s e a
     -> IO ()
 runRenderer GameControlRenderer{..} = do
     let GameControlData{..} = _gcrData

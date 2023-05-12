@@ -16,19 +16,18 @@ import qualified Monomer.Lens as L
 
 import Model.Grid
 import Widgets.GameControl.ControlledGame
-import Widgets.GameControl.GameControlConfig
+import Widgets.GameControl.GameControlCfg
 import Widgets.GameControlLink
 import Widgets.GameControlNode
 
-data GameControlData s a b = GameControlData
+data GameControlData s a = GameControlData
     { _gcdGameLens :: ALens' s a
-    , _gcdNextTaxLens :: Maybe (ALens' s (Maybe Double))
-    , _gcdConfig :: b
+    , _gcdGetVisualGrid :: a -> Grid NodeVisual LinkVisual
+    , _gcdConfig :: GameControlCfg s
     }
 
 getFixedRect
-    :: (GameControlConfig b a)
-    => GameControlData s a b
+    :: GameControlData s a
     -> WidgetEnv s e
     -> Rect
     -> Rect
@@ -54,10 +53,9 @@ getMiddleRect rectA rectB progress = rect where
     Rect xB yB linkSizeB nodeSizeB = rectB
 
 assignAreas
-    :: (GameControlConfig b a)
-    => WidgetEnv s e
+    :: WidgetEnv s e
     -> Rect
-    -> GameControlData s a b
+    -> GameControlData s a
     -> Seq Rect
 assignAreas wenv vp gcData = assignedAreas where
     assignedAreas =
@@ -77,17 +75,17 @@ assignAreas wenv vp gcData = assignedAreas where
     Rect x y linkSize nodeSize = getFixedRect gcData wenv vp
 
 makeChildren
-    :: (ControlledGame a, GameControlConfig b a)
+    :: (ControlledGame a)
     => WidgetEnv s e
     -> WidgetNode s e
-    -> GameControlData s a b
+    -> GameControlData s a
     -> WidgetNode s e
 makeChildren wenv node gcData = resNode where
     resNode = node & L.children .~ fmap fn nodeSequence
         >< fmap fh hlinkSequence
         >< fmap fv vlinkSequence
     game = widgetDataGet (wenv ^. L.model) gameLens
-    grid = getVisualGrid game config
+    grid = (_gcdGetVisualGrid gcData) game
     nodeSequence = getNodeSequence grid
     hlinkSequence = getHlinkSequence grid
     vlinkSequence = getVlinkSequence grid
@@ -114,10 +112,10 @@ makeChildren wenv node gcData = resNode where
     gameLens = WidgetLens $ _gcdGameLens gcData
 
 handleGameChange
-    :: (ControlledGame a, GameControlConfig b a)
+    :: (ControlledGame a)
     => WidgetEnv s e
     -> WidgetNode s e
-    -> GameControlData s a b
+    -> GameControlData s a
     -> (a -> Maybe a)
     -> Maybe (WidgetResult s e)
 handleGameChange wenv node gcData f = result where
@@ -138,17 +136,16 @@ handleGameChange wenv node gcData f = result where
     gameLens = WidgetLens $ _gcdGameLens gcData
 
 getGrid
-    :: (GameControlConfig b a)
-    => GameControlData s a b
+    :: GameControlData s a
     -> WidgetEnv s e
     -> Grid NodeVisual LinkVisual
-getGrid gcData wenv = getVisualGrid game $ _gcdConfig gcData where
+getGrid gcData wenv = (_gcdGetVisualGrid gcData) game where
     game = widgetDataGet (wenv ^. L.model) gameLens
     gameLens = WidgetLens $ _gcdGameLens gcData
 
 getNextTaxLens
-    :: GameControlData s a b
+    :: GameControlData s a
     -> WidgetData s (Maybe Double)
 getNextTaxLens gcData = fromMaybe value nextTaxLens where
     value = WidgetValue Nothing
-    nextTaxLens = WidgetLens <$> _gcdNextTaxLens gcData
+    nextTaxLens = WidgetLens <$> _gccNextScore (_gcdConfig gcData)
