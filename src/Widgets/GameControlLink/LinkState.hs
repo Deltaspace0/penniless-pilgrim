@@ -47,7 +47,7 @@ mergeState oldState ts LinkData{..} newNode = (newState, reqs) where
             { _lsLink = _ldLink
             , _lsOldLink = oldLink
             , _lsRunning = animationDuration' > 0
-            , _lsStart = ts - animationDuration' + delta
+            , _lsStart = newStart
             }
     reqs = if _ldLink == oldLink
         then []
@@ -56,3 +56,6 @@ mergeState oldState ts LinkData{..} newNode = (newState, reqs) where
     oldStart = _lsStart oldState
     delta = min animationDuration' (ts-oldStart)
     animationDuration' = floor _ldAnimationDuration
+    newStart = if (_linkForm <$> _ldLink) == (_linkForm <$> oldLink)
+        then _lsStart oldState
+        else ts - animationDuration' + delta
