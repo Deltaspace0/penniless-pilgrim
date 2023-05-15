@@ -35,4 +35,4 @@ configComposite_ field configs = node where
     eventHandler = handleEvent wdata config
     config = mconcat configs
     cmpConfigs = [compositeMergeModel mergeHandler]
-    mergeHandler _ pm _ = parameters .~ widgetDataGet pm wdata
+    mergeHandler _ pm m _ = m & parameters .~ widgetDataGet pm wdata

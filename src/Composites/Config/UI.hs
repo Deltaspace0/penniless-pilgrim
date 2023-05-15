@@ -47,8 +47,9 @@ configSlider_
     -> [ConfigEvent]
     -> WidgetNode ConfigModel ConfigEvent
 configSlider_ model slider events = widget where
-    widget = enhancedSlider_ field a b config
-    field = parameters . slider . currentValue
+    widget = enhancedSliderD_ wdata a b config
+        [mergeRequired $ \_ _ _ -> True]
+    wdata = WidgetLens $ parameters . slider . currentValue
     a = _csMin slider'
     b = _csMax slider'
     config =
