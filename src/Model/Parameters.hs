@@ -103,16 +103,17 @@ instance Default Parameters where
 
 instance FromJSON Parameters where
     parseJSON = withObject "Parameters" $ \v -> Parameters
-        <$> v .: "grid_columns_slider"
-        <*> v .: "grid_rows_slider"
-        <*> v .: "grid_animation_slider"
-        <*> v .: "link_to_node_slider"
-        <*> v .: "node_to_width_slider"
-        <*> v .: "pilgrim_start_x"
-        <*> v .: "pilgrim_start_y"
-        <*> v .: "game_control_width"
-        <*> v .: "game_control_height"
-        <*> v .: "color_config"
+        <$> v .:? "grid_columns_slider" .!= _apGridColumnsSlider
+        <*> v .:? "grid_rows_slider" .!= _apGridRowsSlider
+        <*> v .:? "grid_animation_slider" .!= _apGridAnimationSlider
+        <*> v .:? "link_to_node_slider" .!= _apLinkToNodeSlider
+        <*> v .:? "node_to_width_slider" .!= _apNodeToWidthSlider
+        <*> v .:? "pilgrim_start_x" .!= _apPilgrimStartXSlider
+        <*> v .:? "pilgrim_start_y" .!= _apPilgrimStartYSlider
+        <*> v .:? "game_control_width" .!= _apGameControlWidth
+        <*> v .:? "game_control_height" .!= _apGameControlHeight
+        <*> v .:? "color_config" .!= _apColorConfig where
+            Parameters{..} = def
 
 instance ToJSON Parameters where
     toJSON Parameters{..} = object
