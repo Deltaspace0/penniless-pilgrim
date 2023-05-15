@@ -12,6 +12,8 @@ module Model.Parameters
     , gridAnimationSlider
     , linkToNodeSlider
     , nodeToWidthSlider
+    , pilgrimStartXSlider
+    , pilgrimStartYSlider
     , gameControlWidth
     , gameControlHeight
     , colorConfig
@@ -34,6 +36,8 @@ data Parameters = Parameters
     , _apGridAnimationSlider :: ConfigSlider
     , _apLinkToNodeSlider :: ConfigSlider
     , _apNodeToWidthSlider :: ConfigSlider
+    , _apPilgrimStartXSlider :: ConfigSlider
+    , _apPilgrimStartYSlider :: ConfigSlider
     , _apGameControlWidth :: Double
     , _apGameControlHeight :: Double
     , _apColorConfig :: ColorConfig
@@ -78,6 +82,20 @@ instance Default Parameters where
             , _csChangeRate = 0.2
             , _csCaption = "Node size to link width ratio"
             }
+        , _apPilgrimStartXSlider = ConfigSlider
+            { _csCurrent = 0
+            , _csMin = 0
+            , _csMax = 32
+            , _csChangeRate = 1
+            , _csCaption = "Pilgrim start position X"
+            }
+        , _apPilgrimStartYSlider = ConfigSlider
+            { _csCurrent = 0
+            , _csMin = 0
+            , _csMax = 32
+            , _csChangeRate = 1
+            , _csCaption = "Pilgrim start position Y"
+            }
         , _apGameControlWidth = 400
         , _apGameControlHeight = 500
         , _apColorConfig = def
@@ -90,6 +108,8 @@ instance FromJSON Parameters where
         <*> v .: "grid_animation_slider"
         <*> v .: "link_to_node_slider"
         <*> v .: "node_to_width_slider"
+        <*> v .: "pilgrim_start_x"
+        <*> v .: "pilgrim_start_y"
         <*> v .: "game_control_width"
         <*> v .: "game_control_height"
         <*> v .: "color_config"
@@ -101,6 +121,8 @@ instance ToJSON Parameters where
         , "grid_animation_slider" .= _apGridAnimationSlider
         , "link_to_node_slider" .= _apLinkToNodeSlider
         , "node_to_width_slider" .= _apNodeToWidthSlider
+        , "pilgrim_start_x" .= _apPilgrimStartXSlider
+        , "pilgrim_start_y" .= _apPilgrimStartYSlider
         , "game_control_width" .= _apGameControlWidth
         , "game_control_height" .= _apGameControlHeight
         , "color_config" .= _apColorConfig
@@ -111,9 +133,13 @@ instance ToFile Parameters
 
 gameFromParameters :: Parameters -> Game
 gameFromParameters Parameters{..} = game where
-    game = makeGame (floor gridColumns) (floor gridRows)
+    game = makeGame_ (floor gridColumns) (floor gridRows) $ def
+        { _position = (max 0 $ floor x, max 0 $ floor y)
+        }
     gridColumns = _csCurrent _apGridColumnsSlider
     gridRows = _csCurrent _apGridRowsSlider
+    x = min (gridColumns-1) $ _csCurrent _apPilgrimStartXSlider
+    y = min (gridRows-1) $ _csCurrent _apPilgrimStartYSlider
 
 parametersFromGame :: Game -> Parameters -> Parameters
 parametersFromGame Game{..} p = p

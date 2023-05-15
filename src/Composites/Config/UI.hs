@@ -33,7 +33,16 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
             , configSlider model gridAnimationSlider
             , configSlider model linkToNodeSlider
             , configSlider model nodeToWidthSlider
-            , button "Change colors" $ ConfigGoto ColorMenu
+            , button "Start position" $ ConfigGoto StartPosMenu
+            , button "Colors" $ ConfigGoto ColorMenu
+            ]
+        StartPosMenu ->
+            [ separatorLine
+            , button "Go back" $ ConfigGoto MainMenu
+            , separatorLine
+            , label "Change pilgrim start position"
+            , configSlider_ model pilgrimStartXSlider [reportEvent]
+            , configSlider_ model pilgrimStartYSlider [reportEvent]
             ]
         ColorMenu ->
             [ separatorLine
