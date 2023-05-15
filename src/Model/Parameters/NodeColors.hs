@@ -27,13 +27,17 @@ data NodeColors = NodeColors
 makeLenses 'NodeColors
 
 instance FromJSON NodeColors where
-    parseJSON = withObject "NodeColors" f where
-        f v = NodeColors
-            <$> g "highlight"
-            <*> g "default"
-            <*> g "hover"
-            <*> g "active" where
-                g t = fromRGB <$> v .: t
+    parseJSON = withObject "NodeColors" $ \v -> do
+        highlight <- fromRGB <$> v .: "highlight"
+        defaultRGB <- v .: "default"
+        hover <- fromRGB <$> v .:? "hover" .!= defaultRGB
+        active <- fromRGB <$> v .:? "active" .!= defaultRGB
+        return $ NodeColors
+            { _nodeHighlight = highlight
+            , _nodeDefault = fromRGB defaultRGB
+            , _nodeHover = hover
+            , _nodeActive = active
+            }
 
 instance ToJSON NodeColors where
     toJSON NodeColors{..} = object

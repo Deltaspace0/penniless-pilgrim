@@ -35,8 +35,8 @@ instance Default ColorConfig where
 
 instance FromJSON ColorConfig where
     parseJSON = withObject "ColorConfig" $ \v -> ColorConfig
-        <$> v .: "game_control_link"
-        <*> v .: "game_control_node"
+        <$> v .:? "game_control_link" .!= def
+        <*> v .:? "game_control_node" .!= def
 
 instance ToJSON ColorConfig where
     toJSON ColorConfig{..} = object

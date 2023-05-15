@@ -48,12 +48,12 @@ instance Default LinkColorConfig where
 instance FromJSON LinkColorConfig where
     parseJSON = withObject "LinkColorConfig" f where
         f v = LinkColorConfig
-            <$> g "default"
-            <*> g "north"
-            <*> g "south"
-            <*> g "west"
-            <*> g "east" where
-                g t = fromRGB <$> v .: t
+            <$> (g "default") .!= _lccDefault def
+            <*> (g "north") .!= _lccNorth def
+            <*> (g "south") .!= _lccSouth def
+            <*> (g "west") .!= _lccWest def
+            <*> (g "east") .!= _lccEast def where
+                g t = (fromRGB <$>) <$> v .:? t
 
 instance ToJSON LinkColorConfig where
     toJSON LinkColorConfig{..} = object

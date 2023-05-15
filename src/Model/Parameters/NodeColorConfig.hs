@@ -59,10 +59,10 @@ instance Default NodeColorConfig where
 
 instance FromJSON NodeColorConfig where
     parseJSON = withObject "NodeColorConfig" $ \v -> NodeColorConfig
-        <$> v .: "default"
-        <*> v .: "pilgrim"
-        <*> v .: "path"
-        <*> v .: "goal"
+        <$> v .:? "default" .!= _nccDefault def
+        <*> v .:? "pilgrim" .!= _nccPilgrim def
+        <*> v .:? "path" .!= _nccPath def
+        <*> v .:? "goal" .!= _nccGoal def
 
 instance ToJSON NodeColorConfig where
     toJSON NodeColorConfig{..} = object
