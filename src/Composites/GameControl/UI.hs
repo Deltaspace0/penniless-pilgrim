@@ -16,7 +16,6 @@ import qualified Monomer.Lens as L
 
 import Common
 import Composites.GameControl.ControlledGame
-import Composites.GameControl.GameControlCfg
 import Composites.GameControl.GameControlEvent
 import Composites.GameControl.GameControlModel
 import Composites.GameControl.LinkVisual
@@ -25,9 +24,8 @@ import Composites.GameControl.NodeVisual
 buildUI
     :: (CompositeModel a, ControlledGame a)
     => (a -> Grid NodeVisual LinkVisual)
-    -> GameControlCfg s
     -> UIBuilder (GameControlModel a) GameControlEvent
-buildUI getGrid config _ GameControlModel{..} = uiNode where
+buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
     uiNode = if null _gcmControlledGame
         then spacer
         else node
@@ -82,7 +80,7 @@ buildUI getGrid config _ GameControlModel{..} = uiNode where
             then transparent
             else _nodeColorHighlight
         NodeVisual{..} = if null visualStack
-            then getDefaultNodeVisual config
+            then getDefaultNodeVisual model
             else head visualStack
         score = getScoreByPosition p game
         twist t = (1+(sin $ t*pi*7/2))/2
@@ -150,8 +148,8 @@ buildUI getGrid config _ GameControlModel{..} = uiNode where
                 ]
         (i, j) = shiftPoint p
     ars = linkWidth*1.5
-    linkWidth = nodeRadius/(getNodeToWidthRatio config)
-    nodeRadius = 1/(getLinkToNodeRatio config)
+    linkWidth = nodeRadius/(getNodeToWidthRatio model)
+    nodeRadius = 1/(getLinkToNodeRatio model)
     grid = getGrid game
-    dur = round $ getAnimationDuration config
+    dur = round $ getAnimationDuration model
     game = fromJust _gcmControlledGame

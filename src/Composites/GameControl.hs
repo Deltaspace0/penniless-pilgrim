@@ -35,16 +35,16 @@ gameControl
 gameControl GameControlData{..} = node where
     node = compositeD_ wt wdata uiBuilder eventHandler cmpConfigs
     wt = "gameControl"
-    wdata = WidgetValue initGameControlModel
-    uiBuilder = buildUI _gcdGetVisualGrid _gcdConfig
+    wdata = WidgetValue $ initGameControlModel _gcdConfig
+    uiBuilder = buildUI _gcdGetVisualGrid
     eventHandler = handleEvent _gcdConfig field
     cmpConfigs =
-        [ mergeRequired $ \_ _ _ -> True
-        , compositeMergeEvents $ \_ _ _ _ _ _ -> [EventStopShake]
+        [ compositeMergeEvents $ \_ _ _ _ _ _ -> [EventStopShake]
         , compositeMergeModel mergeHandler
         ]
-    mergeHandler _ parentModel oldModel _ = oldModel
+    mergeHandler _ parentModel oldModel newModel = newModel
         { _gcmControlledGame = Just $ getGame parentModel
+        , _gcmShakeNode = _gcmShakeNode oldModel
         }
     getGame = flip widgetDataGet field
     field = WidgetLens _gcdGameLens

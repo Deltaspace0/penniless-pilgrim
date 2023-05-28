@@ -6,16 +6,11 @@ module Composites.GameControl.GameControlCfg
     , gameNodeToWidthRatio
     , gameDefaultNodeVisual
     , gameNextScoreField
-    , getAnimationDuration
-    , getLinkToNodeRatio
-    , getNodeToWidthRatio
-    , getDefaultNodeVisual
     ) where
 
 import Control.Applicative ((<|>))
 import Control.Lens
 import Data.Default
-import Data.Maybe
 import Monomer
 
 import Composites.GameControl.NodeVisual
@@ -73,21 +68,3 @@ gameNextScoreField :: ALens' s (Maybe Double) -> GameControlCfg s
 gameNextScoreField v = def
     { _gccNextScore = Just v
     }
-
-getAnimationDuration :: GameControlCfg s -> Double
-getAnimationDuration config = fromMaybe 300 $ _gccDuration config
-
-getLinkToNodeRatio :: GameControlCfg s -> Double
-getLinkToNodeRatio config = fromMaybe 5 $ _gccLinkNode config
-
-getNodeToWidthRatio :: GameControlCfg s -> Double
-getNodeToWidthRatio config = fromMaybe 2 $ _gccNodeWidth config
-
-getDefaultNodeVisual :: GameControlCfg s -> NodeVisual
-getDefaultNodeVisual config = fromMaybe v $ _gccVisual config where
-    v = NodeVisual
-        { _nodeColorHighlight = black
-        , _nodeColorDefault = black
-        , _nodeColorHover = black
-        , _nodeColorActive = black
-        }
