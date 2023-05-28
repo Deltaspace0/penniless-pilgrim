@@ -42,9 +42,15 @@ gameControl GameControlData{..} = node where
         [ compositeMergeEvents $ \_ _ _ _ _ _ -> [EventStopShake]
         , compositeMergeModel mergeHandler
         ]
-    mergeHandler _ parentModel oldModel newModel = newModel
-        { _gcmControlledGame = Just $ getGame parentModel
-        , _gcmShakeNode = _gcmShakeNode oldModel
-        }
+    mergeHandler _ parentModel oldModel newModel = model where
+        model = newModel
+            { _gcmControlledGame = game
+            , _gcmPreviewGame = newPreview
+            , _gcmShakeNode = _gcmShakeNode oldModel
+            }
+        newPreview = if game == _gcmControlledGame oldModel
+            then _gcmPreviewGame oldModel
+            else Nothing
+        game = Just $ getGame parentModel
     getGame = flip widgetDataGet field
     field = WidgetLens _gcdGameLens

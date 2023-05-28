@@ -12,6 +12,7 @@ import Data.Tuple
 import Monomer
 import Monomer.Graph
 import TextShow
+import qualified Data.Sequence as Seq
 import qualified Monomer.Lens as L
 
 import Common
@@ -50,8 +51,8 @@ buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
     focus = L.info . L.focusable .~ True
     graphDatas = toList $ hlinks >< vlinks >< nodes
     nodes = fn <$> getNodeSequence grid
-    hlinks = fl True <$> getHlinkSequence grid
-    vlinks = fl False <$> getVlinkSequence grid
+    hlinks = fl True <$> Seq.zip hlinkSequence hlinkPreview
+    vlinks = fl False <$> Seq.zip vlinkSequence vlinkPreview
     fn (p, visualStack) = graphData where
         graphData =
             [ graphPoint $ negateY $ shiftPoint p
@@ -65,8 +66,8 @@ buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
             , graphActiveColor _nodeColorActive
             , graphBorderColor borderColor
             , graphSeparate_ $ not $ null score
-            , graphOnEnter $ const $ EventSetScore score
-            , graphOnLeave $ const $ EventSetScore Nothing
+            , graphOnEnter $ const $ EventPreview p
+            , graphOnLeave $ const EventResetPreview
             , graphOnClick $ const $ EventClick p
             , graphKey $ "node" <> (showt p)
             , if _gcmShakeNode /= Just p
@@ -84,18 +85,22 @@ buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
             else head visualStack
         score = getScoreByPosition p game
         twist t = (1+(sin $ t*pi*7/2))/2
-    fl isHorizontal (p, link) = graphData where
+    fl isHorizontal ((p, link), (_, link')) = graphData where
         graphData =
-            [ graphPoints ps
+            [ graphPoints $ negateY <$> ps
             , graphDuration dur
-            , graphColor _linkColor
+            , graphColor $ _linkColor justLink'
             , graphFill
-            , graphFillAlpha 1
+            , graphFillAlpha alpha
             , graphKey $ "link" <> (showt isHorizontal) <> (showt p)
             , graphWidth 1
             ]
-        ps = negateY <$> getLinkPoints isHorizontal p _linkForm
-        LinkVisual{..} = fromMaybe emptyLink link
+        alpha = if _linkForm justLink' == _linkForm justLink
+            then 1
+            else 0.5
+        ps = getLinkPoints isHorizontal p $ _linkForm justLink'
+        justLink = fromMaybe emptyLink link
+        justLink' = fromMaybe emptyLink link'
         emptyLink = LinkVisual transparent LinkDefault
     negateY (i, j) = (i, -j)
     shiftPoint (i, j) = (1+fromIntegral i, 1+fromIntegral j)
@@ -150,6 +155,13 @@ buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
     ars = linkWidth*1.5
     linkWidth = nodeRadius/(getNodeToWidthRatio model)
     nodeRadius = 1/(getLinkToNodeRatio model)
+    hlinkPreview = fromMaybe hlinkSequence maybeHlinkPreview
+    vlinkPreview = fromMaybe vlinkSequence maybeVlinkPreview
+    maybeHlinkPreview = getHlinkSequence <$> previewGrid
+    maybeVlinkPreview = getVlinkSequence <$> previewGrid
+    previewGrid = getGrid <$> _gcmPreviewGame
+    hlinkSequence = getHlinkSequence grid
+    vlinkSequence = getVlinkSequence grid
     grid = getGrid game
     dur = round $ getAnimationDuration model
     game = fromJust _gcmControlledGame
