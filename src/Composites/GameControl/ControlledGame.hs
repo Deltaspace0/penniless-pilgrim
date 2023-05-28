@@ -1,4 +1,4 @@
-module Widgets.GameControl.ControlledGame
+module Composites.GameControl.ControlledGame
     ( ControlledGame
     , getCurrentPosition
     , getScoreByPosition

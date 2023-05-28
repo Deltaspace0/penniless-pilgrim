@@ -36,6 +36,15 @@ library
       Composites.Config.ConfigMenu
       Composites.Config.ConfigModel
       Composites.Config.UI
+      Composites.GameControl
+      Composites.GameControl.ControlledGame
+      Composites.GameControl.GameControlCfg
+      Composites.GameControl.GameControlEvent
+      Composites.GameControl.GameControlModel
+      Composites.GameControl.LinkForm
+      Composites.GameControl.LinkVisual
+      Composites.GameControl.NodeVisual
+      Composites.GameControl.UI
       Model
       Model.AppEvent
       Model.AppMenu
@@ -52,15 +61,6 @@ library
       Model.Parameters.NodeColors
       Model.Parameters.RGB
       UI
-      Widgets.GameControl
-      Widgets.GameControl.ControlledGame
-      Widgets.GameControl.GameControlCfg
-      Widgets.GameControl.GameControlEvent
-      Widgets.GameControl.GameControlModel
-      Widgets.GameControl.LinkForm
-      Widgets.GameControl.LinkVisual
-      Widgets.GameControl.NodeVisual
-      Widgets.GameControl.UI
   other-modules:
       Paths_penniless_pilgrim
   hs-source-dirs:

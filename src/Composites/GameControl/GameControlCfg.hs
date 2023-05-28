@@ -1,6 +1,6 @@
 {-# LANGUAGE FunctionalDependencies #-}
 
-module Widgets.GameControl.GameControlCfg
+module Composites.GameControl.GameControlCfg
     ( GameControlCfg(..)
     , gameLinkToNodeRatio
     , gameNodeToWidthRatio
@@ -18,7 +18,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 
-import Widgets.GameControl.NodeVisual
+import Composites.GameControl.NodeVisual
 
 data GameControlCfg s = GameControlCfg
     { _gccDuration :: Maybe Double

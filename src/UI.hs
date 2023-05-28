@@ -13,7 +13,6 @@ import Monomer.SaveManager
 import Common.Util
 import Composites
 import Model
-import Widgets.GameControl
 
 buildUI :: UIBuilder AppModel AppEvent
 buildUI _ AppModel{..} = widgetTree where

@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Widgets.GameControl.UI
+module Composites.GameControl.UI
     ( buildUI
     ) where
 
@@ -15,12 +15,12 @@ import TextShow
 import qualified Monomer.Lens as L
 
 import Common
-import Widgets.GameControl.ControlledGame
-import Widgets.GameControl.GameControlCfg
-import Widgets.GameControl.GameControlEvent
-import Widgets.GameControl.GameControlModel
-import Widgets.GameControl.LinkVisual
-import Widgets.GameControl.NodeVisual
+import Composites.GameControl.ControlledGame
+import Composites.GameControl.GameControlCfg
+import Composites.GameControl.GameControlEvent
+import Composites.GameControl.GameControlModel
+import Composites.GameControl.LinkVisual
+import Composites.GameControl.NodeVisual
 
 buildUI
     :: (CompositeModel a, ControlledGame a)

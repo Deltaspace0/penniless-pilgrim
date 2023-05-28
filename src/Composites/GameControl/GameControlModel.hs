@@ -1,4 +1,4 @@
-module Widgets.GameControl.GameControlModel
+module Composites.GameControl.GameControlModel
     ( GameControlModel(..)
     , initGameControlModel
     ) where

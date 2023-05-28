@@ -18,7 +18,7 @@ import Monomer
 
 import Model.Game
 import Model.Parameters.NodeColors
-import Widgets.GameControl
+import Composites.GameControl
 
 data NodeColorConfig = NodeColorConfig
     { _nccDefault :: NodeColors

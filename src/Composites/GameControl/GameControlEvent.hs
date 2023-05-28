@@ -1,4 +1,4 @@
-module Widgets.GameControl.GameControlEvent
+module Composites.GameControl.GameControlEvent
     ( GameControlEvent(..)
     , handleEvent
     ) where
@@ -7,9 +7,9 @@ import Data.Maybe
 import Monomer
 
 import Common.Direction
-import Widgets.GameControl.ControlledGame
-import Widgets.GameControl.GameControlCfg
-import Widgets.GameControl.GameControlModel
+import Composites.GameControl.ControlledGame
+import Composites.GameControl.GameControlCfg
+import Composites.GameControl.GameControlModel
 
 data GameControlEvent
     = EventSetScore (Maybe Double)

@@ -1,4 +1,4 @@
-module Widgets.GameControl.LinkForm
+module Composites.GameControl.LinkForm
     ( LinkForm(..)
     ) where
 

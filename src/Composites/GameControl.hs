@@ -1,10 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Widgets.GameControl
-    ( module Widgets.GameControl.ControlledGame
-    , module Widgets.GameControl.GameControlCfg
-    , module Widgets.GameControl.LinkVisual
-    , module Widgets.GameControl.NodeVisual
+module Composites.GameControl
+    ( module Composites.GameControl.ControlledGame
+    , module Composites.GameControl.GameControlCfg
+    , module Composites.GameControl.LinkVisual
+    , module Composites.GameControl.NodeVisual
     , GameControlData(..)
     , gameControl
     ) where
@@ -14,13 +14,13 @@ import Data.Typeable
 import Monomer
 
 import Common.Grid
-import Widgets.GameControl.ControlledGame
-import Widgets.GameControl.GameControlCfg
-import Widgets.GameControl.GameControlEvent
-import Widgets.GameControl.GameControlModel
-import Widgets.GameControl.LinkVisual
-import Widgets.GameControl.NodeVisual
-import Widgets.GameControl.UI
+import Composites.GameControl.ControlledGame
+import Composites.GameControl.GameControlCfg
+import Composites.GameControl.GameControlEvent
+import Composites.GameControl.GameControlModel
+import Composites.GameControl.LinkVisual
+import Composites.GameControl.NodeVisual
+import Composites.GameControl.UI
 
 data GameControlData s a = GameControlData
     { _gcdGameLens :: ALens' s a

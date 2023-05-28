@@ -26,7 +26,7 @@ import Common
 import Model.Game.GameLink
 import Model.Game.GameNode
 import Model.Game.Pilgrim
-import Widgets.GameControl.ControlledGame
+import Composites.GameControl.ControlledGame
 
 data Game = Game
     { _grid :: Grid GameNode GameLink

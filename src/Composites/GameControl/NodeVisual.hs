@@ -1,4 +1,4 @@
-module Widgets.GameControl.NodeVisual
+module Composites.GameControl.NodeVisual
     ( NodeVisual(..)
     ) where
 
