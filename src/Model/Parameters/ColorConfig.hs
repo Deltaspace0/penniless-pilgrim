@@ -20,8 +20,7 @@ import Common.Grid
 import Model.Game
 import Model.Parameters.LinkColorConfig
 import Model.Parameters.NodeColorConfig
-import Widgets.GameControlLink
-import Widgets.GameControlNode
+import Widgets.GameControl
 
 data ColorConfig = ColorConfig
     { _ccGameControlLink :: LinkColorConfig

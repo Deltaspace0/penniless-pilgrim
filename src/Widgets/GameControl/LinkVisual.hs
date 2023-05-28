@@ -1,11 +1,11 @@
-module Widgets.GameControlLink.LinkVisual
-    ( module Widgets.GameControlLink.LinkForm
+module Widgets.GameControl.LinkVisual
+    ( module Widgets.GameControl.LinkForm
     , LinkVisual(..)
     ) where
 
 import Monomer
 
-import Widgets.GameControlLink.LinkForm
+import Widgets.GameControl.LinkForm
 
 data LinkVisual = LinkVisual
     { _linkColor :: Color

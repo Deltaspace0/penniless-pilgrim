@@ -22,7 +22,7 @@ import Data.Default
 import Data.Maybe
 import Monomer
 
-import Widgets.GameControlNode.NodeVisual
+import Widgets.GameControl.NodeVisual
 
 data GameControlCfg s = GameControlCfg
     { _gccDuration :: Maybe Double

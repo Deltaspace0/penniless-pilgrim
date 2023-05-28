@@ -8,7 +8,7 @@ module Widgets.GameControl.ControlledGame
 
 import Common.Direction
 
-class ControlledGame a where
+class (Eq a) => ControlledGame a where
     getCurrentPosition :: a -> (Int, Int)
     getScoreByPosition :: (Int, Int) -> a -> Maybe Double
     moveToDirection :: Direction -> a -> Maybe a

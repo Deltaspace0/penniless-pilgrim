@@ -19,12 +19,12 @@ import Monomer
 
 import Model.Game
 import Model.Parameters.RGB
-import Widgets.GameControlLink hiding
+import Widgets.GameControl.LinkVisual hiding
     ( LinkDefault
     , LinkBack
     , LinkForward
     )
-import qualified Widgets.GameControlLink as C
+import qualified Widgets.GameControl.LinkVisual as C
 
 data LinkColorConfig = LinkColorConfig
     { _lccDefault :: Color

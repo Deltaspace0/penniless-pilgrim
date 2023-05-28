@@ -55,23 +55,12 @@ library
       Widgets.GameControl
       Widgets.GameControl.ControlledGame
       Widgets.GameControl.GameControlCfg
-      Widgets.GameControl.GameControlData
-      Widgets.GameControl.GameControlRenderer
-      Widgets.GameControl.GameControlState
-      Widgets.GameControlLink
-      Widgets.GameControlLink.LinkData
-      Widgets.GameControlLink.LinkForm
-      Widgets.GameControlLink.LinkRenderer
-      Widgets.GameControlLink.LinkState
-      Widgets.GameControlLink.LinkVisual
-      Widgets.GameControlNode
-      Widgets.GameControlNode.NodeData
-      Widgets.GameControlNode.NodeMessage
-      Widgets.GameControlNode.NodeRenderer
-      Widgets.GameControlNode.NodeState
-      Widgets.GameControlNode.NodeVisual
-      Widgets.GameControlNode.ShakeState
-      Widgets.GameControlNode.VisualState
+      Widgets.GameControl.GameControlEvent
+      Widgets.GameControl.GameControlModel
+      Widgets.GameControl.LinkForm
+      Widgets.GameControl.LinkVisual
+      Widgets.GameControl.NodeVisual
+      Widgets.GameControl.UI
   other-modules:
       Paths_penniless_pilgrim
   hs-source-dirs:

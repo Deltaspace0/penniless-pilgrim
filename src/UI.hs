@@ -23,7 +23,7 @@ buildUI _ AppModel{..} = widgetTree where
     widgetTree = hstack'
         [ boxCenter $ gameControlM `nodeKey` "mainGrid"
         , separatorLine
-        , side
+        , side `styleBasic` [sizeReqW $ fixedSize 400]
         ] `styleBasic` [padding 32]
     gameControlM = gameControl $ GameControlData
         { _gcdGameLens = gameSaves . currentData
