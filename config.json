@@ -48,8 +48,6 @@
         "change_rate": 10,
         "caption": "Animation duration (in milliseconds)"
     },
-    "game_control_width": 400,
-    "game_control_height": 500,
     "color_config": {
         "game_control_node": {
             "pilgrim": {

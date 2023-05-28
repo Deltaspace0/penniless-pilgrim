@@ -14,8 +14,6 @@ module Model.Parameters
     , nodeToWidthSlider
     , pilgrimStartXSlider
     , pilgrimStartYSlider
-    , gameControlWidth
-    , gameControlHeight
     , colorConfig
     , gameFromParameters
     , parametersFromGame
@@ -38,8 +36,6 @@ data Parameters = Parameters
     , _apNodeToWidthSlider :: ConfigSlider
     , _apPilgrimStartXSlider :: ConfigSlider
     , _apPilgrimStartYSlider :: ConfigSlider
-    , _apGameControlWidth :: Double
-    , _apGameControlHeight :: Double
     , _apColorConfig :: ColorConfig
     } deriving (Eq, Show)
 
@@ -96,8 +92,6 @@ instance Default Parameters where
             , _csChangeRate = 1
             , _csCaption = "Pilgrim start position Y"
             }
-        , _apGameControlWidth = 400
-        , _apGameControlHeight = 500
         , _apColorConfig = def
         }
 
@@ -110,8 +104,6 @@ instance FromJSON Parameters where
         <*> v .:? "node_to_width_slider" .!= _apNodeToWidthSlider
         <*> v .:? "pilgrim_start_x" .!= _apPilgrimStartXSlider
         <*> v .:? "pilgrim_start_y" .!= _apPilgrimStartYSlider
-        <*> v .:? "game_control_width" .!= _apGameControlWidth
-        <*> v .:? "game_control_height" .!= _apGameControlHeight
         <*> v .:? "color_config" .!= _apColorConfig where
             Parameters{..} = def
 
@@ -124,8 +116,6 @@ instance ToJSON Parameters where
         , "node_to_width_slider" .= _apNodeToWidthSlider
         , "pilgrim_start_x" .= _apPilgrimStartXSlider
         , "pilgrim_start_y" .= _apPilgrimStartYSlider
-        , "game_control_width" .= _apGameControlWidth
-        , "game_control_height" .= _apGameControlHeight
         , "color_config" .= _apColorConfig
         ]
 

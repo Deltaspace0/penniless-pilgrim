@@ -32,8 +32,6 @@ buildUI _ AppModel{..} = widgetTree where
             [ duration $ fp _apGridAnimationSlider
             , gameLinkToNodeRatio $ fp _apLinkToNodeSlider
             , gameNodeToWidthRatio $ fp _apNodeToWidthSlider
-            , gameMinWidth _apGameControlWidth
-            , gameMinHeight _apGameControlHeight
             , gameDefaultNodeVisual $ defaultVisual _apColorConfig
             , gameNextScoreField nextTax
             ]
