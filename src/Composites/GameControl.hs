@@ -45,7 +45,9 @@ gameControl GameControlData{..} = node where
         ]
     mergeHandler _ parentModel oldModel newModel = model where
         model = newModel
-            { _gcmControlledGame = game
+            { _gcmControlledGame = if sameGame
+                then _gcmControlledGame oldModel
+                else game
             , _gcmPreviewGame = if sameGame
                 then _gcmPreviewGame oldModel
                 else Nothing
