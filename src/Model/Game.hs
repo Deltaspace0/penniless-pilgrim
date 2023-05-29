@@ -47,6 +47,7 @@ instance ToJSON Game where
 instance ControlledGame Game where
     getCurrentPosition = _position . _pilgrim
     getScoreByPosition = taxFromGame
+    getPreviousPositions = fmap fst . _path . _pilgrim
     moveToDirection = movePilgrim
     moveToPosition = jumpPilgrim
 

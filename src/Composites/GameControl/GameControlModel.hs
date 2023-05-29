@@ -16,6 +16,8 @@ import Composites.GameControl.NodeVisual
 data GameControlModel a = GameControlModel
     { _gcmControlledGame :: Maybe a
     , _gcmPreviewGame :: Maybe a
+    , _gcmBackupGame :: Maybe a
+    , _gcmReplaySequence :: [(Int, Int)]
     , _gcmShakeNode :: Maybe (Int, Int)
     , _gcmDuration :: Maybe Double
     , _gcmLinkNode :: Maybe Double
@@ -23,10 +25,12 @@ data GameControlModel a = GameControlModel
     , _gcmVisual :: Maybe NodeVisual
     } deriving Eq
 
-initGameControlModel :: GameControlCfg s -> GameControlModel a
+initGameControlModel :: GameControlCfg s e -> GameControlModel a
 initGameControlModel config = GameControlModel
     { _gcmControlledGame = Nothing
     , _gcmPreviewGame = Nothing
+    , _gcmBackupGame = Nothing
+    , _gcmReplaySequence = []
     , _gcmShakeNode = Nothing
     , _gcmDuration = _gccDuration config
     , _gcmLinkNode = _gccLinkNode config

@@ -14,6 +14,7 @@ module Model.AppModel
     , gameSavesPath
     , parametersPath
     , nextTax
+    , replaying
     , initModel
     , gameSavesCaptionMethod
     ) where
@@ -38,6 +39,7 @@ data AppModel = AppModel
     , _appGameSavesPath :: Maybe String
     , _appParametersPath :: Maybe String
     , _appNextTax :: Maybe Double
+    , _appReplaying :: Bool
     } deriving Eq
 
 makeLensesWith abbreviatedFields 'AppModel
@@ -56,6 +58,7 @@ initModel configPath gamesPath = do
         , _appGameSavesPath = gamesPath
         , _appParametersPath = configPath
         , _appNextTax = Nothing
+        , _appReplaying = False
         }
 
 gameSavesCaptionMethod :: Game -> ZonedTime -> Text

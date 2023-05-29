@@ -5,6 +5,7 @@ module Composites.GameControl
     , module Composites.GameControl.GameControlCfg
     , module Composites.GameControl.LinkVisual
     , module Composites.GameControl.NodeVisual
+    , GameControlEvent(EventSetReplay)
     , GameControlData(..)
     , gameControl
     ) where
@@ -22,15 +23,15 @@ import Composites.GameControl.LinkVisual
 import Composites.GameControl.NodeVisual
 import Composites.GameControl.UI
 
-data GameControlData s a = GameControlData
+data GameControlData s e a = GameControlData
     { _gcdGameLens :: ALens' s a
     , _gcdGetVisualGrid :: a -> Grid NodeVisual LinkVisual
-    , _gcdConfig :: GameControlCfg s
+    , _gcdConfig :: GameControlCfg s e
     }
 
 gameControl
     :: (Typeable s, Typeable e, Typeable a, ControlledGame a)
-    => GameControlData s a
+    => GameControlData s e a
     -> WidgetNode s e
 gameControl GameControlData{..} = node where
     node = compositeD_ wt wdata uiBuilder eventHandler cmpConfigs
@@ -45,12 +46,16 @@ gameControl GameControlData{..} = node where
     mergeHandler _ parentModel oldModel newModel = model where
         model = newModel
             { _gcmControlledGame = game
-            , _gcmPreviewGame = newPreview
+            , _gcmPreviewGame = if sameGame
+                then _gcmPreviewGame oldModel
+                else Nothing
+            , _gcmBackupGame = game
+            , _gcmReplaySequence = if sameGame
+                then _gcmReplaySequence oldModel
+                else []
             , _gcmShakeNode = _gcmShakeNode oldModel
             }
-        newPreview = if game == _gcmControlledGame oldModel
-            then _gcmPreviewGame oldModel
-            else Nothing
+        sameGame = game == _gcmBackupGame oldModel
         game = Just $ getGame parentModel
     getGame = flip widgetDataGet field
     field = WidgetLens _gcdGameLens

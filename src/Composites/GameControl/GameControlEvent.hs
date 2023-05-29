@@ -3,6 +3,8 @@ module Composites.GameControl.GameControlEvent
     , handleEvent
     ) where
 
+import Control.Concurrent
+import Control.Monad
 import Data.Maybe
 import Monomer
 
@@ -18,16 +20,18 @@ data GameControlEvent
     | EventStopShake
     | EventPreview (Int, Int)
     | EventResetPreview
+    | EventSetReplay Bool
+    | EventReplayStep
     deriving (Eq, Show)
 
 type EventHandle sp ep a
-    =  (GameControlCfg sp)
+    =  (GameControlCfg sp ep)
     -> (GameControlModel a)
     -> [EventResponse (GameControlModel a) GameControlEvent sp ep]
 
 handleEvent
     :: (ControlledGame a)
-    => GameControlCfg sp
+    => GameControlCfg sp ep
     -> WidgetData sp a
     -> EventHandler (GameControlModel a) GameControlEvent sp ep
 handleEvent config field _ _ model event = case event of
@@ -37,6 +41,8 @@ handleEvent config field _ _ model event = case event of
     EventStopShake -> stopShakeHandle config model
     EventPreview p -> previewHandle p config model
     EventResetPreview -> resetPreviewHandle config model
+    EventSetReplay v -> setReplayHandle v config model
+    EventReplayStep -> replayStepHandle config model
 
 setScoreHandle :: Maybe Double -> EventHandle sp ep a
 setScoreHandle score config _ = response where
@@ -93,3 +99,36 @@ resetPreviewHandle _ model = response where
     newModel = model
         { _gcmPreviewGame = Nothing
         }
+
+setReplayHandle :: (ControlledGame a) => Bool -> EventHandle sp ep a
+setReplayHandle start _ model = response where
+    response = [Model newModel] <> [Event EventReplayStep | start]
+    newModel = if start
+        then model
+            { _gcmControlledGame = startGame
+            , _gcmReplaySequence = replaySequence
+            }
+        else model
+            { _gcmControlledGame = _gcmBackupGame model
+            , _gcmReplaySequence = []
+            }
+    startGame = foldM (flip moveToPosition) game path
+    replaySequence = tail $ reverse $ (getCurrentPosition game):path
+    path = getPreviousPositions game
+    game = fromJust $ _gcmControlledGame model
+
+replayStepHandle :: (ControlledGame a) => EventHandle sp ep a
+replayStepHandle config model = response where
+    response = if null replaySequence
+        then Report <$> _gccOnReplayed config
+        else
+            [ Model newModel
+            , Task $ threadDelay 100000 >> pure EventReplayStep
+            ]
+    newModel = model
+        { _gcmControlledGame = moveToPosition p game
+        , _gcmReplaySequence = tail replaySequence
+        }
+    p = head replaySequence
+    game = fromJust $ _gcmControlledGame model
+    replaySequence = _gcmReplaySequence model

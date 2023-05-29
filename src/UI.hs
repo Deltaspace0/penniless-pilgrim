@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module UI
@@ -33,6 +34,7 @@ buildUI _ AppModel{..} = widgetTree where
             , gameNodeToWidthRatio $ fp _apNodeToWidthSlider
             , gameDefaultNodeVisual $ defaultVisual _apColorConfig
             , gameNextScoreField nextTax
+            , gameOnReplayed $ AppSetReplay False
             ]
         }
     side = case _appActiveMenu of
@@ -54,16 +56,24 @@ buildUI _ AppModel{..} = widgetTree where
     sideWidgets =
         [ bigNumberLabel totalTax "Total tax: "
         , bigNumberLabel _appNextTax "Next tax: "
-        , boxCenter $ hstack' $
-            [ button "Reset" $ AppSetGame _appInitGame
-            , optionButton "Save/load game" gameSavesMenu activeMenu
-            , optionButton "Config" configMenu activeMenu
-            ] <> [hideButton | not $ null _appActiveMenu]
+        , boxCenter $ vstack' $
+            [ hgrid_ [childSpacing_ 32]
+                [ button "Reset" $ AppSetGame _appInitGame
+                , if _appReplaying
+                    then button "Stop replay" $ AppSetReplay False
+                    else button "Replay" $ AppSetReplay True
+                ]
+            , separatorLine
+            , menuButtons
+            ]
         ]
+    menuButtons = hgrid_ [childSpacing_ 32]
+        [ optionButton' "Save/load game" $ Just GameSavesMenu
+        , optionButton' "Config" $ Just ConfigMenu
+        ]
+    optionButton' c v = optionButton_ c v activeMenu
+        [onClick AppHideMenu | v == _appActiveMenu]
     totalTax = Just $ _tax $ _pilgrim $ _appGameSaves ^. currentData
-    gameSavesMenu = Just GameSavesMenu
-    configMenu = Just ConfigMenu
-    hideButton = optionButton "Hide" Nothing activeMenu
     Parameters{..} = _appParameters
     fp = view currentValue
 
