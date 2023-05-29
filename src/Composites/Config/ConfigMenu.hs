@@ -5,7 +5,7 @@ module Composites.Config.ConfigMenu
 data ConfigMenu
     = MainMenu
     | StartPosMenu
-    | ColorMenu
+    | AppearanceMenu
     | NodeColorMenu
     | NodeDefaultColorMenu
     | NodePilgrimColorMenu

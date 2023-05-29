@@ -19,8 +19,10 @@ buildUI :: UIBuilder ConfigModel ConfigEvent
 buildUI _ model@(ConfigModel{..}) = widgetTree where
     widgetTree = zstack
         [ vstack'
-            [ button "Save config to file" ConfigSave
-            , button "Load config from file" ConfigLoad
+            [ hgrid'
+                [ button "Save config" ConfigSave
+                , button "Load config" ConfigLoad
+                ]
             , vscroll_ [wheelRate 20] paddedConfigMenu
             ]
         , widgetMaybe _cfgAlertMessage createAlert
@@ -31,10 +33,8 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
             [ configSlider_ model gridColumnsSlider [reportEvent]
             , configSlider_ model gridRowsSlider [reportEvent]
             , configSlider model gridAnimationSlider
-            , configSlider model linkToNodeSlider
-            , configSlider model nodeToWidthSlider
             , button "Start position" $ ConfigGoto StartPosMenu
-            , button "Colors" $ ConfigGoto ColorMenu
+            , button "Appearance" $ ConfigGoto AppearanceMenu
             ]
         StartPosMenu ->
             [ separatorLine
@@ -44,83 +44,92 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
             , configSlider_ model pilgrimStartXSlider [reportEvent]
             , configSlider_ model pilgrimStartYSlider [reportEvent]
             ]
-        ColorMenu ->
+        AppearanceMenu ->
             [ separatorLine
             , button "Go back" $ ConfigGoto MainMenu
             , separatorLine
+            , configSlider model linkToNodeSlider
+            , configSlider model nodeToWidthSlider
+            , separatorLine
             , label "Change colors"
-            , button "Node colors" $ ConfigGoto NodeColorMenu
-            , button "Link colors" $ ConfigGoto LinkColorMenu
+            , hgrid'
+                [ button "Node colors" $ ConfigGoto NodeColorMenu
+                , button "Link colors" $ ConfigGoto LinkColorMenu
+                ]
             ]
         NodeColorMenu ->
             [ separatorLine
-            , button "Go back" $ ConfigGoto ColorMenu
+            , button "Go back" $ ConfigGoto AppearanceMenu
             , separatorLine
             , label "Change node colors"
-            , button "Default" $ ConfigGoto NodeDefaultColorMenu
-            , button "Pilgrim" $ ConfigGoto NodePilgrimColorMenu
-            , button "Path" $ ConfigGoto NodePathColorMenu
-            , button "Goal" $ ConfigGoto NodeGoalColorMenu
+            , hgrid'
+                [ button "Default" $ ConfigGoto NodeDefaultColorMenu
+                , button "Pilgrim" $ ConfigGoto NodePilgrimColorMenu
+                ]
+            , hgrid'
+                [ button "Path" $ ConfigGoto NodePathColorMenu
+                , button "Goal" $ ConfigGoto NodeGoalColorMenu
+                ]
             ]
         NodeDefaultColorMenu ->
             [ separatorLine
             , button "Go back" $ ConfigGoto NodeColorMenu
             , separatorLine
             , label "Change default node colors"
-            , label "Highlight color:"
-            , colorPicker' $ field . nodeHighlight
             , label "Default color:"
             , colorPicker' $ field . nodeDefault
             , label "Hover color:"
             , colorPicker' $ field . nodeHover
             , label "Active color:"
             , colorPicker' $ field . nodeActive
+            , label "Highlight color:"
+            , colorPicker' $ field . nodeHighlight
             ] where field = nodeField . nccDefault
         NodePilgrimColorMenu ->
             [ separatorLine
             , button "Go back" $ ConfigGoto NodeColorMenu
             , separatorLine
             , label "Change pilgrim node colors"
-            , label "Highlight color:"
-            , colorPicker' $ field . nodeHighlight
             , label "Default color:"
             , colorPicker' $ field . nodeDefault
             , label "Hover color:"
             , colorPicker' $ field . nodeHover
             , label "Active color:"
             , colorPicker' $ field . nodeActive
+            , label "Highlight color:"
+            , colorPicker' $ field . nodeHighlight
             ] where field = nodeField . nccPilgrim
         NodePathColorMenu ->
             [ separatorLine
             , button "Go back" $ ConfigGoto NodeColorMenu
             , separatorLine
             , label "Change path node colors"
-            , label "Highlight color:"
-            , colorPicker' $ field . nodeHighlight
             , label "Default color:"
             , colorPicker' $ field . nodeDefault
             , label "Hover color:"
             , colorPicker' $ field . nodeHover
             , label "Active color:"
             , colorPicker' $ field . nodeActive
+            , label "Highlight color:"
+            , colorPicker' $ field . nodeHighlight
             ] where field = nodeField . nccPath
         NodeGoalColorMenu ->
             [ separatorLine
             , button "Go back" $ ConfigGoto NodeColorMenu
             , separatorLine
             , label "Change goal node colors"
-            , label "Highlight color:"
-            , colorPicker' $ field . nodeHighlight
             , label "Default color:"
             , colorPicker' $ field . nodeDefault
             , label "Hover color:"
             , colorPicker' $ field . nodeHover
             , label "Active color:"
             , colorPicker' $ field . nodeActive
+            , label "Highlight color:"
+            , colorPicker' $ field . nodeHighlight
             ] where field = nodeField . nccGoal
         LinkColorMenu ->
             [ separatorLine
-            , button "Go back" $ ConfigGoto ColorMenu
+            , button "Go back" $ ConfigGoto AppearanceMenu
             , separatorLine
             , label "Change link colors"
             , label "Default color:"
@@ -146,6 +155,7 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
     nodeField = colorConfig . ccGameControlNode
     linkField = colorConfig . ccGameControlLink
     vstack' = vstack_ [childSpacing_ 16]
+    hgrid' = hgrid_ [childSpacing_ 16]
     reportEvent = ConfigReportGameChange
     createAlert = (flip alertMsg) $ ConfigSetMessage Nothing
 
