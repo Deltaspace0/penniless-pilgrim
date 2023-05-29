@@ -6,6 +6,7 @@ module Composites.GameControl.GameControlCfg
     , gameNodeToWidthRatio
     , gameDefaultNodeVisual
     , gameNextScoreField
+    , gameReplayStepDuration
     , gameOnReplayed
     ) where
 
@@ -22,6 +23,7 @@ data GameControlCfg s e = GameControlCfg
     , _gccNodeWidth :: Maybe Double
     , _gccVisual :: Maybe NodeVisual
     , _gccNextScore :: Maybe (ALens' s (Maybe Double))
+    , _gccReplay :: Maybe Double
     , _gccOnReplayed :: [e]
     }
 
@@ -32,6 +34,7 @@ instance Default (GameControlCfg s e) where
         , _gccNodeWidth = Nothing
         , _gccVisual = Nothing
         , _gccNextScore = Nothing
+        , _gccReplay = Nothing
         , _gccOnReplayed = []
         }
 
@@ -42,6 +45,7 @@ instance Semigroup (GameControlCfg s e) where
         , _gccNodeWidth = _gccNodeWidth gc2 <|> _gccNodeWidth gc1
         , _gccVisual = _gccVisual gc2 <|> _gccVisual gc1
         , _gccNextScore = _gccNextScore gc2 <|> _gccNextScore gc1
+        , _gccReplay = _gccReplay gc2 <|> _gccReplay gc1
         , _gccOnReplayed = _gccOnReplayed gc1 <> _gccOnReplayed gc2
         }
 
@@ -71,6 +75,11 @@ gameDefaultNodeVisual v = def
 gameNextScoreField :: ALens' s (Maybe Double) -> GameControlCfg s e
 gameNextScoreField v = def
     { _gccNextScore = Just v
+    }
+
+gameReplayStepDuration :: Double -> GameControlCfg s e
+gameReplayStepDuration dur = def
+    { _gccReplay = Just dur
     }
 
 gameOnReplayed :: e -> GameControlCfg s e

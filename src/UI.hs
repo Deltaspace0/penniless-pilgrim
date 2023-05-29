@@ -35,6 +35,7 @@ buildUI _ AppModel{..} = widgetTree where
             , gameDefaultNodeVisual $ defaultVisual _apColorConfig
             , gameNextScoreField nextTax
             , gameOnReplayed $ AppSetReplay False
+            , gameReplayStepDuration $ fp _apGridReplaySlider
             ]
         }
     side = case _appActiveMenu of

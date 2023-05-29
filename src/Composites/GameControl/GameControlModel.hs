@@ -2,6 +2,7 @@ module Composites.GameControl.GameControlModel
     ( GameControlModel(..)
     , initGameControlModel
     , getAnimationDuration
+    , getReplayDuration
     , getLinkToNodeRatio
     , getNodeToWidthRatio
     , getDefaultNodeVisual
@@ -20,6 +21,7 @@ data GameControlModel a = GameControlModel
     , _gcmReplaySequence :: [(Int, Int)]
     , _gcmShakeNode :: Maybe (Int, Int)
     , _gcmDuration :: Maybe Double
+    , _gcmReplayDuration :: Maybe Double
     , _gcmLinkNode :: Maybe Double
     , _gcmNodeWidth :: Maybe Double
     , _gcmVisual :: Maybe NodeVisual
@@ -33,6 +35,7 @@ initGameControlModel config = GameControlModel
     , _gcmReplaySequence = []
     , _gcmShakeNode = Nothing
     , _gcmDuration = _gccDuration config
+    , _gcmReplayDuration = _gccReplay config
     , _gcmLinkNode = _gccLinkNode config
     , _gcmNodeWidth = _gccNodeWidth config
     , _gcmVisual = _gccVisual config
@@ -40,6 +43,9 @@ initGameControlModel config = GameControlModel
 
 getAnimationDuration :: GameControlModel a -> Double
 getAnimationDuration model = fromMaybe 300 $ _gcmDuration model
+
+getReplayDuration :: GameControlModel a -> Double
+getReplayDuration model = fromMaybe 100 $ _gcmReplayDuration model
 
 getLinkToNodeRatio :: GameControlModel a -> Double
 getLinkToNodeRatio model = fromMaybe 5 $ _gcmLinkNode model

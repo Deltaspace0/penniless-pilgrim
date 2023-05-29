@@ -34,6 +34,13 @@
         "change_rate": 1,
         "caption": "Rows"
     },
+    "grid_replay_slider": {
+        "min": 10,
+        "max": 1000,
+        "default": 100,
+        "change_rate": 10,
+        "caption": "Replay step duration (in milliseconds)"
+    },
     "grid_columns_slider": {
         "min": 2,
         "max": 32,

@@ -10,6 +10,7 @@ module Model.Parameters
     , gridColumnsSlider
     , gridRowsSlider
     , gridAnimationSlider
+    , gridReplaySlider
     , linkToNodeSlider
     , nodeToWidthSlider
     , pilgrimStartXSlider
@@ -32,6 +33,7 @@ data Parameters = Parameters
     { _apGridColumnsSlider :: ConfigSlider
     , _apGridRowsSlider :: ConfigSlider
     , _apGridAnimationSlider :: ConfigSlider
+    , _apGridReplaySlider :: ConfigSlider
     , _apLinkToNodeSlider :: ConfigSlider
     , _apNodeToWidthSlider :: ConfigSlider
     , _apPilgrimStartXSlider :: ConfigSlider
@@ -63,6 +65,13 @@ instance Default Parameters where
             , _csMax = 1000
             , _csChangeRate = 10
             , _csCaption = "Animation duration (in milliseconds)"
+            }
+        , _apGridReplaySlider = ConfigSlider
+            { _csCurrent = 100
+            , _csMin = 10
+            , _csMax = 1000
+            , _csChangeRate = 10
+            , _csCaption = "Replay step duration (in milliseconds)"
             }
         , _apLinkToNodeSlider = ConfigSlider
             { _csCurrent = 5
@@ -100,6 +109,7 @@ instance FromJSON Parameters where
         <$> v .:? "grid_columns_slider" .!= _apGridColumnsSlider
         <*> v .:? "grid_rows_slider" .!= _apGridRowsSlider
         <*> v .:? "grid_animation_slider" .!= _apGridAnimationSlider
+        <*> v .:? "grid_replay_slider" .!= _apGridReplaySlider
         <*> v .:? "link_to_node_slider" .!= _apLinkToNodeSlider
         <*> v .:? "node_to_width_slider" .!= _apNodeToWidthSlider
         <*> v .:? "pilgrim_start_x" .!= _apPilgrimStartXSlider
@@ -112,6 +122,7 @@ instance ToJSON Parameters where
         [ "grid_columns_slider" .= _apGridColumnsSlider
         , "grid_rows_slider" .= _apGridRowsSlider
         , "grid_animation_slider" .= _apGridAnimationSlider
+        , "grid_replay_slider" .= _apGridReplaySlider
         , "link_to_node_slider" .= _apLinkToNodeSlider
         , "node_to_width_slider" .= _apNodeToWidthSlider
         , "pilgrim_start_x" .= _apPilgrimStartXSlider

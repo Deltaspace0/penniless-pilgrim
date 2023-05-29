@@ -123,7 +123,7 @@ replayStepHandle config model = response where
         then Report <$> _gccOnReplayed config
         else
             [ Model newModel
-            , Task $ threadDelay 100000 >> pure EventReplayStep
+            , Task $ threadDelay delay >> pure EventReplayStep
             ]
     newModel = model
         { _gcmControlledGame = moveToPosition p game
@@ -132,3 +132,4 @@ replayStepHandle config model = response where
     p = head replaySequence
     game = fromJust $ _gcmControlledGame model
     replaySequence = _gcmReplaySequence model
+    delay = round $ 1000*(getReplayDuration model)

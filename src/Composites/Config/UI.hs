@@ -32,9 +32,17 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
         MainMenu ->
             [ configSlider_ model gridColumnsSlider [reportEvent]
             , configSlider_ model gridRowsSlider [reportEvent]
-            , configSlider model gridAnimationSlider
+            , button "Animation" $ ConfigGoto AnimationMenu
             , button "Start position" $ ConfigGoto StartPosMenu
             , button "Appearance" $ ConfigGoto AppearanceMenu
+            ]
+        AnimationMenu ->
+            [ separatorLine
+            , button "Go back" $ ConfigGoto MainMenu
+            , separatorLine
+            , label "Change animation configs"
+            , configSlider model gridAnimationSlider
+            , configSlider model gridReplaySlider
             ]
         StartPosMenu ->
             [ separatorLine
