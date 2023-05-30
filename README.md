@@ -14,6 +14,8 @@
 - Pilgrim can be returned to any previous position.
 - Next tax shows when hovering over node if pilgrim can be moved there.
 - Grid can be resized to have different dimensions other than 5x5.
+- Grid can be zoomed and dragged by mouse.
+- Pilgrim path can be replayed.
 - Interface can be customized via [config.json](config.json).
 - Config can be saved and loaded from file.
 - Games can also be saved and loaded from file ([games.json](games.json)).
