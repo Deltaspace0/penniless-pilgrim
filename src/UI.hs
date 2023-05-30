@@ -27,7 +27,6 @@ buildUI _ AppModel{..} = widgetTree where
         ] `styleBasic` [padding 32]
     gameControlM = gameControl $ GameControlData
         { _gcdGameLens = gameSaves . currentData
-        , _gcdGetVisualGrid = flip transformGrid _apColorConfig
         , _gcdConfig = mconcat
             [ duration $ fp _apGridAnimationSlider
             , gameLinkToNodeRatio $ fp _apLinkToNodeSlider
@@ -36,6 +35,7 @@ buildUI _ AppModel{..} = widgetTree where
             , gameNextScoreField nextTax
             , gameOnReplayed $ AppSetReplay False
             , gameReplayStepDuration $ fp _apGridReplaySlider
+            , gameColors _apColorConfig
             ]
         }
     side = case _appActiveMenu of

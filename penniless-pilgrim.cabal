@@ -38,6 +38,7 @@ library
       Composites.Config.UI
       Composites.GameControl
       Composites.GameControl.ControlledGame
+      Composites.GameControl.ControlledGameColors
       Composites.GameControl.GameControlCfg
       Composites.GameControl.GameControlEvent
       Composites.GameControl.GameControlModel

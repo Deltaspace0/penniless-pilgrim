@@ -9,7 +9,6 @@ module Model.Parameters.ColorConfig
     , ccGameControlLink
     , ccGameControlNode
     , defaultVisual
-    , transformGrid
     ) where
 
 import Control.Lens hiding ((.=))
@@ -43,12 +42,12 @@ instance ToJSON ColorConfig where
         , "game_control_node" .= _ccGameControlNode
         ]
 
+instance ControlledGameColors Game ColorConfig where
+    getVisualGrid ColorConfig{..} Game{..} = newGrid where
+        newGrid = gridMap nt ht vt _grid 
+        nt = nodeTransform _ccGameControlNode
+        ht = hlinkTransform _ccGameControlLink
+        vt = vlinkTransform _ccGameControlLink
+
 defaultVisual :: ColorConfig -> NodeVisual
 defaultVisual = colorsToVisual . _nccDefault . _ccGameControlNode
-
-transformGrid :: Game -> ColorConfig -> Grid NodeVisual LinkVisual
-transformGrid Game{..} ColorConfig{..} = newGrid where
-    newGrid = gridMap nt ht vt _grid 
-    nt = nodeTransform _ccGameControlNode
-    ht = hlinkTransform _ccGameControlLink
-    vt = vlinkTransform _ccGameControlLink

@@ -2,6 +2,7 @@
 
 module Composites.GameControl
     ( module Composites.GameControl.ControlledGame
+    , module Composites.GameControl.ControlledGameColors
     , module Composites.GameControl.GameControlCfg
     , module Composites.GameControl.LinkVisual
     , module Composites.GameControl.NodeVisual
@@ -14,8 +15,8 @@ import Control.Lens
 import Data.Typeable
 import Monomer
 
-import Common.Grid
 import Composites.GameControl.ControlledGame
+import Composites.GameControl.ControlledGameColors
 import Composites.GameControl.GameControlCfg
 import Composites.GameControl.GameControlEvent
 import Composites.GameControl.GameControlModel
@@ -23,21 +24,25 @@ import Composites.GameControl.LinkVisual
 import Composites.GameControl.NodeVisual
 import Composites.GameControl.UI
 
-data GameControlData s e a = GameControlData
+data GameControlData s e a b = GameControlData
     { _gcdGameLens :: ALens' s a
-    , _gcdGetVisualGrid :: a -> Grid NodeVisual LinkVisual
-    , _gcdConfig :: GameControlCfg s e
+    , _gcdConfig :: GameControlCfg s e b
     }
 
 gameControl
-    :: (Typeable s, Typeable e, Typeable a, ControlledGame a)
-    => GameControlData s e a
+    :: ( Typeable s
+       , Typeable e
+       , Typeable a
+       , Typeable b
+       , ControlledGame a
+       , ControlledGameColors a b
+       )
+    => GameControlData s e a b
     -> WidgetNode s e
 gameControl GameControlData{..} = node where
-    node = compositeD_ wt wdata uiBuilder eventHandler cmpConfigs
+    node = compositeD_ wt wdata buildUI eventHandler cmpConfigs
     wt = "gameControl"
     wdata = WidgetValue $ initGameControlModel _gcdConfig
-    uiBuilder = buildUI _gcdGetVisualGrid
     eventHandler = handleEvent _gcdConfig field
     cmpConfigs =
         [ compositeMergeEvents $ \_ _ _ _ _ _ -> [EventStopShake]

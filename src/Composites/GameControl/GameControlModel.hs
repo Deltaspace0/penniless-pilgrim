@@ -14,7 +14,7 @@ import Monomer
 import Composites.GameControl.GameControlCfg
 import Composites.GameControl.NodeVisual
 
-data GameControlModel a = GameControlModel
+data GameControlModel a b = GameControlModel
     { _gcmControlledGame :: Maybe a
     , _gcmPreviewGame :: Maybe a
     , _gcmBackupGame :: Maybe a
@@ -25,9 +25,10 @@ data GameControlModel a = GameControlModel
     , _gcmLinkNode :: Maybe Double
     , _gcmNodeWidth :: Maybe Double
     , _gcmVisual :: Maybe NodeVisual
+    , _gcmColors :: Maybe b
     } deriving Eq
 
-initGameControlModel :: GameControlCfg s e -> GameControlModel a
+initGameControlModel :: GameControlCfg s e b -> GameControlModel a b
 initGameControlModel config = GameControlModel
     { _gcmControlledGame = Nothing
     , _gcmPreviewGame = Nothing
@@ -39,21 +40,22 @@ initGameControlModel config = GameControlModel
     , _gcmLinkNode = _gccLinkNode config
     , _gcmNodeWidth = _gccNodeWidth config
     , _gcmVisual = _gccVisual config
+    , _gcmColors = _gccColors config
     }
 
-getAnimationDuration :: GameControlModel a -> Double
+getAnimationDuration :: GameControlModel a b -> Double
 getAnimationDuration model = fromMaybe 300 $ _gcmDuration model
 
-getReplayDuration :: GameControlModel a -> Double
+getReplayDuration :: GameControlModel a b -> Double
 getReplayDuration model = fromMaybe 100 $ _gcmReplayDuration model
 
-getLinkToNodeRatio :: GameControlModel a -> Double
+getLinkToNodeRatio :: GameControlModel a b -> Double
 getLinkToNodeRatio model = fromMaybe 5 $ _gcmLinkNode model
 
-getNodeToWidthRatio :: GameControlModel a -> Double
+getNodeToWidthRatio :: GameControlModel a b -> Double
 getNodeToWidthRatio model = fromMaybe 2 $ _gcmNodeWidth model
 
-getDefaultNodeVisual :: GameControlModel a -> NodeVisual
+getDefaultNodeVisual :: GameControlModel a b -> NodeVisual
 getDefaultNodeVisual model = fromMaybe v $ _gcmVisual model where
     v = NodeVisual
         { _nodeColorHighlight = black

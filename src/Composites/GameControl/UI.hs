@@ -9,6 +9,7 @@ import Data.Foldable
 import Data.Maybe
 import Data.Sequence ((><))
 import Data.Tuple
+import Data.Typeable
 import Monomer
 import Monomer.Graph
 import TextShow
@@ -17,17 +18,20 @@ import qualified Monomer.Lens as L
 
 import Common
 import Composites.GameControl.ControlledGame
+import Composites.GameControl.ControlledGameColors
 import Composites.GameControl.GameControlEvent
 import Composites.GameControl.GameControlModel
 import Composites.GameControl.LinkVisual
 import Composites.GameControl.NodeVisual
 
 buildUI
-    :: (CompositeModel a, ControlledGame a)
-    => (a -> Grid NodeVisual LinkVisual)
-    -> UIBuilder (GameControlModel a) GameControlEvent
-buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
-    uiNode = if null _gcmControlledGame
+    :: ( Typeable a
+       , Typeable b
+       , ControlledGameColors a b
+       )
+    => UIBuilder (GameControlModel a b) GameControlEvent
+buildUI _ model@(GameControlModel{..}) = uiNode where
+    uiNode = if null _gcmControlledGame || null _gcmColors
         then spacer
         else node
     node = keystroke keyEvents $ focus $ graphWithData_ graphDatas
@@ -165,3 +169,4 @@ buildUI getGrid _ model@(GameControlModel{..}) = uiNode where
     grid = getGrid game
     dur = round $ getAnimationDuration model
     game = fromJust _gcmControlledGame
+    getGrid = getVisualGrid $ fromJust _gcmColors

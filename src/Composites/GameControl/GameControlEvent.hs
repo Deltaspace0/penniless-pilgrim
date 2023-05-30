@@ -24,16 +24,16 @@ data GameControlEvent
     | EventReplayStep
     deriving (Eq, Show)
 
-type EventHandle sp ep a
-    =  (GameControlCfg sp ep)
-    -> (GameControlModel a)
-    -> [EventResponse (GameControlModel a) GameControlEvent sp ep]
+type EventHandle sp ep a b
+    =  (GameControlCfg sp ep b)
+    -> (GameControlModel a b)
+    -> [EventResponse (GameControlModel a b) GameControlEvent sp ep]
 
 handleEvent
     :: (ControlledGame a)
-    => GameControlCfg sp ep
+    => GameControlCfg sp ep b
     -> WidgetData sp a
-    -> EventHandler (GameControlModel a) GameControlEvent sp ep
+    -> EventHandler (GameControlModel a b) GameControlEvent sp ep
 handleEvent config field _ _ model event = case event of
     EventSetScore score -> setScoreHandle score config model
     EventClick p -> gameHandle (Left p) field config model
@@ -44,7 +44,7 @@ handleEvent config field _ _ model event = case event of
     EventSetReplay v -> setReplayHandle v config model
     EventReplayStep -> replayStepHandle config model
 
-setScoreHandle :: Maybe Double -> EventHandle sp ep a
+setScoreHandle :: Maybe Double -> EventHandle sp ep a b
 setScoreHandle score config _ = response where
     response = RequestParent <$> widgetDataSet wdata score
     wdata = fromMaybe (WidgetValue Nothing) wlens
@@ -54,7 +54,7 @@ gameHandle
     :: (ControlledGame a)
     => Either (Int, Int) Direction
     -> WidgetData sp a
-    -> EventHandle sp ep a
+    -> EventHandle sp ep a b
 gameHandle info field _ model = response where
     response = if null nextGame
         then [Model shakeModel]
@@ -69,7 +69,7 @@ gameHandle info field _ model = response where
     game = fromJust $ _gcmControlledGame model
     resetNextScore = Event $ EventSetScore Nothing
 
-stopShakeHandle :: EventHandle sp ep a
+stopShakeHandle :: EventHandle sp ep a b
 stopShakeHandle _ model = [Model newModel] where
     newModel = model
         { _gcmShakeNode = Nothing
@@ -78,7 +78,7 @@ stopShakeHandle _ model = [Model newModel] where
 previewHandle
     :: (ControlledGame a)
     => (Int, Int)
-    -> EventHandle sp ep a
+    -> EventHandle sp ep a b
 previewHandle p _ model = response where
     response =
         [ Model newModel
@@ -90,7 +90,7 @@ previewHandle p _ model = response where
     score = getScoreByPosition p game
     game = fromJust $ _gcmControlledGame model
 
-resetPreviewHandle :: EventHandle sp ep a
+resetPreviewHandle :: EventHandle sp ep a b
 resetPreviewHandle _ model = response where
     response =
         [ Model newModel
@@ -100,7 +100,10 @@ resetPreviewHandle _ model = response where
         { _gcmPreviewGame = Nothing
         }
 
-setReplayHandle :: (ControlledGame a) => Bool -> EventHandle sp ep a
+setReplayHandle
+    :: (ControlledGame a)
+    => Bool
+    -> EventHandle sp ep a b
 setReplayHandle start _ model = response where
     response = [Model newModel] <> [Event EventReplayStep | start]
     newModel = if start
@@ -117,7 +120,7 @@ setReplayHandle start _ model = response where
     path = getPreviousPositions game
     game = fromJust $ _gcmControlledGame model
 
-replayStepHandle :: (ControlledGame a) => EventHandle sp ep a
+replayStepHandle :: (ControlledGame a) => EventHandle sp ep a b
 replayStepHandle config model = response where
     response = if null replaySequence
         then Report <$> _gccOnReplayed config
