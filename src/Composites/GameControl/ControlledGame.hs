@@ -8,8 +8,9 @@ module Composites.GameControl.ControlledGame
     ) where
 
 import Common.Direction
+import Data.Typeable
 
-class (Eq a) => ControlledGame a where
+class (Eq a, Typeable a) => ControlledGame a where
     getCurrentPosition :: a -> (Int, Int)
     getScoreByPosition :: (Int, Int) -> a -> Maybe Double
     getPreviousPositions :: a -> [(Int, Int)]

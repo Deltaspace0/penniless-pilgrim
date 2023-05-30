@@ -25,19 +25,16 @@ buildUI _ AppModel{..} = widgetTree where
         , separatorLine
         , side `styleBasic` [sizeReqW $ fixedSize 400]
         ] `styleBasic` [padding 32]
-    gameControlM = gameControl $ GameControlData
-        { _gcdGameLens = gameSaves . currentData
-        , _gcdConfig = mconcat
-            [ duration $ fp _apGridAnimationSlider
-            , gameLinkToNodeRatio $ fp _apLinkToNodeSlider
-            , gameNodeToWidthRatio $ fp _apNodeToWidthSlider
-            , gameDefaultNodeVisual $ defaultVisual _apColorConfig
-            , gameNextScoreField nextTax
-            , gameOnReplayed $ AppSetReplay False
-            , gameReplayStepDuration $ fp _apGridReplaySlider
-            , gameColors _apColorConfig
-            ]
-        }
+    gameControlM = gameControl_ (gameSaves . currentData)
+        [ duration $ fp _apGridAnimationSlider
+        , gameLinkToNodeRatio $ fp _apLinkToNodeSlider
+        , gameNodeToWidthRatio $ fp _apNodeToWidthSlider
+        , gameDefaultNodeVisual $ defaultVisual _apColorConfig
+        , gameNextScoreField nextTax
+        , gameOnReplayed $ AppSetReplay False
+        , gameReplayStepDuration $ fp _apGridReplaySlider
+        , gameColors _apColorConfig
+        ]
     side = case _appActiveMenu of
         Just ConfigMenu -> vstack' $ sideWidgets <>
             [ separatorLine

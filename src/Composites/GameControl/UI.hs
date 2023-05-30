@@ -9,7 +9,6 @@ import Data.Foldable
 import Data.Maybe
 import Data.Sequence ((><))
 import Data.Tuple
-import Data.Typeable
 import Monomer
 import Monomer.Graph
 import TextShow
@@ -25,10 +24,7 @@ import Composites.GameControl.LinkVisual
 import Composites.GameControl.NodeVisual
 
 buildUI
-    :: ( Typeable a
-       , Typeable b
-       , ControlledGameColors a b
-       )
+    :: ControlledGameColors a b
     => UIBuilder (GameControlModel a b) GameControlEvent
 buildUI _ model@(GameControlModel{..}) = uiNode where
     uiNode = if null _gcmControlledGame || null _gcmColors

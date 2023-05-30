@@ -1,4 +1,6 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Composites.GameControl
     ( module Composites.GameControl.ControlledGame
@@ -7,8 +9,8 @@ module Composites.GameControl
     , module Composites.GameControl.LinkVisual
     , module Composites.GameControl.NodeVisual
     , GameControlEvent(EventSetReplay)
-    , GameControlData(..)
     , gameControl
+    , gameControl_
     ) where
 
 import Control.Lens
@@ -24,26 +26,25 @@ import Composites.GameControl.LinkVisual
 import Composites.GameControl.NodeVisual
 import Composites.GameControl.UI
 
-data GameControlData s e a b = GameControlData
-    { _gcdGameLens :: ALens' s a
-    , _gcdConfig :: GameControlCfg s e b
-    }
-
 gameControl
-    :: ( Typeable s
-       , Typeable e
-       , Typeable a
-       , Typeable b
-       , ControlledGame a
-       , ControlledGameColors a b
-       )
-    => GameControlData s e a b
+    :: forall s e a b .
+        (Typeable s, Typeable e, ControlledGameColors a b)
+    => ALens' s a
     -> WidgetNode s e
-gameControl GameControlData{..} = node where
+gameControl field = gameControl_ field configs where
+    configs = [] :: [GameControlCfg s e b]
+
+gameControl_
+    :: (Typeable s, Typeable e, ControlledGameColors a b)
+    => ALens' s a
+    -> [GameControlCfg s e b]
+    -> WidgetNode s e
+gameControl_ field configs = node where
     node = compositeD_ wt wdata buildUI eventHandler cmpConfigs
     wt = "gameControl"
-    wdata = WidgetValue $ initGameControlModel _gcdConfig
-    eventHandler = handleEvent _gcdConfig field
+    wdata = WidgetValue $ initGameControlModel config
+    eventHandler = handleEvent config wlens
+    config = mconcat configs
     cmpConfigs =
         [ compositeMergeEvents $ \_ _ _ _ _ _ -> [EventStopShake]
         , compositeMergeModel mergeHandler
@@ -64,5 +65,5 @@ gameControl GameControlData{..} = node where
             }
         sameGame = game == _gcmBackupGame oldModel
         game = Just $ getGame parentModel
-    getGame = flip widgetDataGet field
-    field = WidgetLens _gcdGameLens
+    getGame = flip widgetDataGet wlens
+    wlens = WidgetLens field
