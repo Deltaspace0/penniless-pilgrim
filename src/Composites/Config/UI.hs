@@ -60,6 +60,8 @@ buildUI _ model@(ConfigModel{..}) = widgetTree where
             , configSlider model nodeToWidthSlider
             , separatorLine
             , label "Change colors"
+            , label "Background"
+            , colorPicker' $ colorConfig . ccGameBackground
             , hgrid'
                 [ button "Node colors" $ ConfigGoto NodeColorMenu
                 , button "Link colors" $ ConfigGoto LinkColorMenu

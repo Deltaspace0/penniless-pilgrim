@@ -37,7 +37,7 @@ buildUI _ model@(GameControlModel{..}) = uiNode where
         , minScale 0.5
         , maxScale 5
         , wheelRate 2
-        ] `styleBasic` [bgColor $ rgb 34 36 42]
+        ] `styleBasic` [bgColor backgroundColor]
     keyEvents =
         [ ("Left", EventDirection West)
         , ("Right", EventDirection East)
@@ -165,4 +165,5 @@ buildUI _ model@(GameControlModel{..}) = uiNode where
     grid = getGrid game
     dur = round $ getAnimationDuration model
     game = fromJust _gcmControlledGame
+    backgroundColor = getBackgroundColor $ fromJust _gcmColors
     getGrid = getVisualGrid $ fromJust _gcmColors
